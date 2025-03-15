@@ -1,0 +1,10 @@
+.sidebar {
+  /* background-color: var(--sidebar-color); */
+  min-width: 280px;
+}
+
+.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+}

@@ -1,0 +1,17 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+}
+
+.section-title {
+  font-size: 1.5em;
+  line-height: 1.33333;
+}
+
+.reports-summary-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

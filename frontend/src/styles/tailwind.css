@@ -1,0 +1,39 @@
+/* Start purging... */
+@tailwind components;
+/* Stop purging. */
+
+/* Your own custom component styles */
+
+/* Start purging... */
+@tailwind utilities;
+/* Stop purging. */
+
+@plugin "daisyui";
+@plugin "@tailwindcss/typography";
+
+@import "tailwindcss";
+
+@layer base {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	} 
+
+	* {
+		margin: 0;
+		padding: 0;
+	}
+
+	html {
+		font-family: sans-serif;
+		color: #333;
+	}
+
+	body {
+		margin: 0;
+		padding: 0;
+		font-family: Verdana, "Dejavu Sans", Geneva, Tahoma, sans-serif;
+		background-color: var(--color-base-200);
+	}
+}

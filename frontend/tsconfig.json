@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {
+      "components/*": ["./src/components/*"],
+      "form-components/*": ["src/components/Form/components/*"],
+      "utils/*": ["./src/utils/*"],
+      "const":  ["./src/const"],
+      "api/*": ["./src/api/*"],
+      "strings": ["./src/strings"],
+      "stores/*": ["./src/stores/*"],
+      "stores": ["./src/stores"],
+      "models/*": ["./src/models/*"],
+      "pages/*": ["./src/pages/*"],
+      "img/*": ["./src/img/*"],
+      "logger": ["./src/logger"],
+    },
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "noImplicitAny": false,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

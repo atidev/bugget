@@ -1,0 +1,20 @@
+.dropdown {
+  flex-grow: 1;
+}
+
+.dropdown-content.menu .user-option {
+  display: flex;
+  flex-direction: row;
+  gap: calc(0.25rem* 2);
+  padding-inline: calc(0.25rem* 2);
+  width: max-content;
+}
+
+.dropdown-content.menu .user-option * {
+  padding-inline: 0;
+}
+
+ul.users-list {
+  width: max-content;
+}
+

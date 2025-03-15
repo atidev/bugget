@@ -1,0 +1,19 @@
+services:
+  redis:
+    container_name: redis_bugget
+    image: redis:latest
+    environment:
+      - REDIS_PASSWORD=dev_password
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=1
+    volumes:
+      - ./redis_data:/root/redis
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G

@@ -1,0 +1,20 @@
+services:
+  postgres:
+    container_name: postgres_bugget
+    build: .
+    image: postgres
+    environment:
+      POSTGRES_DB: "dev_db"
+      POSTGRES_USER: "dev_user"
+      POSTGRES_PASSWORD: "dev_password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G

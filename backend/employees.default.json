@@ -1,0 +1,30 @@
+[
+  {
+    "id": "1",
+    "first_name": "Иванов",
+    "last_name": "Иван",
+    "surname": "Иванович",
+    "notification_user_id": "66xpfgxex2da4p5fn8dx17pcnr"
+  },
+  {
+    "id": "any-ldap-id",
+    "first_name": "Петров",
+    "last_name": "Петр",
+    "surname": "Петрович",
+    "notification_user_id": "67xpfgxex2da4p5fn8dx17pcnr"
+  },
+  {
+    "id": "int",
+    "first_name": "Сергеев",
+    "last_name": "Сергей",
+    "surname": "Сергеевич",
+    "notification_user_id": "68xpfgxex2da4p5fn8dx17pcnr"
+  },
+  {
+    "id": "guid",
+    "first_name": "Алексеев",
+    "last_name": "Алексей",
+    "surname": "Алексеевич",
+    "notification_user_id": "69xpfgxex2da4p5fn8dx17pcnr"
+  }
+]

@@ -1,0 +1,48 @@
+.bug {
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bug-content {
+  display: flex;
+  gap: 10px;
+}
+
+.bug-section {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.attachments {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.comment-input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  /* background-color: #aef3fa; */
+}
+
+.status-btn {
+  /* background: #fff; */
+  border: 1px solid #000;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.select-wrapper {
+  width: 100px;
+}
+
+.bug-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px
+}

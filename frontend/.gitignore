@@ -1,0 +1,8 @@
+/node_modules
+/build
+
+.vscode
+.DS_store
+
+tsconfig.node.tsbuildinfo
+tsconfig.tsbuildinfo
