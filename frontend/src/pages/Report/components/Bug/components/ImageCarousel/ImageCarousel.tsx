@@ -3,6 +3,8 @@ import { useState } from "react";
 import "./ImageCarousel.css";
 import { AttachmentResponse } from "src/types/responses";
 
+const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
+
 type Props = {
   attachments: AttachmentResponse[];
 };
@@ -44,9 +46,7 @@ function ImageCarousel({ attachments }: Props) {
         {attachments.map((attachment, index) => {
           return (
             <img
-              src={`${import.meta.env.VITE_BASE_URL}v1/reports/${
-                attachment.reportId
-              }/bug/${attachment.bugId}/attachments/${attachment.id}/content`}
+              src={`${API_URL}v1/reports/${attachment.reportId}/bug/${attachment.bugId}/attachments/${attachment.id}/content`}
               key={attachment.id}
               alt="attachment"
               className="attachment-icon"
@@ -61,11 +61,7 @@ function ImageCarousel({ attachments }: Props) {
         <div className="modal modal-open" onClick={handleOverlayClick}>
           <div className="modal-box relative w-11/12 max-w-3xl">
             <img
-              src={`${import.meta.env.VITE_BASE_URL}v1/reports/${
-                attachments[activeIndex].reportId
-              }/bug/${attachments[activeIndex].bugId}/attachments/${
-                attachments[activeIndex].id
-              }/content`}
+              src={`${API_URL}v1/reports/${attachments[activeIndex].reportId}/bug/${attachments[activeIndex].bugId}/attachments/${attachments[activeIndex].id}/content`}
               alt="картинка бага"
               className="w-full h-full object-cover"
             />

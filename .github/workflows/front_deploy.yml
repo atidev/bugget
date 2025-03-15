@@ -1,0 +1,35 @@
+---
+#-----------------------------------------------------------------------------------------
+#
+# Публикация bugget-ui
+#
+#-----------------------------------------------------------------------------------------
+
+name: publish frontend
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+jobs:
+  build_and_publish_frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+      - name: Extract version from tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Build
+        run: |
+          cd frontend
+          docker build -t bugget-ui .
+      - name: TAG
+        run: docker tag bugget-ui ${{ secrets.DOCKER_LOGIN }}/bugget-ui:${{ env.VERSION }}
+      - name: Push docker image
+        run: docker push ${{ secrets.DOCKER_LOGIN }}/bugget-ui:${{ env.VERSION }}

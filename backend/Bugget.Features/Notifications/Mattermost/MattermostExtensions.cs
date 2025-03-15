@@ -5,8 +5,8 @@ namespace Bugget.Features.Notifications.Mattermost;
 
 public static class MattermostExtensions
 {
-    private static readonly string? MattermostBaseUrl = Environment.GetEnvironmentVariable(MattermostConstants.MattermostBaseUrlName);
-    private static readonly string? MattermostBotAccessTokenName = Environment.GetEnvironmentVariable(MattermostConstants.MattermostBotAccessTokenName);
+    private static readonly string? MattermostBaseUrl = Environment.GetEnvironmentVariable(MattermostConstants.MattermostBaseUrlKey);
+    private static readonly string? MattermostBotAccessTokenName = Environment.GetEnvironmentVariable(MattermostConstants.MattermostBotAccessTokenKey);
     public static IServiceCollection AddMattermostNotifications(this IServiceCollection services)
     {
         if (string.IsNullOrEmpty(MattermostBaseUrl) || string.IsNullOrEmpty(MattermostBotAccessTokenName))

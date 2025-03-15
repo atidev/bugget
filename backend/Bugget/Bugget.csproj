@@ -14,15 +14,6 @@
     <ItemGroup>
         <ProjectReference Include="..\Bugget.BO\Bugget.BO.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="$(SolutionDir)employees.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-        <Content Include="$(SolutionDir)employees.default.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
     
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
