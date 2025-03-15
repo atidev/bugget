@@ -8,8 +8,10 @@ import {
   mapValues,
 } from "lodash";
 
+const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
+
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
+  baseURL: API_URL,
   timeout: 10000,
 });
 

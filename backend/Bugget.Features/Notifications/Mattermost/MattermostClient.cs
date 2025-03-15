@@ -13,8 +13,8 @@ namespace Bugget.Features.Notifications.Mattermost
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient(MattermostConstants.MattermostHttpClientKey);
 
         private readonly string? _botAccessToken =
-            Environment.GetEnvironmentVariable(MattermostConstants.MattermostBotAccessTokenName)
-            ?? throw new ApplicationException($"Не задан токен mattermost, env=[{MattermostConstants.MattermostBotAccessTokenName}]");
+            Environment.GetEnvironmentVariable(MattermostConstants.MattermostBotAccessTokenKey)
+            ?? throw new ApplicationException($"Не задан токен mattermost, env=[{MattermostConstants.MattermostBotAccessTokenKey}]");
 
         private JsonSerializerOptions _jsonSerializerOptions = new()
         {

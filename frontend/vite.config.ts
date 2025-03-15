@@ -7,7 +7,7 @@ export default defineConfig(() => {
   return {
     build: {
       target: "esnext",
-      outDir: "build",
+      outDir: "dist",
     },
     plugins: [react(), tailwindcss()],
     server: {
