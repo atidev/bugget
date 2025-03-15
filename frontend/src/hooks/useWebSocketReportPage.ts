@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
 
+const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
+
 const useWebSocketReportPage = (
   reportId: number,
   onNewComment: (bugId: number) => void,
@@ -20,7 +22,7 @@ const useWebSocketReportPage = (
       previousReportIdRef.current = reportId;
 
       connectionRef.current = new signalR.HubConnectionBuilder()
-        .withUrl(`${import.meta.env.VITE_BASE_URL}v1/report-page-hub`, {
+        .withUrl(`${API_URL}v1/report-page-hub`, {
           transport: signalR.HttpTransportType.WebSockets,
         })
         .withAutomaticReconnect([0, 2000, 5000, 10000])
