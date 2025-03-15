@@ -1,0 +1,68 @@
+---
+#-----------------------------------------------------------------------------------------
+#
+# Публикация bugget-api и bugget-ui
+#
+#-----------------------------------------------------------------------------------------
+
+name: publish backend or frontend
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      component:
+        description: "Выберите, что деплоить"
+        required: true
+        default: "backend"
+        type: choice
+        options:
+          - backend
+          - frontend
+
+jobs:
+  backend:
+    if: github.event.inputs.component == 'backend' || startsWith(github.ref, 'refs/tags/backend-')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+      - name: Extract version from tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Build Backend
+        run: |
+          cd backend
+          docker build -t bugget-api -f ./Bugget/Dockerfile .
+      - name: TAG Backend
+        run: docker tag bugget-api ${{ secrets.DOCKER_LOGIN }}/bugget-api:${{ env.VERSION }}
+      - name: Push Backend Image
+        run: docker push ${{ secrets.DOCKER_LOGIN }}/bugget-api:${{ env.VERSION }}
+
+  frontend:
+    if: github.event.inputs.component == 'frontend' || startsWith(github.ref, 'refs/tags/frontend-')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+      - name: Extract version from tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Build Frontend
+        run: |
+          cd frontend
+          docker build -t bugget-ui .
+      - name: TAG Frontend
+        run: docker tag bugget-ui ${{ secrets.DOCKER_LOGIN }}/bugget-ui:${{ env.VERSION }}
+      - name: Push Frontend Image
+        run: docker push ${{ secrets.DOCKER_LOGIN }}/bugget-ui:${{ env.VERSION }}
