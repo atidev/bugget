@@ -10,11 +10,6 @@ public static class FeaturesExtensions
     {
         services.AddNotifications();
         
-        // services.AddSingleton<WithoutFeaturesService>();
-        //
-        // services.AddSingleton<IReportCreatePostAction, WithoutFeaturesService>(sp => sp.GetRequiredService<WithoutFeaturesService>());
-        // services.AddSingleton<IReportUpdatePostAction, WithoutFeaturesService>(sp => sp.GetRequiredService<WithoutFeaturesService>());
-        
         services.AddSingleton<FeaturesService>();
         
         return services;
