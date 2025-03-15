@@ -1,10 +1,8 @@
-using Bugget.Features.Notifications.Mattermost;
-
 namespace Bugget.Features.Notifications;
 
 public static class ReportMessageBuilder
 {
-    private static readonly string? BuggetBaseUrl = Environment.GetEnvironmentVariable(MattermostConstants.BuggetBaseUrlKey);
+    private static readonly string? BuggetBaseUrl = Environment.GetEnvironmentVariable(NotificationsConstants.BuggetBaseUrlKey);
 
     public static string GetYourResponsibleInNewReportMessage(int reportId, string reportTitle, string creatorUserFullName)
     {
