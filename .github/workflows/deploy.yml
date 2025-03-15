@@ -21,6 +21,9 @@ on:
         options:
           - backend
           - frontend
+      version:
+        description: "Версия (например, 1.2.3)"
+        required: false
 
 jobs:
   backend:
@@ -34,8 +37,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_LOGIN }}
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
-      - name: Extract version from tag
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Set version
+        run: |
+          if [ -z "${{ github.event.inputs.version }}" ]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          else
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          fi
       - name: Build Backend
         run: |
           cd backend
@@ -56,8 +64,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_LOGIN }}
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
-      - name: Extract version from tag
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Set version
+        run: |
+          if [ -z "${{ github.event.inputs.version }}" ]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          else
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          fi
       - name: Build Frontend
         run: |
           cd frontend
