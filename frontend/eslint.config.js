@@ -23,8 +23,6 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
-      // todo remove
-      "@typescript-eslint/no-explicit-any": "off",
       "max-len": [
         "error",
         { code: 1000, ignoreStrings: true, ignoreUrls: true },
