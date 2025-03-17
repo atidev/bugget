@@ -1,7 +1,8 @@
 import { createEffect, createStore } from "effector";
 import { uploadAttachmentApi } from "../api/attachment";
 import { $initialReportForm } from "./report";
-import { AttachmentResponse } from "src/types/responses";
+import { Attachment } from "@/types/attachement";
+import { Bug } from "@/types/bug";
 
 export const uploadAttachmentFx = createEffect(
   async (params: {
@@ -15,10 +16,10 @@ export const uploadAttachmentFx = createEffect(
 );
 
 export const $attachmentsByBugId = createStore<
-  Record<number, AttachmentResponse[]>
+  Record<number, Attachment[]>
 >({})
   .on($initialReportForm, (_, report) =>
-    report.bugs?.reduce((acc: Record<number, any[]>, bug: any) => {
+    report.bugs?.reduce((acc: Record<number, Attachment[]>, bug: Bug) => {
       acc[bug.id] = bug.attachments || [];
       return acc;
     }, {})

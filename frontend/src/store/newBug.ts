@@ -1,6 +1,6 @@
 import { createStore, createEvent, createEffect, sample } from "effector";
 import { createBugApi } from "../api/bug";
-import { BugCreateRequest } from "src/types/requests";
+import { BugCreateRequest } from "@/types/requests";
 import { createReportFx } from "./report";
 
 export const createBugFx = createEffect(

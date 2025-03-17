@@ -1,22 +1,22 @@
 import { createEffect, createStore, sample } from "effector";
 import { fetchReportsSummary } from "../api/reportsSummary";
 import { $user } from "./user";
-import { ReportResponse } from "src/types/responses";
+import { Report } from "@/types/report";
 
 export const loadReportsFx = createEffect(async () => {
-  const data: ReportResponse[] = await fetchReportsSummary();
+  const data: Report[] = await fetchReportsSummary();
   return data;
 });
 
-export const $responsibleReports = createStore<ReportResponse[]>([]);
+export const $responsibleReports = createStore<Report[]>([]);
 
-export const $participantReports = createStore<ReportResponse[]>([]);
+export const $participantReports = createStore<Report[]>([]);
 
 sample({
   clock: loadReportsFx.doneData,
   source: $user,
-  fn: (user, reports: ReportResponse[]) => {
-    return reports.filter((r: ReportResponse) => r.responsible.id === user?.id);
+  fn: (user, reports: Report[]) => {
+    return reports.filter((r: Report) => r.responsible.id === user?.id);
   },
   target: $responsibleReports,
 });
@@ -24,7 +24,7 @@ sample({
 sample({
   clock: loadReportsFx.doneData,
   source: $user,
-  fn: (user, reports: ReportResponse[]) =>
-    reports.filter((r: ReportResponse) => r.responsible.id !== user?.id),
+  fn: (user, reports: Report[]) =>
+    reports.filter((r: Report) => r.responsible.id !== user?.id),
   target: $participantReports,
 });

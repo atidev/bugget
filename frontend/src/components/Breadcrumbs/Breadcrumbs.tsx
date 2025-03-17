@@ -1,4 +1,4 @@
-import { Breadcrumb } from "src/types/ui";
+import { Breadcrumb } from "@/types/ui";
 
 type Props = {
   breadcrumbs: Breadcrumb[];

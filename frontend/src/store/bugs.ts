@@ -1,9 +1,9 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { createBugFx } from "./newBug";
 import { $initialReportForm } from "./report";
-import { updateBugApi } from "../api/bug";
-import { BugStore } from "../types/stores";
-import { BugUpdateRequest } from "src/types/requests";
+import { updateBugApi } from "@/api/bug";
+import { BugStore } from "@/types/stores";
+import { BugUpdateRequest } from "@/types/requests";
 
 interface UpdateBugParams {
   reportId: number;
