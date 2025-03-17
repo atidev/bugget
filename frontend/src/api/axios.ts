@@ -1,12 +1,6 @@
 import axios from "axios";
-import {
-  camelCase,
-  snakeCase,
-  isArray,
-  isObject,
-  mapKeys,
-  mapValues,
-} from "lodash";
+
+import { convertObjectToCamel, convertObjectToSnake } from "../utils/convertCases";
 
 const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
 
@@ -31,36 +25,11 @@ instance.interceptors.response.use(
   }
 );
 
-// Функция преобразования snake_case → camelCase
-const snakeToCamel = (data: any): any => {
-  if (isArray(data)) {
-    return data.map(snakeToCamel);
-  } else if (isObject(data)) {
-    return mapValues(
-      mapKeys(data, (_, key) => camelCase(key)),
-      snakeToCamel
-    );
-  }
-  return data;
-};
-
-// Функция преобразования camelCase → snake_case
-const camelToSnake = (data: any): any => {
-  if (isArray(data)) {
-    return data.map(camelToSnake);
-  } else if (isObject(data)) {
-    return mapValues(
-      mapKeys(data, (_, key) => snakeCase(key)),
-      camelToSnake
-    );
-  }
-  return data;
-};
 
 // Интерцептор ответа: преобразуем snake_case → camelCase
 instance.interceptors.response.use((response) => {
   if (response.data) {
-    response.data = snakeToCamel(response.data);
+    response.data = convertObjectToCamel(response.data);
   }
   return response;
 });
@@ -69,7 +38,7 @@ instance.interceptors.response.use((response) => {
 instance.interceptors.request.use((config) => {
   if (config.headers["Content-Type"] === "multipart/form-data") return config;
   if (config.data) {
-    config.data = camelToSnake(config.data);
+    config.data = convertObjectToSnake(config.data);
   }
   return config;
 });
