@@ -17,7 +17,7 @@ public sealed class CommentsDbClient: PostgresClient
     /// </summary>
     public async Task<CommentDbModel?> CreateCommentAsync(CommentCreateDbModel commentCreateDbModel)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
 
         var jsonResult = await connection.ExecuteScalarAsync<string>(
             "SELECT public.create_comment(@report_id, @bug_id, @text, @creator_user_id);",
@@ -37,7 +37,7 @@ public sealed class CommentsDbClient: PostgresClient
 
     public async Task<CommentDbModel[]> ListCommentsAsync(int reportId, int bugId)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
         var jsonResults = await connection.QueryAsync<string>(
             "SELECT public.list_comments(@report_id, @bug_id);",
             new { report_id = reportId, bug_id = bugId }

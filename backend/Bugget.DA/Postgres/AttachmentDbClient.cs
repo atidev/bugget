@@ -13,7 +13,7 @@ public class AttachmentDbClient: PostgresClient
 {
     public async Task<AttachmentDbModel?> CreateAttachment(AttachmentDbModel attachmentDbModel)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
 
         var jsonResult = await connection.ExecuteScalarAsync<string>(
             "SELECT public.create_attachment(@BugId, @Path, @AttachType, @CreatedAt)",
@@ -33,7 +33,7 @@ public class AttachmentDbClient: PostgresClient
 
     public async Task<AttachmentDbModel?> GetAttachment(int attachmentId)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
         
         var jsonResult = await connection.ExecuteScalarAsync<string>(
             "SELECT public.get_attachment(@attachmentId)",
@@ -50,7 +50,7 @@ public class AttachmentDbClient: PostgresClient
 
     public async Task DeleteAttachment(int attachmentId)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
         
         await connection.ExecuteScalarAsync<string>(
             "SELECT public.delete_attachment(@attachmentId)",
