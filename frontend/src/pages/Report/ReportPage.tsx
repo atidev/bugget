@@ -60,15 +60,14 @@ const ReportPage = () => {
   }, [reportId]);
 
   useEffect(() => {
-    if (reportId) {
       setBreadcrumbs([
         reportsPageBreadcrumb,
-        { label: `Репорт #${reportId}`, path: `/reports/${reportId}` },
-      ]);
-    } else {
-      setBreadcrumbs([reportsPageBreadcrumb]);
-    }
-  }, [reportId]);
+        isNewReport ?
+          { label: "Новый репорт", path: `/reports`} :
+          { label: `Репорт #${reportId}`, path: `/reports/${reportId}`
+        }
+      ].filter(Boolean));
+  }, [reportId, isNewReport]);
 
   const handleCreateReport = async () => {
     const newReport = await createReportFx({

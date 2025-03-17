@@ -72,11 +72,15 @@ const ReportHeader = () => {
           </div>
         )}
       </div>
+      <fieldset className="flex flex-col justify-between items-start mt-2">
 
+      <label htmlFor="report-title" className="label mt-2 mb-1">
+        <span className="label-text">Описание проблемы</span>
+      </label>
       <textarea
         value={reportForm.title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Проблема в двух словах"
+        placeholder="Описание проблемы в двух словах"
         className="issue-description p-2 rounded-sm textarea textarea-bordered bg-base-200 resize-none focus:ring-1 focus:ring-gray-300 focus:border-gray-400"
         maxLength={255}
         rows={2}
@@ -85,8 +89,12 @@ const ReportHeader = () => {
           minHeight: "3rem", // Минимальная высота, чтобы было 2 строки
         }}
       />
+      </fieldset>
 
-      <fieldset className="flex justify-between items-center">
+      <fieldset className="flex flex-col justify-between items-start mt-2">
+        <label htmlFor="responsible" className="label mb-1">
+          <span className="label-text">Ответственный</span>
+        </label>
         <div className="flex gap-4 items-center">
           <UsersAutosuggest
             onSelect={handleUserSelect}
