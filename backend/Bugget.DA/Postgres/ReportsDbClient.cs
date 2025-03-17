@@ -16,7 +16,7 @@ public sealed class ReportsDbClient: PostgresClient
     /// </summary>
     public async Task<ReportDbModel?> GetReportAsync(int reportId)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
         var jsonResult = await connection.ExecuteScalarAsync<string>(
             "SELECT public.get_report(@report_id);",
             new { report_id = reportId }
@@ -27,7 +27,7 @@ public sealed class ReportsDbClient: PostgresClient
     
     public async Task<ReportDbModel[]> ListReportsAsync(string userId)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
         var jsonResults = await connection.QueryAsync<string>(
             "SELECT public.list_reports(@user_id);",
             new { user_id = userId }
@@ -44,7 +44,7 @@ public sealed class ReportsDbClient: PostgresClient
     /// </summary>
     public async Task<ReportDbModel?> CreateReportAsync(ReportCreateDbModel reportDbModel)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
 
         // Корректная сериализация JSON
         var bugsJson = JsonSerializer.Serialize(reportDbModel.Bugs, JsonSerializerOptions);
@@ -69,7 +69,7 @@ public sealed class ReportsDbClient: PostgresClient
     
     public async Task<ReportDbModel?> UpdateReportAsync(ReportUpdateDbModel reportDbModel)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
         
         var jsonResult = await connection.ExecuteScalarAsync<string>(
             "SELECT public.update_report(@report_id, @participants,@title, @status, @responsible_user_id);",
