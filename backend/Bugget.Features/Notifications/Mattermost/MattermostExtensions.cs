@@ -18,6 +18,7 @@ public static class MattermostExtensions
             client.Timeout = TimeSpan.FromSeconds(5);
         });
         
+        services.AddSingleton<MattermostClient>();
         services.AddSingleton<MattermostService>();
         
         services.AddSingleton<IReportCreatePostAction, MattermostService>(sp => sp.GetRequiredService<MattermostService>());
