@@ -5,7 +5,7 @@
 #
 #-----------------------------------------------------------------------------------------
 
-name: publish backend or frontend
+name: publish
 
 on:
   push:
@@ -22,8 +22,8 @@ on:
           - backend
           - frontend
       version:
-        description: "Версия (например, 1.2.3)"
-        required: false
+        description: "Версия (например, v1.2.3)"
+        required: true
 
 jobs:
   backend:
