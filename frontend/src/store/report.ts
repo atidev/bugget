@@ -6,18 +6,20 @@ import {
   sample,
 } from "effector";
 import { fetchReport, createReport, updateReport } from "../api/report";
+import { Report } from "@/types/report";
+import { User } from "@/types/user";
 
 export const fetchReportFx = createEffect(async (id: number) => {
   const data = await fetchReport(id);
   return data;
 });
 
-export const createReportFx = createEffect(async (newReport: any) => {
+export const createReportFx = createEffect(async (newReport: Report) => {
   const data = await createReport(newReport);
   return data;
 });
 
-export const updateReportFx = createEffect(async (request: any) => {
+export const updateReportFx = createEffect(async (request: Report) => {
   const payload = {
     title: request.title,
     status: request.status,
@@ -32,7 +34,7 @@ export const resetReport = createEvent();
 
 export const updateTitle = createEvent<string>();
 export const updateStatus = createEvent<number>();
-export const updateResponsible = createEvent<{ id: string; name: string }>();
+export const updateResponsible = createEvent<User>();
 
 export const setIsNewReport = createEvent<boolean>();
 
@@ -42,7 +44,7 @@ export const $isNewReport = createStore<boolean>(true)
 
 export const $isReportChanged = createStore<boolean>(false).reset(clearReport);
 
-export const $initialReportForm = createStore<any>(null)
+export const $initialReportForm = createStore<Report | null>(null)
   .on(fetchReportFx.doneData, (_, report) => report)
   .reset(clearReport);
 
@@ -51,13 +53,13 @@ export const $reportForm = createStore<{
   id: number | null;
   title: string;
   status: number;
-  responsible: any;
-  participants: any[];
+  responsible: User | null;
+  participants: User[];
 }>({
   id: null,
   title: "",
   status: 0,
-  responsible: {},
+  responsible: null,
   participants: [],
 })
   .on(fetchReportFx.doneData, (_, report) => {
@@ -95,6 +97,9 @@ sample({
 
 // сбарасываем report при сбросе
 sample({
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // todo fix ts-ignore
   source: $initialReportForm, // Берём данные из исходного стейта (загруженного с сервера)
   clock: resetReport, // Ждём, когда сработает resetReport
   target: $reportForm, // Копируем данные в редактируемый стор
@@ -115,6 +120,9 @@ sample({
 });
 
 sample({
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // todo fix ts-ignore
   source: $combinedForm, // Здесь объект { reportForm, initialForm }
   clock: updateReportEvent,
   fn: ({ reportForm, initialForm }) => {
@@ -130,7 +138,7 @@ sample({
           ? reportForm.status
           : undefined,
       responsible:
-        reportForm.responsible.id !== initialForm.responsible?.id
+        reportForm.responsible?.id !== initialForm.responsible?.id
           ? reportForm.responsible
           : undefined,
     };

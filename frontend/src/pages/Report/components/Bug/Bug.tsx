@@ -81,7 +81,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
   // 3. Обработчик выбора файла
   const handleFileChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    attachmentType
+    attachmentType: number
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;

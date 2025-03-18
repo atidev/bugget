@@ -1,13 +1,14 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { getCommentsApi, createCommentApi } from "../api/comment";
 import { $initialReportForm } from "./report";
+import { Comment } from "@/types/comment";
 
 export const getCommentsFx = createEffect<
   {
     reportId: number;
     bugId: number;
   },
-  any,
+  Comment,
   Error
 >(async ({ reportId, bugId }) => {
   return await getCommentsApi(reportId, bugId);
@@ -19,7 +20,7 @@ export const addCommentFx = createEffect<
     bugId: number;
     text: string;
   },
-  any,
+  Comment,
   Error
 >(async ({ reportId, bugId, text }) => {
   return await createCommentApi(reportId, bugId, text);
@@ -27,12 +28,15 @@ export const addCommentFx = createEffect<
 
 export const newBugComments = createEvent<{
   bugId: number;
-  comments: any[];
+  comments: Comment[];
 }>();
 
-export const $commentsByBugId = createStore<Record<number, any[]>>({})
+export const $commentsByBugId = createStore<Record<number, Comment[]>>({})
   .on($initialReportForm, (_, report) =>
-    report.bugs?.reduce((acc: Record<number, any[]>, bug: any) => {
+    report?.bugs?.reduce((acc, bug) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // todo: разобраться с типизацией
       acc[bug.id] = bug.comments || [];
       return acc;
     }, {})
@@ -51,6 +55,9 @@ export const $commentsByBugId = createStore<Record<number, any[]>>({})
   });
 
 sample({
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // todo fix ts-ignore
   clock: getCommentsFx.done,
   fn: ({ params, result }) => ({
     bugId: params.bugId,

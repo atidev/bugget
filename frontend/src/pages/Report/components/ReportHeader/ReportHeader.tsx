@@ -39,8 +39,10 @@ const ReportHeader = () => {
 
   const handleUserSelect = (id: string, name: string) => {
     setResponsibleId({
-      id: id,
-      name: name,
+      id,
+      name,
+      userId: id,
+      fullName: name,
     });
   };
 

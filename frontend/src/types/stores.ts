@@ -1,4 +1,4 @@
-import { BugStatuses } from "const";
+import { BugStatuses } from "@/const";
 
 export interface BugStore {
   id: number;
@@ -8,3 +8,4 @@ export interface BugStore {
   status: BugStatuses;
   isChanged: boolean;
 }
+
