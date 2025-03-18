@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo } from "react";
-import Avatar from "../../../../components/Avatar/Avatar";
+import Avatar from "@/components/Avatar/Avatar";
 import { debounce } from "throttle-debounce";
 import { employeesAutocomplete } from "../../../../api/users";
 
