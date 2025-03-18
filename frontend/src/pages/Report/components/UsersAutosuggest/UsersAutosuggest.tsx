@@ -50,6 +50,19 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
     handleUserSelect(item);
   };
 
+  const clearInput = () => {
+    setSearchString("");
+    setFilteredItems([]);
+    onSelect("", "");
+    inputRef.current?.focus();
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Backspace" && !searchString) {
+      clearInput();
+    }
+  };
+
   return (
     <div className="dropdown">
       <input
@@ -58,7 +71,17 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
         placeholder="Начните вводить"
         onChange={handleChange}
         tabIndex={0}
+        onKeyDown={handleKeyDown}
       />
+      {searchString && (
+      <button
+        className="clear-button btn btn-square btn-ghost bg-transparent hover:bg-transparent absolute right-1 top-1/2 transform -translate-y-1/2 shadow-none border-none"
+        onClick={clearInput}
+        aria-label="Очистить"
+      >
+        <span>&times;</span>
+      </button>
+    )}
       {!!filteredItems?.length && (
         <ul
           tabIndex={0}
