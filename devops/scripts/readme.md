@@ -29,11 +29,11 @@
      ```sh
      docker-compose -f test.yml up -d
      ```
-   - Запуск бэкенда и базы данных (без фронтенда):
+   - Запуск фронтенда и базы данных:
      ```sh
      docker-compose -f test_backend.yml up -d
      ```
-   - Запуск фронтенда и базы данных (без бэкенда):
+   - Запуск бэкенда и базы данных:
      ```sh
      docker-compose -f test_frontend.yml up -d
      ```
@@ -55,17 +55,3 @@ docker-compose -f <file_name>.yml down
 ```
 
 Замените `<file_name>` на `test.yml`, `test_backend.yml` или `test_frontend.yml` в зависимости от используемого конфигурационного файла.
-
-## Логи сервисов
-
-Для просмотра логов определенного сервиса используйте:
-
-```sh
-docker-compose -f <file_name>.yml logs -f <service_name>
-```
-
-Например, для просмотра логов бэкенда:
-
-```sh
-docker-compose -f test.yml logs -f backend
-```
