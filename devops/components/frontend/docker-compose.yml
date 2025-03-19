@@ -1,0 +1,7 @@
+services:
+  frontend_bugget:
+    container_name: frontend_bugget
+    image: gently4005/bugget-ui:latest
+    ports:
+      - "80:80"
+    restart: unless-stopped

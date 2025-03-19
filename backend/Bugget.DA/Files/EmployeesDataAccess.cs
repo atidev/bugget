@@ -50,18 +50,22 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
 
     private static Employee[] Employees =
     [
-        new Employee { Id = "1", FirstName = "Иванов", LastName = "Иван", Surname = "Иванович", NotificationUserId = "66xpfgxex2da4p5fn8dx17pcnr" },
+        new Employee { Id = "1", FirstName = "Иван", LastName = "Иванов", Surname = "Иванович", NotificationUserId = "66xpfgxex2da4p5fn8dx17pcnr" },
         new Employee
         {
-            Id = "any-ldap-id", FirstName = "Петров", LastName = "Петр", Surname = "Петрович", NotificationUserId = "67xpfgxex2da4p5fn8dx17pcnr"
+            Id = "any-ldap-id", FirstName = "Петр", LastName = "Петров", Surname = "Петрович", NotificationUserId = "67xpfgxex2da4p5fn8dx17pcnr"
         },
         new Employee
         {
-            Id = "int", FirstName = "Сергеев", LastName = "Сергей", Surname = "Сергеевич", NotificationUserId = "68xpfgxex2da4p5fn8dx17pcnr"
+            Id = "int", FirstName = "Сергей", LastName = "Сергеев", Surname = "Сергеевич", NotificationUserId = "68xpfgxex2da4p5fn8dx17pcnr"
         },
         new Employee
         {
-            Id = "guid", FirstName = "Алексеев", LastName = "Алексей", Surname = "Алексеевич", NotificationUserId = "69xpfgxex2da4p5fn8dx17pcnr"
+            Id = "guid", FirstName = "Алексей", LastName = "Алексеев", Surname = "Алексеевич", NotificationUserId = "69xpfgxex2da4p5fn8dx17pcnr"
+        },
+        new Employee
+        {
+            Id = "default-user", FirstName = "Дефолт", LastName = "Дефолтов", Surname = "Дефолтович", NotificationUserId = "69xpfgxex2da4p5fn8dx17pcnr"
         }
     ];
 
