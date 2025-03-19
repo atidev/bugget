@@ -4,6 +4,7 @@ import { $initialReportForm } from "./report";
 import { updateBugApi } from "@/api/bug";
 import { BugUpdateRequest } from "@/types/requests";
 import { Bug } from "@/types/bug";
+import { BugStore } from "@/types/stores";
 
 interface UpdateBugParams {
   reportId: number;
@@ -55,7 +56,7 @@ export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
     [newBug.id]: newBug,
   }));
 
-export const $bugsByBugId = createStore<Record<number, Bug>>({})
+export const $bugsByBugId = createStore<Record<number, BugStore>>({})
   .on($initialBugsByBugId, (_, bugs) => bugs)
   .on(updateBugEvent, (state, payload) => {
     const { id, receive, expect, status } = payload;

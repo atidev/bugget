@@ -8,13 +8,14 @@ import {
 import { fetchReport, createReport, updateReport } from "../api/report";
 import { Report } from "@/types/report";
 import { User } from "@/types/user";
+import { ReportStore } from "@/types/stores";
 
 export const fetchReportFx = createEffect(async (id: number) => {
   const data = await fetchReport(id);
   return data;
 });
 
-export const createReportFx = createEffect(async (newReport: Report) => {
+export const createReportFx = createEffect(async (newReport: ReportStore) => {
   const data = await createReport(newReport);
   return data;
 });

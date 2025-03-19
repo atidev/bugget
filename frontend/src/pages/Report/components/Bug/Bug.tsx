@@ -51,7 +51,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
         : ({
             id: bugId,
             status: Number(BugStatuses.IN_PROGRESS),
-            reportId: reportId,
+            reportId,
             receive: "",
             expect: "",
             isChanged: false,
@@ -67,7 +67,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
     },
   });
 
-  const isNewBug = bug.id == null;
+  const isNewBug = bug.id === null;
 
   const isBugChanged = isNewBug
     ? newBugData.receive !== "" && newBugData.expect !== ""
@@ -84,12 +84,12 @@ const Bug = ({ reportId, bugId }: BugProps) => {
     attachmentType: number
   ) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !bug.reportId || !bug.id) return;
 
     try {
       await uploadAttachment({
         reportId: bug.reportId,
-        bugId: bug.id!,
+        bugId: bug.id,
         file,
         attachType: attachmentType,
       });

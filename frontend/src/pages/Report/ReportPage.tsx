@@ -72,7 +72,7 @@ const ReportPage = () => {
   const handleCreateReport = async () => {
     const newReport = await createReportFx({
       title: reportForm.title,
-      responsible_id: reportForm.responsible.id,
+      responsibleId: reportForm.responsible?.id,
       bugs: [
         {
           receive: newBugStore.receive,

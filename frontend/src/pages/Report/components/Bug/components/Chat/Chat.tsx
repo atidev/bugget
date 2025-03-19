@@ -10,7 +10,7 @@ type BugChatProps = {
   bugId: number;
 };
 
-export const Chat: React.FC<BugChatProps> = ({ reportId, bugId }) => {
+export const Chat = ({ reportId, bugId }: BugChatProps) => {
   const [newCommentText, setNewCommentText] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
