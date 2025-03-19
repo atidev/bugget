@@ -41,8 +41,6 @@ const ReportHeader = () => {
     setResponsibleId({
       id,
       name,
-      userId: id,
-      fullName: name,
     });
   };
 

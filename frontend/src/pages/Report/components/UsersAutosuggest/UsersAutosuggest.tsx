@@ -4,16 +4,20 @@ import { debounce } from "throttle-debounce";
 import { employeesAutocomplete } from "../../../../api/users";
 
 import "./UsersAutosuggest.css";
-import { User } from "@/types/user";
 
 type Props = {
   onSelect: (id: string, name: string) => void;
   externalString?: string;
 };
 
+type AutocompleteUser = {
+  fullName: string,
+  userId: string,
+}
+
 const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
   const [searchString, setSearchString] = useState(externalString);
-  const [filteredItems, setFilteredItems] = useState<User[] | never[]>([]);
+  const [filteredItems, setFilteredItems] = useState<AutocompleteUser[] | never[]>([]);
   const inputRef = useRef<null | HTMLInputElement>(null);
 
   const debouncedAutocompleteSearch = useMemo(
@@ -39,13 +43,13 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
     }
   };
 
-  const handleUserSelect = (item: User) => {
+  const handleUserSelect = (item: AutocompleteUser) => {
     setSearchString(item.fullName);
     onSelect(item.userId, item.fullName);
     inputRef.current?.blur();
   };
 
-  const handleItemClick = (event: React.SyntheticEvent, item: User) => {
+  const handleItemClick = (event: React.SyntheticEvent, item: AutocompleteUser) => {
     event.preventDefault();
     handleUserSelect(item);
   };
