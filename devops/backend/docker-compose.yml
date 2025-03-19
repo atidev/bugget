@@ -1,0 +1,7 @@
+services:
+  backend_bugget:
+    container_name: backend_bugget
+    image: gently4005/bugget-api:latest
+    ports:
+      - "7777:7777"
+    restart: unless-stopped

@@ -1,9 +1,3 @@
--- truncate table public."Report" RESTART IDENTITY cascade;
--- truncate table public."ReportParticipants" RESTART IDENTITY cascade;
--- truncate table public."Bug" RESTART IDENTITY cascade;
--- truncate table public."Attachment" RESTART IDENTITY cascade;
--- truncate table public."Comment" RESTART IDENTITY cascade;
-
 -- Таблица отчётов
 CREATE TABLE IF NOT EXISTS public."Report" (
     id integer generated always as identity

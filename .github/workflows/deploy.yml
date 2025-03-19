@@ -52,6 +52,10 @@ jobs:
         run: docker tag bugget-api ${{ secrets.DOCKER_LOGIN }}/bugget-api:${{ env.VERSION }}
       - name: Push Backend Image
         run: docker push ${{ secrets.DOCKER_LOGIN }}/bugget-api:${{ env.VERSION }}
+      - name: Tag Backend as Latest
+        run: docker tag bugget-api ${{ secrets.DOCKER_LOGIN }}/bugget-api:latest
+      - name: Push Backend Latest
+        run: docker push ${{ secrets.DOCKER_LOGIN }}/bugget-api:latest
 
   frontend:
     if: github.event.inputs.component == 'frontend' || startsWith(github.ref, 'refs/tags/frontend-')
@@ -79,3 +83,7 @@ jobs:
         run: docker tag bugget-ui ${{ secrets.DOCKER_LOGIN }}/bugget-ui:${{ env.VERSION }}
       - name: Push Frontend Image
         run: docker push ${{ secrets.DOCKER_LOGIN }}/bugget-ui:${{ env.VERSION }}
+      - name: Tag Frontend as Latest
+        run: docker tag bugget-ui ${{ secrets.DOCKER_LOGIN }}/bugget-ui:latest
+      - name: Push Frontend Latest
+        run: docker push ${{ secrets.DOCKER_LOGIN }}/bugget-ui:latest
