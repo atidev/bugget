@@ -1,9 +1,10 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { createBugFx } from "./newBug";
 import { $initialReportForm } from "./report";
-import { updateBugApi } from "../api/bug";
-import { BugStore } from "../types/stores";
-import { BugUpdateRequest } from "src/types/requests";
+import { updateBugApi } from "@/api/bug";
+import { BugUpdateRequest } from "@/types/requests";
+import { Bug } from "@/types/bug";
+import { BugStore } from "@/types/stores";
 
 interface UpdateBugParams {
   reportId: number;
@@ -17,18 +18,18 @@ export const updateBugFx = createEffect(
   }
 );
 
-export const updateBugEvent = createEvent<Partial<BugStore> & { id: number }>();
-export const updateBugApiEvent = createEvent<Partial<BugStore>>();
+export const updateBugEvent = createEvent<Partial<Bug> & { id: number }>();
+export const updateBugApiEvent = createEvent<Partial<Bug>>();
 export const resetBug = createEvent<number>();
 
-export const $initialBugsByBugId = createStore<Record<number, BugStore>>({})
+export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
   .on($initialReportForm, (_, report) =>
-    (report.bugs as BugStore[]).reduce(
-      (acc: Record<number, BugStore>, bug: BugStore) => {
+    (report?.bugs as Bug[]).reduce(
+      (acc: Record<number, Bug>, bug: Bug) => {
         acc[bug.id] = bug;
         return acc;
       },
-      {} as Record<number, BugStore>
+      {} as Record<number, Bug>
     )
   )
   .on(updateBugFx.done, (state, { result }) => {

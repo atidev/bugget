@@ -18,3 +18,8 @@ ul.users-list {
   width: max-content;
 }
 
+.clear-button.btn :active:not(.btn-active) {
+  transform: none;
+  translate: none;
+}
+

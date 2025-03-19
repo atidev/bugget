@@ -7,18 +7,7 @@
     "skipLibCheck": true,
     "baseUrl": "./",
     "paths": {
-      "components/*": ["./src/components/*"],
-      "form-components/*": ["src/components/Form/components/*"],
-      "utils/*": ["./src/utils/*"],
-      "const":  ["./src/const"],
-      "api/*": ["./src/api/*"],
-      "strings": ["./src/strings"],
-      "stores/*": ["./src/stores/*"],
-      "stores": ["./src/stores"],
-      "models/*": ["./src/models/*"],
-      "pages/*": ["./src/pages/*"],
-      "img/*": ["./src/img/*"],
-      "logger": ["./src/logger"],
+      "@/*": ["./src/*"]
     },
 
     /* Bundler mode */
@@ -29,7 +18,6 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "allowJs": true,
-    "noImplicitAny": false,
 
     /* Linting */
     "strict": true,

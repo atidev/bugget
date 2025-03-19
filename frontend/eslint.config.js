@@ -17,14 +17,23 @@ export default tseslint.config(
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
     },
+    settings: {
+      "import/resolver": {
+        alias: {
+          map: [
+            ["@/", "./src/"],
+          ],
+          // не забудьте указать расширения, если необходимо
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
+      },
+    },
     rules: {
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },
       ],
-      // todo remove
-      "@typescript-eslint/no-explicit-any": "off",
       "max-len": [
         "error",
         { code: 1000, ignoreStrings: true, ignoreUrls: true },

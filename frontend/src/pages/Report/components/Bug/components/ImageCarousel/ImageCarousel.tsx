@@ -1,12 +1,12 @@
 import { useState } from "react";
 
 import "./ImageCarousel.css";
-import { AttachmentResponse } from "src/types/responses";
+import { Attachment } from "@/types/attachement";
 
 const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
 
 type Props = {
-  attachments: AttachmentResponse[];
+  attachments: Attachment[];
 };
 
 function ImageCarousel({ attachments }: Props) {

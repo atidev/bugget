@@ -4,10 +4,10 @@ export const uploadAttachmentApi = async (params: {
   reportId: number;
   bugId: number;
   file: File;
-  attachType: number;
+  attachType?: number;
 }) => {
   try {
-    const { reportId, bugId, file, attachType } = params;
+    const { reportId, bugId, file, attachType = 1 } = params;
     const formData = new FormData();
     formData.append("file", file);
 

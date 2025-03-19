@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 
 import "./ReportSummary.css";
-import { ReportResponse } from "src/types/responses";
+import { Report } from "@/types/report";
 
 interface ReportProps {
-  report: ReportResponse;
+  report: Report;
   highlight?: boolean;
 }
 

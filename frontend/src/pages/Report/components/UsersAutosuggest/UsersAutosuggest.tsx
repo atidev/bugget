@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo } from "react";
-import Avatar from "../../../../components/Avatar/Avatar";
+import Avatar from "@/components/Avatar/Avatar";
 import { debounce } from "throttle-debounce";
 import { employeesAutocomplete } from "../../../../api/users";
 
@@ -10,9 +10,14 @@ type Props = {
   externalString?: string;
 };
 
+type AutocompleteUser = {
+  fullName: string,
+  userId: string,
+}
+
 const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
   const [searchString, setSearchString] = useState(externalString);
-  const [filteredItems, setFilteredItems] = useState<any[] | never[]>([]);
+  const [filteredItems, setFilteredItems] = useState<AutocompleteUser[] | never[]>([]);
   const inputRef = useRef<null | HTMLInputElement>(null);
 
   const debouncedAutocompleteSearch = useMemo(
@@ -38,15 +43,28 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
     }
   };
 
-  const handleUserSelect = (item: any) => {
+  const handleUserSelect = (item: AutocompleteUser) => {
     setSearchString(item.fullName);
     onSelect(item.userId, item.fullName);
     inputRef.current?.blur();
   };
 
-  const handleItemClick = (event: React.SyntheticEvent, item: any) => {
+  const handleItemClick = (event: React.SyntheticEvent, item: AutocompleteUser) => {
     event.preventDefault();
     handleUserSelect(item);
+  };
+
+  const clearInput = () => {
+    setSearchString("");
+    setFilteredItems([]);
+    onSelect("", "");
+    inputRef.current?.focus();
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Backspace" && !searchString) {
+      clearInput();
+    }
   };
 
   return (
@@ -57,7 +75,17 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
         placeholder="Начните вводить"
         onChange={handleChange}
         tabIndex={0}
+        onKeyDown={handleKeyDown}
       />
+      {searchString && (
+      <button
+        className="clear-button btn btn-square btn-ghost bg-transparent hover:bg-transparent absolute right-1 top-1/2 transform -translate-y-1/2 shadow-none border-none"
+        onClick={clearInput}
+        aria-label="Очистить"
+      >
+        <span>&times;</span>
+      </button>
+    )}
       {!!filteredItems?.length && (
         <ul
           tabIndex={0}
