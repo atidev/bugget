@@ -1,3 +1,0 @@
-include:
-  - redis/docker-compose.yml
-  - postgres/docker-compose.yml
