@@ -4,4 +4,7 @@ services:
     image: gently4005/bugget-api:latest
     ports:
       - "7777:7777"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=development
+      - POSTGRES_CONNECTION_STRING=Host=postgres_bugget;Port=5432;Database=postgres;Username=postgres
     restart: unless-stopped
