@@ -1,11 +1,10 @@
----
 #-----------------------------------------------------------------------------------------
 #
 # Публикация bugget-api и bugget-ui
 #
 #-----------------------------------------------------------------------------------------
 
-name: publish backend or frontend
+name: publish
 
 on:
   push:
@@ -22,8 +21,8 @@ on:
           - backend
           - frontend
       version:
-        description: "Версия (например, 1.2.3)"
-        required: false
+        description: "Версия (например, v1.2.3)"
+        required: true
 
 jobs:
   backend:
@@ -44,14 +43,18 @@ jobs:
           else
             echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
           fi
-      - name: Build Backend
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push Backend Multi-Arch
         run: |
           cd backend
-          docker build -t bugget-api -f ./Bugget/Dockerfile .
-      - name: TAG Backend
-        run: docker tag bugget-api ${{ secrets.DOCKER_LOGIN }}/bugget-api:${{ env.VERSION }}
-      - name: Push Backend Image
-        run: docker push ${{ secrets.DOCKER_LOGIN }}/bugget-api:${{ env.VERSION }}
+          docker buildx create --use
+          docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKER_LOGIN }}/bugget-api:${{ env.VERSION }} --push -f ./Bugget/Dockerfile .
+          docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKER_LOGIN }}/bugget-api:latest --push -f ./Bugget/Dockerfile .
 
   frontend:
     if: github.event.inputs.component == 'frontend' || startsWith(github.ref, 'refs/tags/frontend-')
@@ -71,11 +74,15 @@ jobs:
           else
             echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
           fi
-      - name: Build Frontend
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push Frontend Multi-Arch
         run: |
           cd frontend
-          docker build -t bugget-ui .
-      - name: TAG Frontend
-        run: docker tag bugget-ui ${{ secrets.DOCKER_LOGIN }}/bugget-ui:${{ env.VERSION }}
-      - name: Push Frontend Image
-        run: docker push ${{ secrets.DOCKER_LOGIN }}/bugget-ui:${{ env.VERSION }}
+          docker buildx create --use
+          docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKER_LOGIN }}/bugget-ui:${{ env.VERSION }} --push .
+          docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKER_LOGIN }}/bugget-ui:latest --push .

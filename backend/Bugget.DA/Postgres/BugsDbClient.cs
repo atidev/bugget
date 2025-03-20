@@ -17,7 +17,7 @@ public sealed class BugsDbClient : PostgresClient
     /// </summary>
     public async Task<BugDbModel?> CreateBugAsync(BugCreateDbModel bugCreateDbModel)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
         
         var jsonResult = await connection.ExecuteScalarAsync<string>(
             "SELECT public.create_bug(@report_id, @receive, @expect, @creator_user_id, @status);",
@@ -38,7 +38,7 @@ public sealed class BugsDbClient : PostgresClient
     
     public async Task<BugDbModel?> UpdateBugAsync(BugUpdateDbModel updateBugDbModel)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
         
         var jsonResult = await connection.ExecuteScalarAsync<string>(
             "SELECT public.update_bug(@bug_id, @report_id,  @updater_user_id, @receive, @expect, @status);",
@@ -60,7 +60,7 @@ public sealed class BugsDbClient : PostgresClient
 
     public async Task<BugDbModel?> GetBug(int bugId)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = await DataSource.OpenConnectionAsync();
 
         var jsonResult = await connection.ExecuteScalarAsync<string>(
             "SELECT public.get_bug(@bugId)",
