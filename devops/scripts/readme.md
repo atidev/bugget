@@ -9,11 +9,11 @@
 
 ## Запуск компонентов
 
-В проекте есть три файла для запуска различных наборов сервисов:
+В проекте есть файлы для запуска различных наборов сервисов:
 
-- `test.yml` – Запуск всей платформы (PostgreSQL, Backend, Frontend).
-- `test_backend.yml` – Запуск PostgreSQL и Frontend (без Backend).
-- `test_frontend.yml` – Запуск PostgreSQL и Backend (без Frontend).
+- `all.yml` – запуск всей платформы (PostgreSQL, Backend, Frontend).
+- `pg_front.yml` – запуск только PostgreSQL и Frontend.
+- `pg_back.yml` – запуск только PostgreSQL и Backend.
 
 ### Запуск
 
@@ -27,20 +27,24 @@
 
    - Полный запуск всех компонентов:
      ```sh
-     docker-compose -f test.yml up -d
+     docker-compose -f all.yml up -d
      ```
    - Запуск фронтенда и базы данных:
      ```sh
-     docker-compose -f test_backend.yml up -d
+     docker-compose -f pg_front.yml up -d
      ```
    - Запуск бэкенда и базы данных:
      ```sh
-     docker-compose -f test_frontend.yml up -d
+     docker-compose -f pg_back.yml up -d
+     ```
+   - Запуск платформы с пересборкой образов на основе текущей ветки:
+     ```sh
+     docker-compose --env-file .all_build.env -f all.yml up --build -d
      ```
 
-   Флаг `-d` позволяет запустить контейнеры в фоновом режиме. Иногда полезно его не указывать, чтобы видеть логи всех компонентов.
+   Флаг `-d` запускает контейнеры в фоновом режиме. Если хотите видеть логи всех компонентов в реальном времени, уберите этот флаг.
 
-3. Проверьте запущенные контейнеры (или через UI-интерфейс Docker):
+3. Проверьте запущенные контейнеры (или используйте UI-интерфейс Docker):
 
    ```sh
    docker ps
@@ -54,4 +58,4 @@
 docker-compose -f <file_name>.yml down
 ```
 
-Замените `<file_name>` на `test.yml`, `test_backend.yml` или `test_frontend.yml` в зависимости от используемого конфигурационного файла.
+Где `<file_name>` – это `all.yml`, `pg_back.yml` или `pg_front.yml` в зависимости от запущенной конфигурации.
