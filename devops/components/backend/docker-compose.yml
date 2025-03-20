@@ -1,7 +1,10 @@
 services:
   backend_bugget:
     container_name: backend_bugget
-    image: gently4005/bugget-api:latest
+    image: ${BACKEND_IMAGE:-gently4005/bugget-api:latest}
+    build:
+      context: ${BACKEND_BUILD_CONTEXT:-}
+      dockerfile: ${BACKEND_DOCKERFILE:-}
     ports:
       - "7777:7777"
     environment:
