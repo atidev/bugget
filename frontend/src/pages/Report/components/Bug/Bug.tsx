@@ -67,7 +67,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
     },
   });
 
-  const isNewBug = bug.id === null;
+  const isNewBug = bug.id === null || bug.id === undefined;
 
   const isBugChanged = isNewBug
     ? newBugData.receive !== "" && newBugData.expect !== ""

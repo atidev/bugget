@@ -72,7 +72,7 @@ const ReportHeader = () => {
           </div>
         )}
       </div>
-      <fieldset className="flex flex-col justify-between items-start mt-2">
+      <div className="flex flex-col justify-between items-start mt-2">
 
       <label htmlFor="report-title" className="label mt-2 mb-1">
         <span className="label-text">Описание проблемы</span>
@@ -89,28 +89,30 @@ const ReportHeader = () => {
           minHeight: "3rem", // Минимальная высота, чтобы было 2 строки
         }}
       />
-      </fieldset>
+      </div>
 
-      <fieldset className="flex flex-col justify-between items-start mt-2">
-        <label htmlFor="responsible" className="label mb-1">
-          <span className="label-text">Ответственный</span>
-        </label>
-        <div className="flex gap-4 items-center">
-          <UsersAutosuggest
-            onSelect={handleUserSelect}
-            externalString={reportForm.responsible?.name}
-          />
-          <div className="participants-wrapper">
-            {reportForm.participants?.length > 0
-              ? reportForm.participants.map((p) => (
-                  <div className="tooltip">
-                    <Avatar />
-                    <span key={p.id} className="tooltiptext rounded">
-                      {p.name}
-                    </span>
-                  </div>
-                ))
-              : null}
+      <div className="flex justify-between items-end mt-2">
+        <div>
+          <label htmlFor="responsible" className="label mb-1">
+            <span className="label-text">Ответственный</span>
+          </label>
+          <div className="flex gap-4 items-center">
+            <UsersAutosuggest
+              onSelect={handleUserSelect}
+              externalString={reportForm.responsible?.name}
+            />
+            <div className="participants-wrapper">
+              {reportForm.participants?.length > 0
+                ? reportForm.participants.map((p) => (
+                    <div className="tooltip">
+                      <Avatar />
+                      <span key={p.id} className="tooltiptext rounded">
+                        {p.name}
+                      </span>
+                    </div>
+                  ))
+                : null}
+            </div>
           </div>
         </div>
         {!isNewReport && isReportChanged && (
@@ -122,7 +124,7 @@ const ReportHeader = () => {
             />
           </div>
         )}
-      </fieldset>
+      </div>
     </div>
   );
 };

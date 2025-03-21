@@ -20,7 +20,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
         {/* Sidebar content here */}
         {user?.name &&
         <li>
-          <a>{user.name}</a>
+          <a href="/">{user.name}</a>
         </li>
         }
         <li>
