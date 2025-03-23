@@ -1,6 +1,6 @@
 import "./Header.css";
 import { useLocation, useNavigate } from "react-router-dom";
-import { clearReport } from "@/store/report"; 
+import { clearReport } from "@/store/report";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const Header = () => {
               navigate("/reports");
             }}
           >
-            Создать
+            Новый репорт
           </button>
         </>
       )}
