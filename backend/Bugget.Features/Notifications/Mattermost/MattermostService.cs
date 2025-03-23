@@ -20,7 +20,7 @@ public sealed class MattermostService(
             return Task.CompletedTask;
 
         var message = ReportMessageBuilder.GetYourResponsibleInNewReportMessage(
-            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, EmployeeAdapter.Transform(creatorEmployee).FullName
+            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, EmployeeAdapter.Transform(creatorEmployee).Name
         );
 
         return mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
@@ -41,7 +41,7 @@ public sealed class MattermostService(
             return Task.CompletedTask;
 
         var message = ReportMessageBuilder.GetYourResponsibleInExistReportMessage(
-            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, EmployeeAdapter.Transform(updaterEmployee).FullName
+            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, EmployeeAdapter.Transform(updaterEmployee).Name
         );
 
         return mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);

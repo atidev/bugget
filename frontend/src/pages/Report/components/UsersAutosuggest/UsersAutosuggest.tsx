@@ -1,65 +1,51 @@
-import { useState, useRef, useMemo } from "react";
+import { useEffect, useRef } from "react";
 import Avatar from "@/components/Avatar/Avatar";
-import { debounce } from "throttle-debounce";
-import { employeesAutocomplete } from "../../../../api/users";
 
 import "./UsersAutosuggest.css";
 
+import {
+  $searchString,
+  setSearchString,
+  clearSearch,
+  $filteredItems,
+  AutocompleteUser
+} from '@/store/usersAutosuggest';
+import { useUnit } from "effector-react";
+
 type Props = {
   onSelect: (id: string, name: string) => void;
-  externalString?: string;
+  externalString: string | undefined;
 };
 
-type AutocompleteUser = {
-  fullName: string,
-  userId: string,
-}
-
 const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
-  const [searchString, setSearchString] = useState(externalString);
-  const [filteredItems, setFilteredItems] = useState<AutocompleteUser[] | never[]>([]);
-  const inputRef = useRef<null | HTMLInputElement>(null);
+  const [searchString, filteredItems, setSearch, clear] = useUnit([
+    $searchString,
+    $filteredItems,
+    setSearchString,
+    clearSearch,
+  ]);
 
-  const debouncedAutocompleteSearch = useMemo(
-    () =>
-      debounce(300, async (searchString: string) => {
-        try {
-          const response = await employeesAutocomplete(searchString);
-          // здесь, внутри коллбэка, мы имеем доступ к результатам
-          setFilteredItems(response.employees);
-        } catch (err) {
-          console.error(err);
-          setFilteredItems([]);
-        }
-      }),
-    []
-  );
+  useEffect(() => {
+    setSearch(externalString ?? "");
+  }, [externalString, setSearch]);
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setSearchString(value);
-    if (value) {
-      debouncedAutocompleteSearch(value);
-    }
+    setSearch(event.target.value);
   };
 
   const handleUserSelect = (item: AutocompleteUser) => {
-    setSearchString(item.fullName);
-    onSelect(item.userId, item.fullName);
+    setSearch(item.name);
+    onSelect(item.id, item.name);
     inputRef.current?.blur();
   };
 
-  const handleItemClick = (event: React.SyntheticEvent, item: AutocompleteUser) => {
-    event.preventDefault();
-    handleUserSelect(item);
-  };
-
   const clearInput = () => {
-    setSearchString("");
-    setFilteredItems([]);
+    clear();
     onSelect("", "");
     inputRef.current?.focus();
-  }
+  };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Backspace" && !searchString) {
@@ -78,14 +64,14 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
         onKeyDown={handleKeyDown}
       />
       {searchString && (
-      <button
-        className="clear-button btn btn-square btn-ghost bg-transparent hover:bg-transparent absolute right-1 top-1/2 transform -translate-y-1/2 shadow-none border-none"
-        onClick={clearInput}
-        aria-label="Очистить"
-      >
-        <span>&times;</span>
-      </button>
-    )}
+        <button
+          className="clear-button btn btn-square btn-ghost bg-transparent hover:bg-transparent absolute right-1 top-1/2 transform -translate-y-1/2 shadow-none border-none"
+          onClick={clearInput}
+          aria-label="Очистить"
+        >
+          <span>&times;</span>
+        </button>
+      )}
       {!!filteredItems?.length && (
         <ul
           tabIndex={0}
@@ -93,10 +79,10 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
         >
           {filteredItems.map((user) => {
             return (
-              <li key={user.userId} className="user-option">
+              <li key={user.id} className="user-option">
                 <Avatar width={2} />
-                <a onClick={(event) => handleItemClick(event, user)}>
-                  {user.fullName}
+                <a onClick={() => handleUserSelect(user)}>
+                  {user.name}
                 </a>
               </li>
             );

@@ -27,7 +27,7 @@ public sealed class AuthController(EmployeesDataAccess employeesDataAccess) : Ap
         return Ok(new UserView
         {
             Id = employee.Id,
-            Name = EmployeeAdapter.Transform(employee).FullName,
+            Name = EmployeeAdapter.Transform(employee).Name,
         });
     }
 }

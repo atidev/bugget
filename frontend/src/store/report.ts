@@ -9,6 +9,7 @@ import { fetchReport, createReport, updateReport } from "../api/report";
 import { Report } from "@/types/report";
 import { User } from "@/types/user";
 import { ReportStore } from "@/types/stores";
+import { clearSearch } from '@/store/usersAutosuggest';
 
 export const fetchReportFx = createEffect(async (id: number) => {
   const data = await fetchReport(id);
@@ -43,7 +44,8 @@ export const $isNewReport = createStore<boolean>(true)
   .on(setIsNewReport, (_, isNew) => isNew)
   .reset(clearReport);
 
-export const $isReportChanged = createStore<boolean>(false).reset(clearReport);
+export const $isReportChanged = createStore<boolean>(false)
+.reset(clearReport);
 
 export const $initialReportForm = createStore<Report | null>(null)
   .on(fetchReportFx.doneData, (_, report) => report)
@@ -155,3 +157,5 @@ sample({
   source: updateReportFx.doneData, // После успешного обновления отчета
   target: [$reportForm, $initialReportForm], // Обновляем оба стора
 });
+
+clearReport.watch(() => clearSearch());

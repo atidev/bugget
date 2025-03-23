@@ -60,13 +60,14 @@ const ReportPage = () => {
   }, [reportId]);
 
   useEffect(() => {
-      setBreadcrumbs([
-        reportsPageBreadcrumb,
-        isNewReport ?
-          { label: "Новый репорт", path: `/reports`} :
-          { label: `Репорт #${reportId}`, path: `/reports/${reportId}`
+    setBreadcrumbs([
+      reportsPageBreadcrumb,
+      isNewReport ?
+        { label: "Новый репорт", path: `/reports` } :
+        {
+          label: `Репорт #${reportId}`, path: `/reports/${reportId}`
         }
-      ].filter(Boolean));
+    ].filter(Boolean));
   }, [reportId, isNewReport]);
 
   const handleCreateReport = async () => {
@@ -85,6 +86,9 @@ const ReportPage = () => {
     }
   };
 
+  console.log("isNewReport", isNewReport);
+  console.log("newBugStore.isReady", newBugStore.isReady);
+  console.log("reportForm.responsible?.id", reportForm.responsible?.id);
   return (
     <div className="reports-wrapper">
       <ReportHeader />
@@ -101,7 +105,8 @@ const ReportPage = () => {
 
       {isExists && <Bug reportId={reportForm.id} />}
 
-      {isNewReport && newBugStore.isReady && (
+
+      {isNewReport && newBugStore.isReady && reportForm.responsible?.id && (
         <div className="button-wrapper">
           <button
             onClick={handleCreateReport}

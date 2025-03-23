@@ -18,7 +18,7 @@ public static class EmployeeAdapter
         if(string.IsNullOrEmpty(fullName))
             fullName = e.Id;
         
-        return new EmployeeView { UserId = e.Id, FullName = fullName };
+        return new EmployeeView { Id = e.Id, Name = fullName };
     }
     
     public static UserView ToUserView(Employee e)

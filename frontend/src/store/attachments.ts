@@ -19,7 +19,7 @@ export const $attachmentsByBugId = createStore<
   Record<number, Attachment[]>
 >({})
   .on($initialReportForm, (_, report) =>
-    report?.bugs.reduce((acc: Record<number, Attachment[]>, bug: Bug) => {
+    (report?.bugs ?? []).reduce((acc: Record<number, Attachment[]>, bug: Bug) => {
       acc[bug.id] = bug.attachments || [];
       return acc;
     }, {})

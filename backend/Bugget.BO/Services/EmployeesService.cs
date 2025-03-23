@@ -29,9 +29,9 @@ public class EmployeesService(EmployeesDataAccess employeesDataAccess)
             // текущая глубина + 1
             .Where(e => user.Depth == null || e.Depth >= user.Depth - depth)
             .Select(EmployeeAdapter.Transform)
-            .Where(v => v.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            .OrderBy(v => v.FullName.IndexOf(searchString, StringComparison.OrdinalIgnoreCase))
-            .ThenBy(v => v.FullName)
+            .Where(v => v.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(v => v.Name.IndexOf(searchString, StringComparison.OrdinalIgnoreCase))
+            .ThenBy(v => v.Name)
             .ToList();
 
         return (foundedUsers.Skip(skip).Take(take), foundedUsers.Count);

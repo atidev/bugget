@@ -8,12 +8,12 @@ import {
   $isNewReport,
   updateStatus,
   updateReportEvent,
-} from "../../../../store/report";
+} from "@/store/report";
 import "./ReportHeader.css";
-import CancelButton from "../../../../components/CancelButton/CancelButton";
-import SaveButton from "../../../../components/SaveButton/SaveButton";
+import CancelButton from "@/components/CancelButton/CancelButton";
+import SaveButton from "@/components/SaveButton/SaveButton";
 import UsersAutosuggest from "../UsersAutosuggest/UsersAutosuggest";
-import Avatar from "../../../../components/Avatar/Avatar";
+import Avatar from "@/components/Avatar/Avatar";
 import { ReportStatuses } from "../../../../const";
 
 const ReportHeader = () => {
@@ -74,21 +74,21 @@ const ReportHeader = () => {
       </div>
       <div className="flex flex-col justify-between items-start mt-2">
 
-      <label htmlFor="report-title" className="label mt-2 mb-1">
-        <span className="label-text">Описание проблемы</span>
-      </label>
-      <textarea
-        value={reportForm.title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Описание проблемы в двух словах"
-        className="issue-description p-2 rounded-sm textarea textarea-bordered bg-base-200 resize-none focus:ring-1 focus:ring-gray-300 focus:border-gray-400"
-        maxLength={255}
-        rows={2}
-        style={{
-          height: "auto", // Автоматическая высота
-          minHeight: "3rem", // Минимальная высота, чтобы было 2 строки
-        }}
-      />
+        <label htmlFor="report-title" className="label mt-2 mb-1">
+          <span className="label-text">Описание проблемы</span>
+        </label>
+        <textarea
+          value={reportForm.title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Описание проблемы в двух словах"
+          className="issue-description p-2 rounded-sm textarea textarea-bordered bg-base-200 resize-none focus:ring-1 focus:ring-gray-300 focus:border-gray-400"
+          maxLength={255}
+          rows={2}
+          style={{
+            height: "auto", // Автоматическая высота
+            minHeight: "3rem", // Минимальная высота, чтобы было 2 строки
+          }}
+        />
       </div>
 
       <div className="flex justify-between items-end mt-2">
@@ -104,13 +104,13 @@ const ReportHeader = () => {
             <div className="participants-wrapper">
               {reportForm.participants?.length > 0
                 ? reportForm.participants.map((p) => (
-                    <div className="tooltip">
-                      <Avatar />
-                      <span key={p.id} className="tooltiptext rounded">
-                        {p.name}
-                      </span>
-                    </div>
-                  ))
+                  <div className="tooltip" key={p.id}>
+                    <Avatar />
+                    <span key={p.id} className="tooltiptext rounded">
+                      {p.name}
+                    </span>
+                  </div>
+                ))
                 : null}
             </div>
           </div>
