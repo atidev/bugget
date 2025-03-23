@@ -37,12 +37,19 @@ public sealed class EmployeesController(EmployeesService service) : ApiControlle
     [ProducesResponseType(typeof(FoundedEmployeesView), 200)]
     public IActionResult AutocompleteEmployees([FromQuery] [Required] string searchString,
         [FromQuery] int skip = 0,
-        [FromQuery] int take = 10)
+        [FromQuery] int take = 10,
+        [FromQuery] uint depth = 1)
     {
         if (string.IsNullOrWhiteSpace(searchString) || skip < 0 || take <= 0)
             return BadRequest();
-        
-        var (employees, total) = service.AutocompleteEmployees(searchString, skip, take);
+
+        var user = User.GetIdentity();
+        var (employees, total) = service.AutocompleteEmployees(
+            user.Id,
+            searchString,
+            skip,
+            take,
+            depth);
         
         return Ok(new FoundedEmployeesView { Employees = employees, Total = total });
     }

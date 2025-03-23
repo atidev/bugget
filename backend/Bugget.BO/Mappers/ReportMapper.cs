@@ -1,7 +1,7 @@
 using Bugget.Entities.Adapters;
 using Bugget.Entities.BO;
 using Bugget.Entities.BO.ReportBo;
-using Bugget.Entities.Constants;
+using Bugget.Entities.BO.Search;
 using Bugget.Entities.DbModels;
 using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DbModels.Report;
@@ -32,6 +32,15 @@ public static class ReportMapper
                     ? EmployeeAdapter.ToUserView(e)
                     : EmployeeAdapter.ToUserView(p)).ToArray(),
             Bugs = report.Bugs.Select(b => b.ToView(employeesDict)).ToArray()
+        };
+    }
+
+    public static SearchReportsView ToView(this SearchReportsDbModel search, IReadOnlyDictionary<string, Employee> employeesDict)
+    {
+        return new SearchReportsView
+        {
+            Reports = search.Reports.Select(r => ToView(r, employeesDict)).ToArray(),
+            Total = search.Total
         };
     }
 
@@ -93,6 +102,44 @@ public static class ReportMapper
             Status = report.Status,
             ResponsibleUserId = report.ResponsibleUserId,
             ParticipantsUserIds = report.ParticipantsUserIds,
+        };
+    }
+
+    public static SearchReports ToSearchReports(
+        string? query,
+        int[]? reportStatuses,
+        string[]? userIds,
+        string[]? teamIds,
+        string? sort,
+        uint skip,
+        uint take,
+        IReadOnlyDictionary<string, IReadOnlyCollection<Employee>> employeesByTeam)
+    {
+        List<string> resultUserIds = [];
+        if (teamIds?.Length >= 0)
+        {
+            foreach (var teamId in teamIds)
+            {
+                if (employeesByTeam.TryGetValue(teamId, out var team))
+                {
+                    resultUserIds.AddRange(team.Select(e => e.Id));
+                }
+            }
+        }
+
+        if (userIds?.Length >= 0)
+        {
+            resultUserIds.AddRange(userIds);
+        }
+
+        return new SearchReports
+        {
+            Query = string.IsNullOrEmpty(query) ? null : query,
+            ReportStatuses = reportStatuses?.Length > 0 ? reportStatuses : null,
+            UserIds = resultUserIds.Count > 0 ? resultUserIds.ToArray() : null,
+            Skip = skip,
+            Take = take,
+            Sort = SortOption.Parse(sort)
         };
     }
 }

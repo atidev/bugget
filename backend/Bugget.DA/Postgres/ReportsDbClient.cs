@@ -1,11 +1,8 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Bugget.Entities.Config;
+using Bugget.Entities.BO.Search;
 using Bugget.Entities.DbModels;
 using Bugget.Entities.DbModels.Report;
 using Dapper;
-using Microsoft.Extensions.Options;
-using Npgsql;
 
 namespace Bugget.DA.Postgres;
 
@@ -86,6 +83,27 @@ public sealed class ReportsDbClient: PostgresClient
         return jsonResult != null
             ? Deserialize<ReportDbModel>(jsonResult)
             : null;
+    }
+    
+    public async Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+
+        var jsonResult = await connection.ExecuteScalarAsync<string>(
+            "SELECT public.search_reports(@query, @statuses, @userIds, @sortField, @sortDesc, @skip, @take);",
+            new
+            {
+                query = search.Query,
+                statuses = search.ReportStatuses,
+                userIds = search.UserIds,
+                sortField = search.Sort.Field, // "created_at" или "updated_at"
+                sortDesc = search.Sort.IsDescending,
+                skip = (int)search.Skip,
+                take = (int)search.Take
+            }
+        );
+
+        return Deserialize<SearchReportsDbModel>(jsonResult);
     }
     
     private T? Deserialize<T>(string json) => JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);

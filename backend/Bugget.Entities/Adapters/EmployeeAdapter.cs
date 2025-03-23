@@ -12,8 +12,13 @@ public static class EmployeeAdapter
             .AppendWithSeparator(e.Surname)
             .AppendWithSeparator(e.FirstName)
             .AppendWithSeparator(e.LastName);
+
+        var fullName = sb.ToString().TrimEnd();
         
-        return new EmployeeView { UserId = e.Id, FullName = sb.ToString().TrimEnd() };
+        if(string.IsNullOrEmpty(fullName))
+            fullName = e.Id;
+        
+        return new EmployeeView { UserId = e.Id, FullName = fullName };
     }
     
     public static UserView ToUserView(Employee e)
