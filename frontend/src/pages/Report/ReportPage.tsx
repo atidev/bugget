@@ -86,9 +86,6 @@ const ReportPage = () => {
     }
   };
 
-  console.log("isNewReport", isNewReport);
-  console.log("newBugStore.isReady", newBugStore.isReady);
-  console.log("reportForm.responsible?.id", reportForm.responsible?.id);
   return (
     <div className="reports-wrapper">
       <ReportHeader />

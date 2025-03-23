@@ -55,7 +55,3 @@ sample({
   }),
   target: createBugFx,
 });
-
-$isExists.watch((value) => {
-  console.log("[$isExists] updated to:", value);
-});
