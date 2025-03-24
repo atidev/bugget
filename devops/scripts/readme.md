@@ -27,19 +27,20 @@
 
    - Полный запуск всех компонентов:
      ```sh
-     docker-compose -f all.yml up -d
+     docker-compose -f all.yml up --pull always -d
      ```
    - Запуск фронтенда и базы данных:
      ```sh
-     docker-compose -f pg_front.yml up -d
+     docker-compose -f pg_front.yml up --pull always -d
      ```
    - Запуск бэкенда и базы данных:
      ```sh
-     docker-compose -f pg_back.yml up -d
+     docker-compose -f pg_back.yml up --pull always -d
      ```
    - Запуск платформы с пересборкой образов на основе текущей ветки:
      ```sh
-     docker-compose --env-file .all_build.env -f all.yml up --build -d
+     docker-compose --env-file .build.env -f all.yml build --no-cache  
+     docker-compose --env-file .build.env -f all.yml up -d
      ```
 
    Флаг `-d` запускает контейнеры в фоновом режиме. Если хотите видеть логи всех компонентов в реальном времени, уберите этот флаг.

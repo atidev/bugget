@@ -32,14 +32,18 @@ export const newBugComments = createEvent<{
 }>();
 
 export const $commentsByBugId = createStore<Record<number, Comment[]>>({})
-  .on($initialReportForm, (_, report) =>
-    (report?.bugs ?? []).reduce((acc, bug) => {
+  .on($initialReportForm, (_, report) => {
+    if (!report?.bugs.length)
+      return;
+
+    return report.bugs.reduce((acc, bug) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       // todo: разобраться с типизацией
       acc[bug.id] = bug.comments || [];
       return acc;
     }, {})
+  }
   )
   .on(newBugComments, (state, { bugId, comments }) => {
     return {

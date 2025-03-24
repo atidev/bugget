@@ -23,15 +23,20 @@ export const updateBugApiEvent = createEvent<Partial<Bug>>();
 export const resetBug = createEvent<number>();
 
 export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
-.on($initialReportForm, (_, report) =>
-  (report?.bugs ?? []).reduce(
-    (acc: Record<number, Bug>, bug: Bug) => {
-      acc[bug.id] = bug;
-      return acc;
-    },
-    {} as Record<number, Bug>
+  .on($initialReportForm, (_, report) => {
+
+    if (!report?.bugs.length)
+      return;
+
+    return report.bugs.reduce(
+      (acc: Record<number, Bug>, bug: Bug) => {
+        acc[bug.id] = bug;
+        return acc;
+      },
+      {} as Record<number, Bug>
+    )
+  }
   )
-)
   .on(updateBugFx.done, (state, { result }) => {
     if (!result) return state;
 
@@ -102,14 +107,14 @@ export const $bugsIds = createStore<number[]>([]).on(
 sample({
   source: updateBugApiEvent,
   fn: (bug) =>
-    ({
-      reportId: bug.reportId,
-      bugId: bug.id,
-      bug: {
-        expect: bug.expect ?? null,
-        receive: bug.receive ?? null,
-        status: bug.status ?? null,
-      } as BugUpdateRequest,
-    } as UpdateBugParams),
+  ({
+    reportId: bug.reportId,
+    bugId: bug.id,
+    bug: {
+      expect: bug.expect ?? null,
+      receive: bug.receive ?? null,
+      status: bug.status ?? null,
+    } as BugUpdateRequest,
+  } as UpdateBugParams),
   target: updateBugFx,
 });
