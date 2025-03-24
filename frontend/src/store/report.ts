@@ -9,7 +9,6 @@ import { fetchReport, createReport, updateReport } from "../api/report";
 import { Report } from "@/types/report";
 import { User } from "@/types/user";
 import { ReportStore } from "@/types/stores";
-import { clearSearch } from '@/store/usersAutosuggest';
 
 export const fetchReportFx = createEffect(async (id: number) => {
   const data = await fetchReport(id);
@@ -157,5 +156,3 @@ sample({
   source: updateReportFx.doneData, // После успешного обновления отчета
   target: [$reportForm, $initialReportForm], // Обновляем оба стора
 });
-
-clearReport.watch(() => clearSearch());
