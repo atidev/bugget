@@ -15,9 +15,9 @@
     "axios": "1.8.2",
     "effector": "^23.3.0",
     "effector-react": "^23.3.0",
+    "lucide-react": "^0.483.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.5.0",
     "react-router-dom": "^7.2.0",
     "tailwindcss": "^4.0.9",
     "throttle-debounce": "^5.0.2"
