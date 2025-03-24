@@ -5,10 +5,10 @@ public class EmployeeView
     /// <summary>
     /// Id пользователя
     /// </summary>
-    public required string UserId { get; set; }
+    public required string Id { get; set; }
     
     /// <summary>
     /// Полное имя пользователя
     /// </summary>
-    public required string FullName { get; set; }
+    public required string Name { get; set; }
 }

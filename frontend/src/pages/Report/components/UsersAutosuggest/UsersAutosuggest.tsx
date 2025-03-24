@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import { debounce } from "throttle-debounce";
 import { employeesAutocomplete } from "../../../../api/users";
@@ -11,8 +11,8 @@ type Props = {
 };
 
 type AutocompleteUser = {
-  fullName: string,
-  userId: string,
+  name: string,
+  id: string,
 }
 
 const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
@@ -35,6 +35,11 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
     []
   );
 
+  useEffect(() => {
+    setSearchString(externalString ?? "");
+    setFilteredItems([]);
+  }, [externalString]);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setSearchString(value);
@@ -44,8 +49,8 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
   };
 
   const handleUserSelect = (item: AutocompleteUser) => {
-    setSearchString(item.fullName);
-    onSelect(item.userId, item.fullName);
+    setSearchString(item.name);
+    onSelect(item.id, item.name);
     inputRef.current?.blur();
   };
 
@@ -93,10 +98,10 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
         >
           {filteredItems.map((user) => {
             return (
-              <li key={user.userId} className="user-option">
+              <li key={user.id} className="user-option">
                 <Avatar width={2} />
                 <a onClick={(event) => handleItemClick(event, user)}>
-                  {user.fullName}
+                  {user.name}
                 </a>
               </li>
             );

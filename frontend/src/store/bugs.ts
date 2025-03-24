@@ -1,6 +1,6 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { createBugFx } from "./newBug";
-import { $initialReportForm } from "./report";
+import { $initialReportForm, clearReport } from "./report";
 import { updateBugApi } from "@/api/bug";
 import { BugUpdateRequest } from "@/types/requests";
 import { Bug } from "@/types/bug";
@@ -23,14 +23,19 @@ export const updateBugApiEvent = createEvent<Partial<Bug>>();
 export const resetBug = createEvent<number>();
 
 export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
-  .on($initialReportForm, (_, report) =>
-    (report?.bugs as Bug[]).reduce(
+  .on($initialReportForm, (_, report) => {
+
+    if (!report?.bugs.length)
+      return;
+
+    return report.bugs.reduce(
       (acc: Record<number, Bug>, bug: Bug) => {
         acc[bug.id] = bug;
         return acc;
       },
       {} as Record<number, Bug>
     )
+  }
   )
   .on(updateBugFx.done, (state, { result }) => {
     if (!result) return state;
@@ -54,7 +59,8 @@ export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
   .on(createBugFx.doneData, (state, newBug) => ({
     ...state,
     [newBug.id]: newBug,
-  }));
+  }))
+  .reset(clearReport);
 
 export const $bugsByBugId = createStore<Record<number, BugStore>>({})
   .on($initialBugsByBugId, (_, bugs) => bugs)
@@ -90,24 +96,25 @@ export const $bugsByBugId = createStore<Record<number, BugStore>>({})
       ...state,
       [bugId]: { ...initialBug, isChanged: false },
     };
-  });
+  })
+  .reset(clearReport);
 
 export const $bugsIds = createStore<number[]>([]).on(
   $initialBugsByBugId,
   (_, bugs) => Object.keys(bugs).map(Number)
-);
+).reset(clearReport);
 
 sample({
   source: updateBugApiEvent,
   fn: (bug) =>
-    ({
-      reportId: bug.reportId,
-      bugId: bug.id,
-      bug: {
-        expect: bug.expect ?? null,
-        receive: bug.receive ?? null,
-        status: bug.status ?? null,
-      } as BugUpdateRequest,
-    } as UpdateBugParams),
+  ({
+    reportId: bug.reportId,
+    bugId: bug.id,
+    bug: {
+      expect: bug.expect ?? null,
+      receive: bug.receive ?? null,
+      status: bug.status ?? null,
+    } as BugUpdateRequest,
+  } as UpdateBugParams),
   target: updateBugFx,
 });

@@ -1,6 +1,6 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { getCommentsApi, createCommentApi } from "../api/comment";
-import { $initialReportForm } from "./report";
+import { $initialReportForm, clearReport } from "./report";
 import { Comment } from "@/types/comment";
 
 export const getCommentsFx = createEffect<
@@ -32,14 +32,18 @@ export const newBugComments = createEvent<{
 }>();
 
 export const $commentsByBugId = createStore<Record<number, Comment[]>>({})
-  .on($initialReportForm, (_, report) =>
-    report?.bugs?.reduce((acc, bug) => {
+  .on($initialReportForm, (_, report) => {
+    if (!report?.bugs.length)
+      return;
+
+    return report.bugs.reduce((acc, bug) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       // todo: разобраться с типизацией
       acc[bug.id] = bug.comments || [];
       return acc;
     }, {})
+  }
   )
   .on(newBugComments, (state, { bugId, comments }) => {
     return {
@@ -52,7 +56,8 @@ export const $commentsByBugId = createStore<Record<number, Comment[]>>({})
       ...state,
       [params.bugId]: [...(state[params.bugId] || []), result],
     };
-  });
+  })
+  .reset(clearReport);
 
 sample({
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

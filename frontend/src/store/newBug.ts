@@ -1,7 +1,7 @@
 import { createStore, createEvent, createEffect, sample } from "effector";
 import { createBugApi } from "../api/bug";
 import { BugCreateRequest } from "@/types/requests";
-import { createReportFx } from "./report";
+import { createReportFx, clearReport } from "./report";
 
 export const createBugFx = createEffect(
   async ({ reportId, bug }: { reportId: number; bug: BugCreateRequest }) => {
@@ -31,11 +31,13 @@ export const $newBugStore = createStore<{
     };
   })
   .reset(createBugFx.done)
-  .reset(createReportFx.doneData);
+  .reset(createReportFx.doneData)
+  .reset(clearReport);
 
 export const $isExists = createStore<boolean>(false)
   .on(setExists, (_, isExists) => isExists)
-  .reset(createBugFx.doneData);
+  .reset(createBugFx.doneData)
+  .reset(clearReport);
 
 export const createBugEventByApi = createEvent<{
   reportId: number;

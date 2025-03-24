@@ -18,7 +18,8 @@ namespace Bugget.Controllers;
 /// </summary>
 [LdapAuth]
 [Route("bugget/public/v1/reports")]
-public sealed class ReportsController(ReportsService reportsService,
+public sealed class ReportsController(
+    ReportsService reportsService,
     IHubContext<ReportPageHub> hubContext,
     EmployeesDataAccess employeesDataAccess) : ApiController
 {
@@ -76,10 +77,41 @@ public sealed class ReportsController(ReportsService reportsService,
     {
         var user = User.GetIdentity();
         var report = await reportsService.UpdateReportAsync(updateDto.ToReportUpdate(reportId, user.Id));
-        
+
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");
-        
+
         return report?.ToView(employeesDataAccess.DictEmployees());
+    }
+
+    /// <summary>
+    /// Поиск по репортам
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("search")]
+    [ProducesResponseType(typeof(SearchReportsView), 200)]
+    public async Task<SearchReportsView> SearchReportsAsync(
+        [FromQuery] string? query,
+        [FromQuery] int[]? reportStatuses,
+        [FromQuery] string[]? userIds,
+        [FromQuery] string[]? teamIds,
+        [FromQuery] string? sort,
+        [FromQuery] uint skip = 0,
+        [FromQuery] uint take = 10
+        )
+    {
+        var searchResult = await reportsService.SearchReportsAsync(
+            ReportMapper.ToSearchReports(
+                query,
+                reportStatuses,
+                userIds,
+                teamIds,
+                sort,
+                skip,
+                take,
+                employeesDataAccess.DictByTeamEmployees()
+                ));
+        
+        return searchResult.ToView(employeesDataAccess.DictEmployees());
     }
 }

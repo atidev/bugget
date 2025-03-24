@@ -1,6 +1,7 @@
 using Bugget.BO.Mappers;
 using Bugget.DA.Postgres;
 using Bugget.Entities.BO.ReportBo;
+using Bugget.Entities.BO.Search;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Features;
 using Bugget.Features.Context;
@@ -44,5 +45,10 @@ public sealed class ReportsService(
         await featuresService.ExecuteReportUpdatePostActions(new ReportUpdateContext(report, reportDbModel));
 
         return reportDbModel;
+    }
+    
+    public Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)
+    {
+        return reportsDbClient.SearchReportsAsync(search);
     }
 }
