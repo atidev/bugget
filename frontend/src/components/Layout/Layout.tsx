@@ -22,12 +22,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isMainPage]);
   return (
-    <div className="drawer bg-base-100">
+    <div className="drawer">
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content">
-      <Header />
-      <Breadcrumbs breadcrumbs={breadcrumbs} className="py-4" />
-      <main>{children}</main>
+        <Header />
+        <Breadcrumbs breadcrumbs={breadcrumbs} className="py-4" />
+        <main>{children}</main>
       </div>
       <Sidebar isOpen={isSidebarOpen} />
     </div>

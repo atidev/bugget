@@ -15,6 +15,7 @@ import SaveButton from "@/components/SaveButton/SaveButton";
 import UsersAutosuggest from "../UsersAutosuggest/UsersAutosuggest";
 import Avatar from "@/components/Avatar/Avatar";
 import { ReportStatuses } from "../../../../const";
+import Dropdown from "@/components/Dropdown/Dropdown";
 
 const ReportHeader = () => {
   const [
@@ -45,8 +46,11 @@ const ReportHeader = () => {
   };
 
   return (
-    <div className="report-form p-4 mb-3 bg-base-100 rounded-box shadow-lg border border-gray-300">
-      <div className="flex items-center justify-between">
+    <div className={`report-form p-4 mb-3 bg-white rounded-box shadow-lg border border-gray-300 ${reportForm.status === Number(ReportStatuses.READY)
+      ? "border-success"
+      : ""
+      }`}>
+      <div className="flex items-center justify-between items-start">
         {isNewReport ? (
           <span className="text-2xl">Новый репорт</span>
         ) : (
@@ -56,46 +60,35 @@ const ReportHeader = () => {
         )}
 
         {!isNewReport && (
-          <div className="select-wrapper">
-            <select
-              id="status"
-              className={`select text-sm rounded-lg block w-full p-2.5 dark:placeholder-gray-400 dark:text-white`}
-              // todo: remove double type convertion
-              onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
-                setUpdateStatus(Number(event.target.value) as ReportStatuses)
-              }
-              value={reportForm.status}
-            >
-              <option value={ReportStatuses.READY}>Решён</option>
-              <option value={ReportStatuses.IN_PROGRESS}>Активен</option>
-            </select>
-          </div>
+          <Dropdown
+            className="max-w-[150px]"
+            value={reportForm.status}
+            onChange={(v) => {
+              setUpdateStatus(Number(v) as ReportStatuses)
+            }}
+            options={[
+              { label: 'В работе', value: ReportStatuses.READY },
+              { label: 'Решён', value: ReportStatuses.IN_PROGRESS },
+            ]}
+          />
         )}
       </div>
-      <div className="flex flex-col justify-between items-start mt-2">
-
-        <label htmlFor="report-title" className="label mt-2 mb-1">
-          <span className="label-text">Описание проблемы</span>
-        </label>
-        <textarea
+      <div>
+        <div className="text-xs font-semibold mt-1 mb-1">Заголовок</div>
+        <input
+          type="text"
           value={reportForm.title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Описание проблемы в двух словах"
-          className="issue-description p-2 rounded-sm textarea textarea-bordered bg-base-200 resize-none focus:ring-1 focus:ring-gray-300 focus:border-gray-400"
+          className="input input-bordered w-full focus:outline-none"
           maxLength={255}
-          rows={2}
-          style={{
-            height: "auto", // Автоматическая высота
-            minHeight: "3rem", // Минимальная высота, чтобы было 2 строки
-          }}
         />
       </div>
 
-      <div className="flex justify-between items-end mt-2">
+      <div className="flex justify-between items-end">
         <div>
-          <label htmlFor="responsible" className="label mb-1">
-            <span className="label-text">Ответственный</span>
-          </label>
+          <div className="text-xs font-semibold mb-1">Ответственный</div>
+
           <div className="flex gap-4 items-center">
             <UsersAutosuggest
               onSelect={handleUserSelect}

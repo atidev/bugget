@@ -24,7 +24,7 @@ textarea.issue-description {
   bottom: 120%;
   left: 50%;
   margin-left: -110px;
- 
+
   /* Position the tooltip text - see examples below! */
   position: absolute;
   z-index: 1;
@@ -34,6 +34,7 @@ textarea.issue-description {
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
 .select-wrapper {
   width: 100px;
 }

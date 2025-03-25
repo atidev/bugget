@@ -7,9 +7,10 @@ const SearchFilters = () => {
   const statuses = useUnit($statuses)
   return (
     <>
-      <div className="mb-4 text-lg font-bold">Поисковые фильтры</div>
+      <div className="mb-4 text-lg font-base font-medium">Поисковые фильтры</div>
       <Dropdown
-        defaultValue={null}
+        className="w-[280px]"
+        onResetValue={null}
         label="Статус репорта"
         multiple
         value={statuses}

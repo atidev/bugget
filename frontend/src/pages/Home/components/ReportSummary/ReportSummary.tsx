@@ -14,12 +14,11 @@ const ReportSummary = ({ report, highlight }: ReportProps) => {
   return (
     <div
       key={report.id}
-      className={`card border bg-base-300 shadow-lg cursor-pointer ${
-        highlight ? "border-error bg-warning/10" : "border-gray-300"
-      }`}
+      className={`card border bg-white shadow-lg cursor-pointer ${highlight ? "border-error bg-warning/10" : "border-gray-300"
+        }`}
       onClick={() => navigate(`/reports/${report.id}`)}
     >
-      <div className="card-body p-4 bg-base-300">
+      <div className="card-body p-4">
         <h3 className="card-title text-lg font-semibold dark:text-stone-50">
           {report.title}
         </h3>

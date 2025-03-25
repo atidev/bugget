@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ChevronDown, X } from "lucide-react";
 
 type DropdownOption<T = string> = {
@@ -13,19 +12,21 @@ type DropdownProps<T = string> = {
     onChange: (value: T | T[] | null) => void;
     multiple?: boolean;
     className?: string;
-    defaultValue?: T | T[] | null;
+    onResetValue?: T | T[] | null;
 };
 
-const Dropdown = <T,>({
-    label,
-    options,
-    value,
-    onChange,
-    multiple = false,
-    className = "",
-    defaultValue,
-}: DropdownProps<T>) => {
-    const [open, setOpen] = useState(false);
+const Dropdown = <T,>(props: DropdownProps<T>) => {
+    const {
+        label,
+        options,
+        value,
+        onChange,
+        multiple = false,
+        className = "",
+        onResetValue
+    } = props;
+
+    const hasCustomResetValue = "onResetValue" in props;
 
     const isSelected = (val: T) =>
         multiple
@@ -47,14 +48,10 @@ const Dropdown = <T,>({
         : value !== null && value !== undefined;
 
     return (
-        <div className={`dropdown min-w-[280px] ${className}`}>
-            {label && <div className="mb-1 text-sm text-gray-600">{label}</div>}
-            <div
-                tabIndex={0}
-                className="btn w-full justify-between"
-                onClick={() => setOpen(!open)}
-            >
-                <span className="flex gap-1 flex-wrap items-center">
+        <div className={`dropdown ${className}`} tabIndex={0}>
+            {label && <div className="mb-1 text-xs font-semibold">{label}</div>}
+            <div className="btn w-full justify-between">
+                <span className="flex gap-1 flex-wrap items-center font-normal">
                     {!hasValue ? (
                         <span className="text-gray-400 font-normal">Любой</span>
                     ) : multiple ? (
@@ -73,13 +70,14 @@ const Dropdown = <T,>({
                     )}
                 </span>
                 <span className="flex items-center">
-                    {hasValue && (
+                    {hasValue && hasCustomResetValue && (
                         <button
                             type="button"
                             className="inline-flex p-2"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                onChange(defaultValue ?? (multiple ? [] : null));
+                                onChange(onResetValue ?? (multiple ? [] : null));
+                                (e.currentTarget.closest('.dropdown') as HTMLElement)?.blur();
                             }}
                         >
                             <X className="w-4 h-4 text-gray-400 hover:text-red-500" />
@@ -89,16 +87,13 @@ const Dropdown = <T,>({
                 </span>
             </div>
 
-            <ul
-                tabIndex={0}
-                className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full z-[1]"
-            >
-                {!multiple && (
+            <ul className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full z-[1]">
+                {!multiple && hasCustomResetValue && (
                     <li key="none">
                         <a
-                            onClick={() => {
+                            onClick={(e) => {
                                 onChange(null as T);
-                                setOpen(false);
+                                (e.currentTarget.closest('.dropdown') as HTMLElement)?.blur();
                             }}
                             className={value === null || value === undefined ? "active" : ""}
                         >
@@ -111,7 +106,7 @@ const Dropdown = <T,>({
                 {options.map((opt) => (
                     <li key={String(opt.value)}>
                         <a
-                            onClick={() => {
+                            onClick={(e) => {
                                 if (multiple) {
                                     const current = Array.isArray(value) ? value : [];
                                     const exists = current.includes(opt.value);
@@ -121,7 +116,7 @@ const Dropdown = <T,>({
                                     onChange(updated);
                                 } else {
                                     onChange(opt.value);
-                                    setOpen(false);
+                                    (e.currentTarget.closest('.dropdown') as HTMLElement)?.blur();
                                 }
                             }}
                             className={isSelected(opt.value) ? "active" : ""}
