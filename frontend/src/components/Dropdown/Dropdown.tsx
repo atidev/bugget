@@ -48,7 +48,7 @@ const Dropdown = <T,>({
 
     return (
         <div className={`dropdown min-w-[280px] ${className}`}>
-            {label && <div className="mb-1 text-sm font-semibold">{label}</div>}
+            {label && <div className="mb-1 text-sm text-gray-600">{label}</div>}
             <div
                 tabIndex={0}
                 className="btn w-full justify-between"

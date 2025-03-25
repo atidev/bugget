@@ -1,3 +1,5 @@
+using Bugget.Entities.Views.Users;
+
 namespace Bugget.Entities.Views;
 
 public sealed class BugView

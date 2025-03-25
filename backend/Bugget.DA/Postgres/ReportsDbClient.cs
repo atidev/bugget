@@ -90,16 +90,16 @@ public sealed class ReportsDbClient: PostgresClient
         await using var connection = await DataSource.OpenConnectionAsync();
 
         var jsonResult = await connection.ExecuteScalarAsync<string>(
-            "SELECT public.search_reports(@query, @statuses, @userIds, @sortField, @sortDesc, @skip, @take);",
+            "SELECT public.search_reports(@sortField, @sortDesc, @skip, @take, @query, @statuses, @userIds);",
             new
             {
+                sortField = search.Sort.Field,
+                sortDesc = search.Sort.IsDescending,
+                skip = (int)search.Skip,
+                take = (int)search.Take,
                 query = search.Query,
                 statuses = search.ReportStatuses,
                 userIds = search.UserIds,
-                sortField = search.Sort.Field, // "created_at" или "updated_at"
-                sortDesc = search.Sort.IsDescending,
-                skip = (int)search.Skip,
-                take = (int)search.Take
             }
         );
 

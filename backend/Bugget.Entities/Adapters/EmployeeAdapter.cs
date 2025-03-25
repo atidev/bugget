@@ -1,6 +1,7 @@
 using System.Text;
 using Bugget.Entities.BO;
 using Bugget.Entities.Views;
+using Bugget.Entities.Views.Users;
 
 namespace Bugget.Entities.Adapters;
 
