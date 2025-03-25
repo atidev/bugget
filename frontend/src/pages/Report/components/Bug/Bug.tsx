@@ -267,7 +267,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
             />
           </div>
         )}
-        {!isNewBug && <div className="mt-4">
+        {!isNewBug && <div className="mt-2">
           <Chat reportId={bug.reportId!} bugId={bug.id!} /></div>}
       </div>
     </div>
