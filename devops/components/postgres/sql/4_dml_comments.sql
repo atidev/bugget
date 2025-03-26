@@ -64,3 +64,30 @@ WHERE c.bug_id = _bug_id AND EXISTS (
 );
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE public.delete_comment(
+    p_user_id TEXT,
+    p_report_id INT,
+    p_bug_id INT,
+    p_comment_id INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    IF EXISTS (
+        SELECT 1
+        FROM public."Comment" c
+        JOIN public."Bug" b ON b.id = c.bug_id
+        JOIN public."Report" r ON r.id = b.report_id
+        WHERE c.id = p_comment_id
+          AND c.bug_id = p_bug_id
+          AND r.id = p_report_id
+          AND c.creator_user_id = p_user_id 
+    )
+    THEN
+        DELETE FROM public."Comment"
+        WHERE id = p_comment_id AND bug_id = p_bug_id;
+    END IF;
+END;
+$$;

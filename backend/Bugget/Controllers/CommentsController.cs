@@ -58,4 +58,19 @@ public sealed class CommentsController(
         var comments = await commentsService.ListCommentsAsync(reportId, bugId);
         return comments.Select(c => c.ToCommentView(employeesService.DictEmployees())).ToArray();
     }
+
+    /// <summary>
+    /// Удалить свой комментарий
+    /// </summary>
+    /// <param name="reportId"></param>
+    /// <param name="bugId"></param>
+    /// <param name="commentId"></param>
+    /// <returns></returns>
+    [HttpDelete("{commentId}")]
+    [ProducesResponseType( 200)]
+    public Task DeleteCommentAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromRoute] int commentId)
+    {
+        var user = User.GetIdentity();
+        return commentsService.DeleteCommentAsync(user.Id, reportId, bugId, commentId);
+    }
 }

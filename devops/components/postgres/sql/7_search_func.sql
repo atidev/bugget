@@ -24,11 +24,13 @@ BEGIN
             r.id,
             r.created_at,
             r.updated_at,
+            CASE WHEN _sort_field = 'rank' THEN
             (
                 COALESCE(ts_rank(r.search_vector, ts_query), 0) * 1.5 +
                 COALESCE((SELECT MAX(ts_rank(b.search_vector, ts_query)) FROM public."Bug" b WHERE b.report_id = r.id), 0) * 1.2 +
                 COALESCE((SELECT MAX(ts_rank(c.search_vector, ts_query)) FROM public."Comment" c JOIN public."Bug" b ON c.bug_id = b.id WHERE b.report_id = r.id), 0)
-            ) AS rank
+            )
+            ELSE 0 END AS rank
         FROM public."Report" r
         LEFT JOIN public."ReportParticipants" rp ON rp.report_id = r.id
         WHERE (_query IS NULL OR ts_query IS NULL OR
@@ -49,7 +51,8 @@ BEGIN
         SELECT id
         FROM ranked_reports
         ORDER BY
-            rank DESC NULLS LAST,
+            CASE WHEN _sort_field = 'rank' AND _sort_desc THEN rank END DESC NULLS LAST,
+            CASE WHEN _sort_field = 'rank' AND NOT _sort_desc THEN rank END ASC NULLS FIRST,
             CASE WHEN _sort_field = 'created' AND _sort_desc THEN created_at END DESC,
             CASE WHEN _sort_field = 'created' AND NOT _sort_desc THEN created_at END ASC,
             CASE WHEN _sort_field = 'updated' AND _sort_desc THEN updated_at END DESC,

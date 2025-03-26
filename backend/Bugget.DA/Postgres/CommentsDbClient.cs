@@ -48,6 +48,15 @@ public sealed class CommentsDbClient: PostgresClient
             .Select(json => Deserialize<CommentDbModel>(json)!)
             .ToArray();
     }
+    
+    public async Task DeleteCommentAsync(string userId, int reportId, int bugId, int commentId)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+        await connection.ExecuteAsync(
+            "CALL public.delete_comment(@user_id, @report_id, @bug_id, @comment_id);",
+            new { user_id = userId, report_id = reportId, bug_id = bugId, comment_id = commentId }
+        );
+    }
 
     private T? Deserialize<T>(string json) => JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
 }

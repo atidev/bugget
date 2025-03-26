@@ -9,17 +9,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bugget.Controllers;
 
 /// <summary>
-/// Api для работы с сотрудниками
+/// Api для работы с командами
 /// </summary>
 [LdapAuth]
-[Route("bugget/public/v1/employees")]
-public sealed class EmployeesController(EmployeesService service) : ApiController
+[Route("bugget/public/v1/teams")]
+public sealed class TeamsController(EmployeesService service) : ApiController
 {
     /// <summary>
-    /// Поиск сотрудников по имени
+    /// Поиск команды по имени
     /// </summary>
     [HttpGet("autocomplete")]
-    [ProducesResponseType(typeof(FoundedEmployeesView), 200)]
+    [ProducesResponseType(typeof(FoundedTeamsView), 200)]
     public IActionResult AutocompleteEmployees([FromQuery] [Required] string searchString,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 10,
@@ -29,13 +29,17 @@ public sealed class EmployeesController(EmployeesService service) : ApiControlle
             return BadRequest();
 
         var user = User.GetIdentity();
-        var (employees, total) = service.AutocompleteEmployees(
+        var (teams, total) = service.AutocompleteTeams(
             user.Id,
             searchString,
             skip,
             take,
             depth);
         
-        return Ok(new FoundedEmployeesView { Employees = employees, Total = total });
+        return Ok(new FoundedTeamsView { Teams = teams.Select(t=>new TeamView
+        {
+            Id = t.Id,
+            Name = t.Name
+        }), Total = total });
     }
 }

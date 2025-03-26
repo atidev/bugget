@@ -17,4 +17,9 @@ public sealed class CommentsService(CommentsDbClient commentsDbClient)
     {
         return commentsDbClient.ListCommentsAsync(reportId, bugId);
     }
+    
+    public Task DeleteCommentAsync(string userId, int reportId, int bugId, int commmentId)
+    {
+        return commentsDbClient.DeleteCommentAsync(userId, reportId, bugId, commmentId);
+    }
 }

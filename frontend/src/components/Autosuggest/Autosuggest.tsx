@@ -1,24 +1,24 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import { debounce } from "throttle-debounce";
-import { employeesAutocomplete } from "../../../../api/users";
 
-import "./UsersAutosuggest.css";
+import "./Autosuggest.css";
 
 type Props = {
-  onSelect: (id: string, name: string) => void;
   externalString?: string;
+  onSelect: (entity: AutocompleteEntity) => void;
+  autocompleteFn: (searchString: string) => Promise<AutocompleteEntity[]>;
 };
 
-type AutocompleteUser = {
-  name: string;
+type AutocompleteEntity = {
+  display: string;
   id: string;
 };
 
-const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
+const Autosuggest = ({ externalString, onSelect, autocompleteFn }: Props) => {
   const [searchString, setSearchString] = useState(externalString);
   const [filteredItems, setFilteredItems] = useState<
-    AutocompleteUser[] | never[]
+    AutocompleteEntity[] | never[]
   >([]);
   const inputRef = useRef<null | HTMLInputElement>(null);
 
@@ -26,9 +26,8 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
     () =>
       debounce(300, async (searchString: string) => {
         try {
-          const response = await employeesAutocomplete(searchString);
-          // здесь, внутри коллбэка, мы имеем доступ к результатам
-          setFilteredItems(response.employees);
+          const data = await autocompleteFn(searchString);
+          setFilteredItems(data);
         } catch (err) {
           console.error(err);
           setFilteredItems([]);
@@ -50,15 +49,15 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
     }
   };
 
-  const handleUserSelect = (item: AutocompleteUser) => {
-    setSearchString(item.name);
-    onSelect(item.id, item.name);
+  const handleUserSelect = (item: AutocompleteEntity) => {
+    setSearchString(item.display);
+    onSelect(item);
     inputRef.current?.blur();
   };
 
   const handleItemClick = (
     event: React.SyntheticEvent,
-    item: AutocompleteUser
+    item: AutocompleteEntity
   ) => {
     event.preventDefault();
     handleUserSelect(item);
@@ -67,7 +66,7 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
   const clearInput = () => {
     setSearchString("");
     setFilteredItems([]);
-    onSelect("", "");
+    onSelect({} as AutocompleteEntity);
     inputRef.current?.focus();
   };
 
@@ -106,7 +105,7 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
               <li key={user.id} className="user-option">
                 <Avatar width={2} />
                 <a onClick={(event) => handleItemClick(event, user)}>
-                  {user.name}
+                  {user.display}
                 </a>
               </li>
             );
@@ -117,4 +116,4 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
   );
 };
 
-export default UsersAutosuggest;
+export default Autosuggest;

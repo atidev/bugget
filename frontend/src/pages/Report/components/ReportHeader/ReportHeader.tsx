@@ -12,10 +12,12 @@ import {
 import "./ReportHeader.css";
 import CancelButton from "@/components/CancelButton/CancelButton";
 import SaveButton from "@/components/SaveButton/SaveButton";
-import UsersAutosuggest from "../UsersAutosuggest/UsersAutosuggest";
+import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Avatar from "@/components/Avatar/Avatar";
 import { ReportStatuses } from "../../../../const";
 import Dropdown from "@/components/Dropdown/Dropdown";
+import { employeesAutocomplete } from "@/api/users";
+import { User } from "@/types/user";
 
 const ReportHeader = () => {
   const [
@@ -47,11 +49,10 @@ const ReportHeader = () => {
 
   return (
     <div
-      className={`report-form p-4 mb-3 bg-base-100 rounded-box shadow-lg border border-gray-300 ${
-        reportForm.status === Number(ReportStatuses.READY)
-          ? "border-success"
-          : ""
-      }`}
+      className={`report-form p-4 mb-3 rounded-box shadow-lg border border-gray-300 ${reportForm.status === Number(ReportStatuses.READY)
+        ? "border-success"
+        : ""
+        }`}
     >
       <div className="flex items-center justify-between items-start">
         {isNewReport ? (
@@ -93,25 +94,32 @@ const ReportHeader = () => {
           <div className="text-xs font-semibold mb-1">Ответственный</div>
 
           <div className="flex gap-4 items-center">
-            <UsersAutosuggest
-              onSelect={handleUserSelect}
+            <Autosuggest
+              onSelect={(entity) => handleUserSelect(entity.id, entity.display)}
               externalString={reportForm.responsible?.name}
+              autocompleteFn={async (searchString) => {
+                const response = await employeesAutocomplete(searchString);
+                return (response.employees ?? []).map((e: User) => ({
+                  id: e.id,
+                  display: e.name,
+                }));
+              }}
             />
             <div className="participants-wrapper">
               {reportForm.participants?.length > 0
                 ? reportForm.participants.map((p) => (
-                    <div className="tooltip" key={p.id}>
-                      <Avatar />
-                      <span key={p.id} className="tooltiptext rounded">
-                        {p.name}
-                      </span>
-                    </div>
-                  ))
+                  <div className="tooltip" key={p.id}>
+                    <Avatar />
+                    <span key={p.id} className="tooltiptext rounded">
+                      {p.name}
+                    </span>
+                  </div>
+                ))
                 : null}
             </div>
           </div>
         </div>
-        {!isNewReport && isReportChanged && (
+        {!isNewReport && isReportChanged && reportForm.responsible?.id && (
           <div className="flex gap-2 justify-end">
             <CancelButton isChanged={isReportChanged} onReset={reset} />
             <SaveButton
