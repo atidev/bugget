@@ -46,7 +46,7 @@ const ReportHeader = () => {
   };
 
   return (
-    <div className={`report-form p-4 mb-3 bg-white rounded-box shadow-lg border border-gray-300 ${reportForm.status === Number(ReportStatuses.READY)
+    <div className={`report-form p-4 mb-3 bg-base-100 rounded-box shadow-lg border border-gray-300 ${reportForm.status === Number(ReportStatuses.READY)
       ? "border-success"
       : ""
       }`}>

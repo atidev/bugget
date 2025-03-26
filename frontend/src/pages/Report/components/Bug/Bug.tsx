@@ -118,13 +118,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
   }, [bug.receive, bug.expect]);
 
   return (
-    // <div
-    //   className={`bug bg-white card-m border border-3 transition-color duration-200 ${bug.status === Number(BugStatuses.READY)
-    //     ? "border-success"
-    //     : ""
-    //     }`}
-    // >
-    <div className={`p-4 mb-3 bg-white rounded-box shadow-lg border border-gray-300 ${bug.status === Number(BugStatuses.READY)
+    <div className={`p-4 mb-3 bg-base-100 rounded-box shadow-lg border border-gray-300 ${bug.status === Number(BugStatuses.READY)
       ? "border-success"
       : ""
       }`}>

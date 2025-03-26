@@ -7,5 +7,5 @@ body {
 	overflow-x: hidden;
 	font-family: Verdana, "Dejavu Sans", Geneva, Tahoma, sans-serif;
 	min-height: 100vh;
-	background-color: white;
+	background-color: var(--b1);
 }

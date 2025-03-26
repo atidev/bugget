@@ -20,7 +20,7 @@ const Main = () => {
     <div className="text-base-content auto-rows-min gap-4">
       <section className="flex flex-column section">
         
-      <h2 className="section-title">Ответственный</h2>
+      <h2 className="section-title text-base-content">Ответственный</h2>
       <div className="reports-summary-wrapper">
         {!!responsibleReports.length && (
           responsibleReports.map((report) => (
@@ -31,7 +31,7 @@ const Main = () => {
       </section>
       <div className="divider section-divider"></div>  
       <section className="flex flex-column section">
-      <h2 className="section-title">Участник</h2>
+      <h2 className="section-title text-base-content">Участник</h2>
       <div className="reports-summary-wrapper">
         {!!participantReports.length && (
           participantReports.map((report) => (

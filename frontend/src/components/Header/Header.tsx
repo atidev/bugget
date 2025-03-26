@@ -36,7 +36,7 @@ const Header = () => {
 
         {isVisible("search") && (
           <button
-            className="btn bg-white"
+            className="btn bg-base-100"
             onClick={() => navigate("/search")}
           >
             <Search className="w-4 h-4" />

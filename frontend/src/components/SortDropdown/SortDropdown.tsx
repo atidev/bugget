@@ -47,7 +47,7 @@ const SortDropdown = <T,>({
       <div className="relative">
         <button
           type="button"
-          className="px-4 py-2 inline-flex gap-2 items-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="px-4 py-2 inline-flex gap-2 items-center text-sm font-medium text-base-content hover:bg-base-200"
           onClick={() => setOpen(!open)}
         >
           {selectedLabel}
@@ -55,12 +55,12 @@ const SortDropdown = <T,>({
         </button>
 
         {open && (
-          <ul className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-md shadow">
+          <ul className="absolute z-50 mt-1 w-full bg-base-100 border border-gray-300 rounded-md shadow">
             {options.map((opt) => (
               <li key={String(opt.value)}>
                 <button
                   type="button"
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 ${opt.value === value ? "bg-gray-100 font-semibold" : ""
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-base-200 ${opt.value === value ? "bg-base-200 font-semibold" : ""
                     }`}
                   onClick={() => {
                     onChange(opt.value);
@@ -77,7 +77,7 @@ const SortDropdown = <T,>({
 
       <button
         type="button"
-        className="border-l border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50"
+        className="border-l border-gray-300 px-3 py-2 text-base-content hover:bg-base-200"
         onClick={onToggleDirection}
       >
         {direction === "asc" ? (
