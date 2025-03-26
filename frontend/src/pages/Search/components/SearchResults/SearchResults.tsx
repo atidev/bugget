@@ -4,6 +4,21 @@ import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import { getStatusMeta } from "@/constants/status";
 import { useNavigate } from "react-router-dom";
+import { Report } from "@/types/report";
+
+const getLatestUpdateDate = (report: Report) => {
+  return new Date(
+    Math.max(
+      new Date(report.updatedAt).getTime(),
+      ...report.bugs.map((bug) =>
+        Math.max(
+          new Date(bug.updatedAt).getTime(),
+          ...bug.comments.map((c) => new Date(c.updatedAt).getTime())
+        )
+      )
+    )
+  );
+};
 
 const SearchResults = () => {
   const [searhResult] = useUnit([$searchResult]);
@@ -45,7 +60,7 @@ const SearchResults = () => {
             </div>
             <div className="text-sm text-base-content/70">
               Последнее обновление:{" "}
-              {formatDistanceToNow(new Date(report.updatedAt), {
+              {formatDistanceToNow(getLatestUpdateDate(report), {
                 addSuffix: true,
                 locale: ru,
               })}
