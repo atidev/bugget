@@ -1,5 +1,5 @@
 import { createEffect, createStore, sample } from "effector";
-import { fetchReportsSummary } from "../api/reportsSummary";
+import { fetchReportsSummary } from "@/api/reportsSummary";
 import { $user } from "./user";
 import { Report } from "@/types/report";
 

@@ -1,14 +1,21 @@
-import "./Header.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { clearReport } from "@/store/report";
+import { Search } from "lucide-react";
+
+const HIDDEN_BUTTONS = {
+  createReport: ["/reports"],
+  search: ["/search"],
+};
 
 const Header = () => {
+  const isVisible = (button: keyof typeof HIDDEN_BUTTONS) =>
+    !HIDDEN_BUTTONS[button].includes(location.pathname);
+
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isNotCreatePage = location.pathname !== "/reports";
   return (
-    <header className="h-16 justify-between bg-base-300 shadow-sm px-3 flex items-center">
+    <header className="h-16 justify-between bg-base-100 shadow-sm px-3 flex items-center">
       <label htmlFor="my-drawer" className="btn bg-base-200 drawer-button ">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -25,10 +32,19 @@ const Header = () => {
           ></path>{" "}
         </svg>
       </label>
-      {isNotCreatePage && (
-        <>
+      <div>
+        {isVisible("search") && (
           <button
-            className="btn-create-report"
+            className="btn bg-base-100"
+            onClick={() => navigate("/search")}
+          >
+            <Search className="w-4 h-4" />
+          </button>
+        )}
+
+        {isVisible("createReport") && (
+          <button
+            className="btn btn-primary ml-2 font-normal"
             onClick={() => {
               clearReport();
               navigate("/reports");
@@ -36,8 +52,8 @@ const Header = () => {
           >
             Новый репорт
           </button>
-        </>
-      )}
+        )}
+      </div>
     </header>
   );
 };

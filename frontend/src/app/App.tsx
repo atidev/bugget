@@ -6,6 +6,7 @@ import Reports from "../pages/Report/ReportPage";
 import "../styles/tailwind.css";
 import { useEffect } from "react";
 import { authFx } from "../store/user";
+import Search from "@/pages/Search/Search";
 
 const App = () => {
   useEffect(() => {
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/reports/:reportId" element={<Reports />} />
+          <Route path="/search" element={<Search />} />
         </Routes>
       </Layout>
     </Router>

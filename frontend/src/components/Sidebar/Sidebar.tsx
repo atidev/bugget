@@ -18,11 +18,11 @@ const Sidebar: React.FC<SidebarProps> = () => {
       ></label>
       <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4 sidebar">
         {/* Sidebar content here */}
-        {user?.name &&
-        <li>
-          <a href="/">{user.name}</a>
-        </li>
-        }
+        {user?.name && (
+          <li>
+            <a href="/">{user.name}</a>
+          </li>
+        )}
         <li>
           <a>В разработке</a>
         </li>

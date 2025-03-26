@@ -20,7 +20,7 @@ export const createCommentApi = async (
   try {
     const { data } = await axios.post(
       `v1/reports/${reportId}/bugs/${bugId}/comments`,
-      {text:text}
+      { text: text }
     );
     return data;
   } catch (error) {

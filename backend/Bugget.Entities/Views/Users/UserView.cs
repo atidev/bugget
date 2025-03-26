@@ -1,4 +1,4 @@
-namespace Bugget.Entities.Views;
+namespace Bugget.Entities.Views.Users;
 
 public sealed class UserView
 {

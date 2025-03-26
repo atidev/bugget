@@ -21,6 +21,7 @@ import { Chat } from "./components/Chat/Chat";
 import { uploadAttachmentFx } from "../../../../store/attachments";
 import ImageCarousel from "./components/ImageCarousel/ImageCarousel";
 import { BugStore } from "../../../../types/stores";
+import Dropdown from "@/components/Dropdown/Dropdown";
 
 interface BugProps {
   reportId?: number | null;
@@ -118,10 +119,8 @@ const Bug = ({ reportId, bugId }: BugProps) => {
 
   return (
     <div
-      className={`bug bg-base-200 rounded-box card-m shadow-xs border border-3 transition-color duration-200 ${
-        bug.status === Number(BugStatuses.READY)
-          ? "border-3 border-success shadow-lg"
-          : "border-base-200"
+      className={`p-4 mb-3 bg-base-100 rounded-box shadow-lg border border-gray-300 ${
+        bug.status === Number(BugStatuses.READY) ? "border-success" : ""
       }`}
     >
       <div className="bug-content-wrapper">
@@ -136,27 +135,20 @@ const Bug = ({ reportId, bugId }: BugProps) => {
 
           {/* Селект статуса (только для существующего бага) */}
           {!isNewBug && (
-            <div className="select-wrapper">
-              <select
-                id="status"
-                className={`select ${
-                  bug.status === Number(BugStatuses.READY)
-                    ? "select-success border-success"
-                    : ""
-                } text-sm rounded-lg block w-full p-2.5`}
-                onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
-                  const newStatus = event.target.value;
-                  updateBugData({ id: bug.id!, status: Number(newStatus) });
-                }}
-                value={bug.status}
-              >
-                <option value={Number(BugStatuses.READY)}>Решён</option>
-                <option value={Number(BugStatuses.IN_PROGRESS)}>Активен</option>
-              </select>
-            </div>
+            <Dropdown
+              className="max-w-[150px]"
+              onChange={(v) => {
+                updateBugData({ id: bug.id!, status: Number(v) });
+              }}
+              value={bug.status}
+              options={[
+                { label: "Исправлен", value: BugStatuses.READY },
+                { label: "Открыт", value: BugStatuses.IN_PROGRESS },
+              ]}
+            />
           )}
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 text-xs font-semibold mb-1 mt-3">
           <span className="w-1/2">Фактический результат</span>
           <span className="w-1/2">Ожидаемый результат</span>
         </div>
@@ -173,7 +165,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
                     status: bug.status,
                   })
             }
-            className="textarea bug-section p-4 bg-base-100"
+            className="textarea bug-section p-4 bg-base-100 focus:outline-none"
           />
           <textarea
             ref={textareaRefExpect}
@@ -187,7 +179,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
                     status: bug.status,
                   })
             }
-            className="textarea bug-section p-4 bg-base-100"
+            className="textarea bug-section p-4 bg-base-100 focus:outline-none"
           />
         </div>
         <div className="flex gap-3">
@@ -205,7 +197,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               {/* Кнопка "плюс" — открывает окно выбора файла */}
               {!isNewBug && (
                 <button
-                  className="btn btn-info btn-outline "
+                  className="btn btn-accent btn-outline mt-2"
                   onClick={() => fileInputRefRecieve.current?.click()}
                 >
                   + Добавить файл
@@ -230,7 +222,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               {/* Кнопка "плюс" — открывает окно выбора файла */}
               {!isNewBug && (
                 <button
-                  className="btn btn-info btn-outline "
+                  className="btn btn-accent btn-outline mt-2"
                   onClick={() => fileInputRefExpected.current?.click()}
                 >
                   + Добавить файл
@@ -244,7 +236,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
         </div>
         {/* Кнопки "Сохранить" / "Отмена" */}
         {!isNewReport && isBugChanged && (
-          <div className="flex gap-2 justify-end">
+          <div className="flex gap-2 justify-end mt-2">
             <CancelButton
               isChanged={isBugChanged}
               onReset={() => {
@@ -270,9 +262,11 @@ const Bug = ({ reportId, bugId }: BugProps) => {
             />
           </div>
         )}
-
-        {/* Комментарии (Chat) */}
-        {!isNewBug && <Chat reportId={bug.reportId!} bugId={bug.id!} />}
+        {!isNewBug && (
+          <div className="mt-2">
+            <Chat reportId={bug.reportId!} bugId={bug.id!} />
+          </div>
+        )}
       </div>
     </div>
   );

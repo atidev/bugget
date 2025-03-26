@@ -9,7 +9,7 @@ const SaveButton: React.FC<SaveButtonProps> = ({ isChanged, onSave }) => {
   return (
     <button
       onClick={onSave}
-      className={`btn btn-info px-4 py-2 rounded text-white`}
+      className={`btn btn-primary px-4 py-2`}
       disabled={!isChanged}
     >
       Сохранить

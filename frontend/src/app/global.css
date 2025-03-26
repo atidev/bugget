@@ -1,27 +1,11 @@
 * {
   box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-
-:root {
-  --glz-color-neutral-tone-1: #f8f9fa;
-  --glz-color-neutral-tone-2: #e9ecef;
-  --glz-color-neutral-tone-3: #dee2e6;
-  --glz-color-neutral-tone-4: #ced4da;
-  --glz-color-neutral-tone-5: #adb5bd; /* основной цвет */
-  --glz-color-neutral-tone-6: #6c757d;
-  --glz-color-neutral-tone-7: #495057;
-  --glz-color-neutral-tone-8: #343a40;
-  --glz-color-neutral-tone-9: #212529;
-  --header-color: #212529;
-  --sidebar-color: rgb(17, 169, 169);
-  --report-color: rgb(244, 117, 212);
 }
 
 html,
 body {
   overflow-x: hidden;
   font-family: Verdana, "Dejavu Sans", Geneva, Tahoma, sans-serif;
+  min-height: 100vh;
+  background-color: var(--b1);
 }

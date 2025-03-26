@@ -14,19 +14,17 @@ const ReportSummary = ({ report, highlight }: ReportProps) => {
   return (
     <div
       key={report.id}
-      className={`card border bg-base-300 shadow-lg cursor-pointer ${
+      className={`card border bg-base-100 shadow-lg cursor-pointer ${
         highlight ? "border-error bg-warning/10" : "border-gray-300"
       }`}
       onClick={() => navigate(`/reports/${report.id}`)}
     >
-      <div className="card-body p-4 bg-base-300">
-        <h3 className="card-title text-lg font-semibold dark:text-stone-50">
-          {report.title}
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-stone-300">
+      <div className="card-body p-4">
+        <h3 className="card-title text-lg font-semibold">{report.title}</h3>
+        <p className="text-sm dark:text-stone-300">
           Ответственный: {report.responsible.name}
         </p>
-        <p className="text-sm text-gray-500 dark:text-stone-200">
+        <p className="text-sm dark:text-stone-200">
           Участники:{" "}
           {report.participants
             .map((participant) => participant.name)

@@ -43,8 +43,7 @@ export const $isNewReport = createStore<boolean>(true)
   .on(setIsNewReport, (_, isNew) => isNew)
   .reset(clearReport);
 
-export const $isReportChanged = createStore<boolean>(false)
-.reset(clearReport);
+export const $isReportChanged = createStore<boolean>(false).reset(clearReport);
 
 export const $initialReportForm = createStore<Report | null>(null)
   .on(fetchReportFx.doneData, (_, report) => report)

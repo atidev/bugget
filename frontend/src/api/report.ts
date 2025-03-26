@@ -1,5 +1,4 @@
 import axios from "./axios";
-// import dataMock from "../mocks/report.json";
 
 export const fetchReport = async (id: number) => {
   try {

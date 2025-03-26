@@ -1,11 +1,11 @@
 CREATE OR REPLACE FUNCTION public.search_reports(
+    _sort_field TEXT,
+    _sort_desc BOOLEAN,
+    _skip INT,
+    _take INT,
     _query TEXT DEFAULT NULL,
     _statuses INT[] DEFAULT NULL,
-    _user_ids TEXT[] DEFAULT NULL,
-    _sort_field TEXT DEFAULT 'created_at',
-    _sort_desc BOOLEAN DEFAULT TRUE,
-    _skip INT DEFAULT 0,
-    _take INT DEFAULT 10
+    _user_ids TEXT[] DEFAULT NULL
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -50,10 +50,10 @@ BEGIN
         FROM ranked_reports
         ORDER BY
             rank DESC NULLS LAST,
-            CASE WHEN _sort_field = 'created_at' AND _sort_desc THEN created_at END DESC,
-            CASE WHEN _sort_field = 'created_at' AND NOT _sort_desc THEN created_at END ASC,
-            CASE WHEN _sort_field = 'updated_at' AND _sort_desc THEN updated_at END DESC,
-            CASE WHEN _sort_field = 'updated_at' AND NOT _sort_desc THEN updated_at END ASC
+            CASE WHEN _sort_field = 'created' AND _sort_desc THEN created_at END DESC,
+            CASE WHEN _sort_field = 'created' AND NOT _sort_desc THEN created_at END ASC,
+            CASE WHEN _sort_field = 'updated' AND _sort_desc THEN updated_at END DESC,
+            CASE WHEN _sort_field = 'updated' AND NOT _sort_desc THEN updated_at END ASC
         OFFSET _skip LIMIT _take
     ),
     reports_array AS (

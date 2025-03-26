@@ -108,28 +108,25 @@ public static class ReportMapper
     public static SearchReports ToSearchReports(
         string? query,
         int[]? reportStatuses,
-        string[]? userIds,
-        string[]? teamIds,
+        string? userId,
+        string? teamId,
         string? sort,
         uint skip,
         uint take,
         IReadOnlyDictionary<string, IReadOnlyCollection<Employee>> employeesByTeam)
     {
         List<string> resultUserIds = [];
-        if (teamIds?.Length >= 0)
+        if (!string.IsNullOrEmpty(teamId))
         {
-            foreach (var teamId in teamIds)
+            if (employeesByTeam.TryGetValue(teamId, out var team))
             {
-                if (employeesByTeam.TryGetValue(teamId, out var team))
-                {
-                    resultUserIds.AddRange(team.Select(e => e.Id));
-                }
+                resultUserIds.AddRange(team.Select(e => e.Id));
             }
         }
 
-        if (userIds?.Length >= 0)
+        if (!string.IsNullOrEmpty(userId))
         {
-            resultUserIds.AddRange(userIds);
+            resultUserIds.AddRange(userId);
         }
 
         return new SearchReports

@@ -9,7 +9,7 @@ const CancelButton: React.FC<CancelButtonProps> = ({ isChanged, onReset }) => {
   return (
     <button
       onClick={onReset}
-      className={`px-4 py-2 btn btn-outline btn-info`}
+      className={`px-4 py-2 btn btn-outline btn-secondary`}
       disabled={!isChanged}
     >
       Отменить

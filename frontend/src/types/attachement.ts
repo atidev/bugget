@@ -1,4 +1,3 @@
-
 export type Attachment = {
   id: number;
   bugId: number;

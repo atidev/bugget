@@ -2,7 +2,10 @@ import { Bug } from "@/types/bug";
 import axios from "./axios";
 import { BugUpdateRequest } from "@/types/requests";
 
-export const createBugApi = async (reportId: number, createBugRequest: BugUpdateRequest) => {
+export const createBugApi = async (
+  reportId: number,
+  createBugRequest: BugUpdateRequest
+) => {
   try {
     const { data } = await axios.post(
       `/v1/reports/${reportId}/bugs`,

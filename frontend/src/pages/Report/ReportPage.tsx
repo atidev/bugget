@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { setBreadcrumbs } from '../../store/breadcrumbs';
+import { setBreadcrumbs } from "../../store/breadcrumbs";
 import { useList, useUnit } from "effector-react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -16,8 +16,7 @@ import ReportHeader from "./components/ReportHeader/ReportHeader";
 import "./ReportPage.css";
 import useWebSocketReportPage from "../../hooks/useWebSocketReportPage";
 
-const reportsPageBreadcrumb =
-  { label: "Репорты", path: '/' };
+const reportsPageBreadcrumb = { label: "Репорты", path: "/" };
 
 const ReportPage = () => {
   const { reportId } = useParams();
@@ -60,14 +59,17 @@ const ReportPage = () => {
   }, [reportId]);
 
   useEffect(() => {
-    setBreadcrumbs([
-      reportsPageBreadcrumb,
-      isNewReport ?
-        { label: "Новый репорт", path: `/reports` } :
-        {
-          label: `Репорт #${reportId}`, path: `/reports/${reportId}`
-        }
-    ].filter(Boolean));
+    setBreadcrumbs(
+      [
+        reportsPageBreadcrumb,
+        isNewReport
+          ? { label: "Новый репорт", path: `/reports` }
+          : {
+              label: `Репорт #${reportId}`,
+              path: `/reports/${reportId}`,
+            },
+      ].filter(Boolean)
+    );
   }, [reportId, isNewReport]);
 
   const handleCreateReport = async () => {
@@ -93,7 +95,7 @@ const ReportPage = () => {
 
       {!isNewReport && bugsIds.length > 0 && !isExists && (
         <button
-          className="btn btn-block btn-outline btn-info mt-5"
+          className="btn btn-block btn-outline btn-primary mt-5"
           onClick={() => setExistsHandler(true)}
         >
           + Добавить баг
@@ -102,12 +104,11 @@ const ReportPage = () => {
 
       {isExists && <Bug reportId={reportForm.id} />}
 
-
       {isNewReport && newBugStore.isReady && reportForm.responsible?.id && (
         <div className="button-wrapper">
           <button
             onClick={handleCreateReport}
-            className="btn btn-info text-white px-4 py-2 rounded"
+            className="btn btn-primary font-normal"
           >
             Создать репорт
           </button>

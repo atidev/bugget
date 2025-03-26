@@ -4,6 +4,7 @@ import {
   addCommentFx,
   $commentsByBugId,
 } from "../../../../../../store/comments";
+import { SendHorizonal } from "lucide-react";
 
 type BugChatProps = {
   reportId: number;
@@ -47,8 +48,6 @@ export const Chat = ({ reportId, bugId }: BugChatProps) => {
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="text-xl font-bold mb-4">Комментарии</div>
-
       <div className="flex-1 overflow-auto mb-4 space-y-2">
         {comments.map((comment, index) => (
           <div
@@ -61,7 +60,7 @@ export const Chat = ({ reportId, bugId }: BugChatProps) => {
         ))}
       </div>
 
-      <div className="flex items-center space-x-2">
+      <div className="flex items-end space-x-2">
         <textarea
           ref={textareaRef}
           value={newCommentText}
@@ -74,22 +73,9 @@ export const Chat = ({ reportId, bugId }: BugChatProps) => {
         <button
           onClick={handleAddComment}
           disabled={isAdding}
-          className="btn btn-info text-white px-4 py-1 rounded disabled:opacity-50 flex items-center justify-center"
+          className="btn btn-accent text-white px-4 py-1 rounded disabled:opacity-50 flex items-center justify-center h-[32px]"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="size-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-            />
-          </svg>
+          <SendHorizonal className="size-6" />
         </button>
       </div>
     </div>

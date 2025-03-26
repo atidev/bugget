@@ -93,8 +93,8 @@ public sealed class ReportsController(
     public async Task<SearchReportsView> SearchReportsAsync(
         [FromQuery] string? query,
         [FromQuery] int[]? reportStatuses,
-        [FromQuery] string[]? userIds,
-        [FromQuery] string[]? teamIds,
+        [FromQuery] string? userId,
+        [FromQuery] string? teamId,
         [FromQuery] string? sort,
         [FromQuery] uint skip = 0,
         [FromQuery] uint take = 10
@@ -104,8 +104,8 @@ public sealed class ReportsController(
             ReportMapper.ToSearchReports(
                 query,
                 reportStatuses,
-                userIds,
-                teamIds,
+                userId,
+                teamId,
                 sort,
                 skip,
                 take,
