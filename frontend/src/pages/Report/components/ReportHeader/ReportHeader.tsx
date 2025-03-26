@@ -67,8 +67,8 @@ const ReportHeader = () => {
               setUpdateStatus(Number(v) as ReportStatuses)
             }}
             options={[
-              { label: 'В работе', value: ReportStatuses.READY },
-              { label: 'Решён', value: ReportStatuses.IN_PROGRESS },
+              { label: 'Решён', value: ReportStatuses.READY },
+              { label: 'В работе', value: ReportStatuses.IN_PROGRESS },
             ]}
           />
         )}
