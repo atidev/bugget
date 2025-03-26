@@ -5,8 +5,8 @@
 .dropdown-content.menu .user-option {
   display: flex;
   flex-direction: row;
-  gap: calc(0.25rem* 2);
-  padding-inline: calc(0.25rem* 2);
+  gap: calc(0.25rem * 2);
+  padding-inline: calc(0.25rem * 2);
   width: max-content;
 }
 
@@ -22,4 +22,3 @@ ul.users-list {
   transform: none;
   translate: none;
 }
-

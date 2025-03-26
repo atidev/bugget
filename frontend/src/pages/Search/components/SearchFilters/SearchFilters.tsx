@@ -3,11 +3,12 @@ import { updateStatuses, $statuses } from "@/store/search";
 import { useUnit } from "effector-react";
 
 const SearchFilters = () => {
-
-  const statuses = useUnit($statuses)
+  const statuses = useUnit($statuses);
   return (
     <>
-      <div className="mb-4 text-lg font-base font-medium">Поисковые фильтры</div>
+      <div className="mb-4 text-lg font-base font-medium">
+        Поисковые фильтры
+      </div>
       <Dropdown
         className="w-[280px]"
         onResetValue={null}
@@ -16,11 +17,11 @@ const SearchFilters = () => {
         value={statuses}
         onChange={(value) => {
           const list = Array.isArray(value) ? value : [value];
-          updateStatuses(list.filter(v => v !== null));
+          updateStatuses(list.filter((v) => v !== null));
         }}
         options={[
-          { label: 'В работе', value: 0 },
-          { label: 'Решён', value: 1 },
+          { label: "В работе", value: 0 },
+          { label: "Решён", value: 1 },
         ]}
       />
     </>

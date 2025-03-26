@@ -9,4 +9,3 @@ export const searchReports = async (searchParams: string) => {
     return [];
   }
 };
-

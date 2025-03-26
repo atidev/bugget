@@ -24,9 +24,7 @@ export const resetBug = createEvent<number>();
 
 export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
   .on($initialReportForm, (_, report) => {
-
-    if (!report?.bugs.length)
-      return;
+    if (!report?.bugs.length) return;
 
     return report.bugs.reduce(
       (acc: Record<number, Bug>, bug: Bug) => {
@@ -34,9 +32,8 @@ export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
         return acc;
       },
       {} as Record<number, Bug>
-    )
-  }
-  )
+    );
+  })
   .on(updateBugFx.done, (state, { result }) => {
     if (!result) return state;
 
@@ -99,22 +96,21 @@ export const $bugsByBugId = createStore<Record<number, BugStore>>({})
   })
   .reset(clearReport);
 
-export const $bugsIds = createStore<number[]>([]).on(
-  $initialBugsByBugId,
-  (_, bugs) => Object.keys(bugs).map(Number)
-).reset(clearReport);
+export const $bugsIds = createStore<number[]>([])
+  .on($initialBugsByBugId, (_, bugs) => Object.keys(bugs).map(Number))
+  .reset(clearReport);
 
 sample({
   source: updateBugApiEvent,
   fn: (bug) =>
-  ({
-    reportId: bug.reportId,
-    bugId: bug.id,
-    bug: {
-      expect: bug.expect ?? null,
-      receive: bug.receive ?? null,
-      status: bug.status ?? null,
-    } as BugUpdateRequest,
-  } as UpdateBugParams),
+    ({
+      reportId: bug.reportId,
+      bugId: bug.id,
+      bug: {
+        expect: bug.expect ?? null,
+        receive: bug.receive ?? null,
+        status: bug.status ?? null,
+      } as BugUpdateRequest,
+    }) as UpdateBugParams,
   target: updateBugFx,
 });

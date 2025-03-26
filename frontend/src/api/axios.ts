@@ -1,6 +1,9 @@
 import axios from "axios";
 
-import { convertObjectToCamel, convertObjectToSnake } from "../utils/convertCases";
+import {
+  convertObjectToCamel,
+  convertObjectToSnake,
+} from "../utils/convertCases";
 
 const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
 
@@ -24,7 +27,6 @@ instance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 
 // Интерцептор ответа: преобразуем snake_case → camelCase
 instance.interceptors.response.use((response) => {

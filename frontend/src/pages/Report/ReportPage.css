@@ -1,9 +1,9 @@
 .reports-wrapper {
-	display: flex;
-	flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .button-wrapper {
-	display: flex;
-	justify-content: end;
+  display: flex;
+  justify-content: end;
 }

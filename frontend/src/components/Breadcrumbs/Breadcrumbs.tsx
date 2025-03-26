@@ -6,19 +6,17 @@ type Props = {
 };
 
 const Breadcrumbs = ({ breadcrumbs, className }: Props) => (
-  <div className={`breadcrumbs text-sm mx-4 ${className}`} >
+  <div className={`breadcrumbs text-sm mx-4 ${className}`}>
     <ul>
-  {breadcrumbs.map((breadcrumb) => {
-    return (
-      <li key={breadcrumb.path}>
-        <a href={breadcrumb.path}>
-          {breadcrumb.label}
-        </a>
-      </li>
-    )
-  })}
-</ul>
+      {breadcrumbs.map((breadcrumb) => {
+        return (
+          <li key={breadcrumb.path}>
+            <a href={breadcrumb.path}>{breadcrumb.label}</a>
+          </li>
+        );
+      })}
+    </ul>
   </div>
-)
+);
 
 export default Breadcrumbs;

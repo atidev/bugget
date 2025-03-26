@@ -11,13 +11,15 @@ type Props = {
 };
 
 type AutocompleteUser = {
-  name: string,
-  id: string,
-}
+  name: string;
+  id: string;
+};
 
 const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
   const [searchString, setSearchString] = useState(externalString);
-  const [filteredItems, setFilteredItems] = useState<AutocompleteUser[] | never[]>([]);
+  const [filteredItems, setFilteredItems] = useState<
+    AutocompleteUser[] | never[]
+  >([]);
   const inputRef = useRef<null | HTMLInputElement>(null);
 
   const debouncedAutocompleteSearch = useMemo(
@@ -54,7 +56,10 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
     inputRef.current?.blur();
   };
 
-  const handleItemClick = (event: React.SyntheticEvent, item: AutocompleteUser) => {
+  const handleItemClick = (
+    event: React.SyntheticEvent,
+    item: AutocompleteUser
+  ) => {
     event.preventDefault();
     handleUserSelect(item);
   };
@@ -64,7 +69,7 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
     setFilteredItems([]);
     onSelect("", "");
     inputRef.current?.focus();
-  }
+  };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Backspace" && !searchString) {
@@ -83,14 +88,14 @@ const UsersAutosuggest = ({ onSelect, externalString }: Props) => {
         onKeyDown={handleKeyDown}
       />
       {searchString && (
-      <button
-        className="clear-button btn btn-square btn-ghost bg-transparent hover:bg-transparent absolute right-1 top-1/2 transform -translate-y-1/2 shadow-none border-none"
-        onClick={clearInput}
-        aria-label="Очистить"
-      >
-        <span>&times;</span>
-      </button>
-    )}
+        <button
+          className="clear-button btn btn-square btn-ghost bg-transparent hover:bg-transparent absolute right-1 top-1/2 transform -translate-y-1/2 shadow-none border-none"
+          onClick={clearInput}
+          aria-label="Очистить"
+        >
+          <span>&times;</span>
+        </button>
+      )}
       {!!filteredItems?.length && (
         <ul
           tabIndex={0}

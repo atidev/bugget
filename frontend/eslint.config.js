@@ -20,9 +20,7 @@ export default tseslint.config(
     settings: {
       "import/resolver": {
         alias: {
-          map: [
-            ["@/", "./src/"],
-          ],
+          map: [["@/", "./src/"]],
           // не забудьте указать расширения, если необходимо
           extensions: [".js", ".jsx", ".ts", ".tsx"],
         },

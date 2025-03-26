@@ -1,5 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, ArrowDownNarrowWide, ArrowUpWideNarrow } from "lucide-react";
+import {
+  ChevronDown,
+  ArrowDownNarrowWide,
+  ArrowUpWideNarrow,
+} from "lucide-react";
 
 export type SortOption<T = string> = {
   label: string;
@@ -60,8 +64,9 @@ const SortDropdown = <T,>({
               <li key={String(opt.value)}>
                 <button
                   type="button"
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-base-200 ${opt.value === value ? "bg-base-200 font-semibold" : ""
-                    }`}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-base-200 ${
+                    opt.value === value ? "bg-base-200 font-semibold" : ""
+                  }`}
                   onClick={() => {
                     onChange(opt.value);
                     setOpen(false);

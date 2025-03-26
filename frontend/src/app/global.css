@@ -1,11 +1,11 @@
 * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html,
 body {
-	overflow-x: hidden;
-	font-family: Verdana, "Dejavu Sans", Geneva, Tahoma, sans-serif;
-	min-height: 100vh;
-	background-color: var(--b1);
+  overflow-x: hidden;
+  font-family: Verdana, "Dejavu Sans", Geneva, Tahoma, sans-serif;
+  min-height: 100vh;
+  background-color: var(--b1);
 }

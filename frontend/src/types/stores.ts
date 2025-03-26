@@ -12,7 +12,5 @@ export interface BugStore {
 export type ReportStore = {
   title: string;
   bugs: BugStore[];
-  responsibleId?: string,
+  responsibleId?: string;
 };
-
-

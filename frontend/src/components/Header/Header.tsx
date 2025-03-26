@@ -2,12 +2,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { clearReport } from "@/store/report";
 import { Search } from "lucide-react";
 
-const Header = () => {
-  const HIDDEN_BUTTONS = {
-    createReport: ["/reports"],
-    search: ["/search"],
-  };
+const HIDDEN_BUTTONS = {
+  createReport: ["/reports"],
+  search: ["/search"],
+};
 
+const Header = () => {
   const isVisible = (button: keyof typeof HIDDEN_BUTTONS) =>
     !HIDDEN_BUTTONS[button].includes(location.pathname);
 
@@ -33,7 +33,6 @@ const Header = () => {
         </svg>
       </label>
       <div>
-
         {isVisible("search") && (
           <button
             className="btn bg-base-100"
@@ -54,7 +53,6 @@ const Header = () => {
             Новый репорт
           </button>
         )}
-
       </div>
     </header>
   );

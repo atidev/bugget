@@ -50,13 +50,13 @@ const Bug = ({ reportId, bugId }: BugProps) => {
       return id
         ? state[id]
         : ({
-          id: bugId,
-          status: Number(BugStatuses.IN_PROGRESS),
-          reportId,
-          receive: "",
-          expect: "",
-          isChanged: false,
-        } as BugStore);
+            id: bugId,
+            status: Number(BugStatuses.IN_PROGRESS),
+            reportId,
+            receive: "",
+            expect: "",
+            isChanged: false,
+          } as BugStore);
     },
   });
 
@@ -118,10 +118,11 @@ const Bug = ({ reportId, bugId }: BugProps) => {
   }, [bug.receive, bug.expect]);
 
   return (
-    <div className={`p-4 mb-3 bg-base-100 rounded-box shadow-lg border border-gray-300 ${bug.status === Number(BugStatuses.READY)
-      ? "border-success"
-      : ""
-      }`}>
+    <div
+      className={`p-4 mb-3 bg-base-100 rounded-box shadow-lg border border-gray-300 ${
+        bug.status === Number(BugStatuses.READY) ? "border-success" : ""
+      }`}
+    >
       <div className="bug-content-wrapper">
         <div className="flex items-center justify-between">
           {isNewBug ? (
@@ -141,8 +142,8 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               }}
               value={bug.status}
               options={[
-                { label: 'Исправлен', value: BugStatuses.READY },
-                { label: 'Открыт', value: BugStatuses.IN_PROGRESS },
+                { label: "Исправлен", value: BugStatuses.READY },
+                { label: "Открыт", value: BugStatuses.IN_PROGRESS },
               ]}
             />
           )}
@@ -159,10 +160,10 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               isNewBug
                 ? updateNewBugData({ receive: e.target.value })
                 : updateBugData({
-                  id: bug.id!,
-                  receive: e.target.value,
-                  status: bug.status,
-                })
+                    id: bug.id!,
+                    receive: e.target.value,
+                    status: bug.status,
+                  })
             }
             className="textarea bug-section p-4 bg-base-100 focus:outline-none"
           />
@@ -173,10 +174,10 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               isNewBug
                 ? updateNewBugData({ expect: e.target.value })
                 : updateBugData({
-                  id: bug.id!,
-                  expect: e.target.value,
-                  status: bug.status,
-                })
+                    id: bug.id!,
+                    expect: e.target.value,
+                    status: bug.status,
+                  })
             }
             className="textarea bug-section p-4 bg-base-100 focus:outline-none"
           />
@@ -261,8 +262,11 @@ const Bug = ({ reportId, bugId }: BugProps) => {
             />
           </div>
         )}
-        {!isNewBug && <div className="mt-2">
-          <Chat reportId={bug.reportId!} bugId={bug.id!} /></div>}
+        {!isNewBug && (
+          <div className="mt-2">
+            <Chat reportId={bug.reportId!} bugId={bug.id!} />
+          </div>
+        )}
       </div>
     </div>
   );
