@@ -51,7 +51,6 @@ const SearchFilters = () => {
           externalString={teamFilter?.name}
           autocompleteFn={async (searchString) => {
             const response = await teamsAutocomplete(searchString);
-            console.log(response)
             return (response.teams ?? []).map((t: Team) => ({
               id: t.id,
               display: t.name,
