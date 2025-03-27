@@ -25,6 +25,7 @@ const Search = () => {
   const options: SortOption[] = [
     { label: "Дата создания", value: "created" },
     { label: "Дата изменения", value: "updated" },
+    { label: "Лучшее совпадение", value: "rank" },
   ];
 
   useEffect(() => {
@@ -42,6 +43,7 @@ const Search = () => {
           <SearchInput />
           <div className="flex justify-end my-3">
             <SortDropdown
+              className="w-[245px]"
               options={options}
               value={sortField}
               direction={sortDirection}

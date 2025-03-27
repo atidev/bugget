@@ -23,7 +23,12 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
     {
         return EmployeesCollection.Value;
     }
-    
+
+    public IReadOnlyCollection<Team> ListTeams()
+    {
+        return TeamsCollection.Value;
+    }
+
     public IReadOnlyDictionary<string, IReadOnlyCollection<Employee>> DictByTeamEmployees()
     {
         return EmployeesByTeam.Value;
@@ -112,15 +117,31 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
         }
     ];
 
-    private static readonly Lazy<IReadOnlyCollection<Employee>> EmployeesCollection = new(() => Employees.AsReadOnly());
+    private static readonly Lazy<IReadOnlyCollection<Employee>> EmployeesCollection = new(() => Employees);
 
-    private static readonly Lazy<IReadOnlyDictionary<string, Employee>> EmployeesDict = new(() => Employees.ToDictionary(k => k.Id).AsReadOnly());
+    private static readonly Lazy<IReadOnlyCollection<Team>> TeamsCollection = new(() =>
+    {
+        if (Employees.Any(e => string.IsNullOrEmpty(e.TeamId) || string.IsNullOrEmpty(e.TeamName)))
+            return [];
+
+        return Employees.GroupBy(e => e.TeamId).Select(g =>
+        {
+            var anyEmpl = g.First();
+            return new Team
+            {
+                Id = anyEmpl.TeamId!,
+                Name = anyEmpl.TeamName!,
+                Depth = anyEmpl.Depth
+            };
+        }).ToArray();
+    });
+
+    private static readonly Lazy<IReadOnlyDictionary<string, Employee>> EmployeesDict = new(() => Employees.ToDictionary(k => k.Id));
 
     private static readonly Lazy<IReadOnlyDictionary<string, IReadOnlyCollection<Employee>>> EmployeesByTeam = new(() =>
         Employees
             .GroupBy(e => e.TeamId ?? string.Empty)
             .ToDictionary(
-                g => g.Key, IReadOnlyCollection<Employee> (g) => g.ToArray().AsReadOnly()
-            )
-            .AsReadOnly());
+                g => g.Key, IReadOnlyCollection<Employee> (g) => g.ToArray()
+            ));
 }

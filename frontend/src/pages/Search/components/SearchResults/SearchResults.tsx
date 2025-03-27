@@ -4,6 +4,25 @@ import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import { getStatusMeta } from "@/constants/status";
 import { useNavigate } from "react-router-dom";
+import { Report } from "@/types/report";
+
+const getLatestUpdateDate = (report: Report) => {
+  let latestTime = new Date(report.updatedAt).getTime();
+  report.bugs.forEach((bug) => {
+    const bugTime = new Date(bug.updatedAt).getTime();
+    if (bugTime > latestTime) {
+      latestTime = bugTime;
+    }
+    bug.comments.forEach((comment) => {
+      const commentTime = new Date(comment.updatedAt).getTime();
+      if (commentTime > latestTime) {
+        latestTime = commentTime;
+      }
+    }
+    )
+  })
+  return new Date(latestTime);
+};
 
 const SearchResults = () => {
   const [searhResult] = useUnit([$searchResult]);
@@ -45,7 +64,7 @@ const SearchResults = () => {
             </div>
             <div className="text-sm text-base-content/70">
               Последнее обновление:{" "}
-              {formatDistanceToNow(new Date(report.updatedAt), {
+              {formatDistanceToNow(getLatestUpdateDate(report), {
                 addSuffix: true,
                 locale: ru,
               })}

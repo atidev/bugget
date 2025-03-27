@@ -119,7 +119,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
 
   return (
     <div
-      className={`p-4 mb-3 bg-base-100 rounded-box shadow-lg border border-gray-300 ${
+      className={`p-4 mb-3 rounded-box shadow-lg border border-gray-300 ${
         bug.status === Number(BugStatuses.READY) ? "border-success" : ""
       }`}
     >

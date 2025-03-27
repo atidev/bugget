@@ -12,10 +12,20 @@ import {
 import "./ReportHeader.css";
 import CancelButton from "@/components/CancelButton/CancelButton";
 import SaveButton from "@/components/SaveButton/SaveButton";
-import UsersAutosuggest from "../UsersAutosuggest/UsersAutosuggest";
+import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Avatar from "@/components/Avatar/Avatar";
 import { ReportStatuses } from "../../../../const";
 import Dropdown from "@/components/Dropdown/Dropdown";
+import { employeesAutocomplete } from "@/api/users";
+import { User } from "@/types/user";
+
+const autocompleteUsers = async (searchString: string) => {
+  const response = await employeesAutocomplete(searchString);
+  return (response.employees ?? []).map((employee: User) => ({
+    id: employee.id,
+    display: employee.name,
+  }));
+};
 
 const ReportHeader = () => {
   const [
@@ -38,16 +48,13 @@ const ReportHeader = () => {
     updateReportEvent,
   ]);
 
-  const handleUserSelect = (id: string, name: string) => {
-    setResponsibleId({
-      id,
-      name,
-    });
+  const handleUserSelect = (user: User | null) => {
+    setResponsibleId(user);
   };
 
   return (
     <div
-      className={`report-form p-4 mb-3 bg-base-100 rounded-box shadow-lg border border-gray-300 ${
+      className={`report-form p-4 mb-3 rounded-box shadow-lg border border-gray-300 ${
         reportForm.status === Number(ReportStatuses.READY)
           ? "border-success"
           : ""
@@ -93,9 +100,10 @@ const ReportHeader = () => {
           <div className="text-xs font-semibold mb-1">Ответственный</div>
 
           <div className="flex gap-4 items-center">
-            <UsersAutosuggest
-              onSelect={handleUserSelect}
+            <Autosuggest
+              onSelect={(entity) => handleUserSelect(entity ? { id: entity.id, name: entity.display } : null)}
               externalString={reportForm.responsible?.name}
+              autocompleteFn={autocompleteUsers}
             />
             <div className="participants-wrapper">
               {reportForm.participants?.length > 0
@@ -111,7 +119,7 @@ const ReportHeader = () => {
             </div>
           </div>
         </div>
-        {!isNewReport && isReportChanged && (
+        {!isNewReport && isReportChanged && reportForm.responsible?.id && (
           <div className="flex gap-2 justify-end">
             <CancelButton isChanged={isReportChanged} onReset={reset} />
             <SaveButton

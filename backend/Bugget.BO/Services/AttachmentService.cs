@@ -99,7 +99,6 @@ public sealed class AttachmentService(
 
     private string GetAttachmentFilePath(Bug bug, string fileName) =>
         $"{bug.ReportId}/{bug.Id}/{fileName.Trim('.')}";
-        // fileName;
 
     private string GetAttachmentContentAbsolutePath(string attachmentRelativePath) 
         => Path.Combine(_baseDir, attachmentRelativePath);

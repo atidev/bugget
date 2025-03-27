@@ -1,5 +1,4 @@
 import axios from "./axios";
-import dataMock from "../mocks/reportsSummary.json";
 
 export const fetchReportsSummary = async () => {
   try {
@@ -7,6 +6,6 @@ export const fetchReportsSummary = async () => {
     return data;
   } catch (error) {
     console.error(error);
-    return dataMock;
+    return [];
   }
 };

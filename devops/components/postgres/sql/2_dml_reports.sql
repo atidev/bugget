@@ -144,7 +144,8 @@ BEGIN
     UPDATE public."Report"
     SET title               = COALESCE(_title, title),
         status              = COALESCE(_status, status),
-        responsible_user_id = COALESCE(_responsible_user_id, responsible_user_id)
+        responsible_user_id = COALESCE(_responsible_user_id, responsible_user_id),
+        updated_at = now()
     WHERE id = _report_id;
 
     -- Добавляем участников, если переданы

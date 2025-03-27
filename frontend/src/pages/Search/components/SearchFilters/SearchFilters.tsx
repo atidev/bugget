@@ -1,16 +1,47 @@
+import { employeesAutocomplete } from "@/api/users";
+import { teamsAutocomplete } from "@/api/teams";
+import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import { updateStatuses, $statuses } from "@/store/search";
+import {
+  updateStatuses,
+  $statuses,
+  $userFilter,
+  updateUserFilter,
+  $teamFilter,
+  updateTeamFilter,
+} from "@/store/search";
+import { User } from "@/types/user";
+import { Team } from "@/types/team";
 import { useUnit } from "effector-react";
 
+const autocompleteUsers = async (searchString: string) => {
+  const response = await employeesAutocomplete(searchString);
+  return (response.employees ?? []).map((employee: User) => ({
+    id: employee.id,
+    display: employee.name,
+  }));
+};
+
+const autocompleteTeams = async (searchString: string) => {
+  const response = await teamsAutocomplete(searchString);
+  return (response.teams ?? []).map((team: Team) => ({
+    id: team.id,
+    display: team.name,
+  }));
+};
+
 const SearchFilters = () => {
-  const statuses = useUnit($statuses);
+  const [statuses, userFilter, teamFilter] = useUnit([
+    $statuses,
+    $userFilter,
+    $teamFilter,
+  ]);
   return (
-    <>
+    <div className="flex flex-col gap-3">
       <div className="mb-4 text-lg font-base font-medium">
         Поисковые фильтры
       </div>
       <Dropdown
-        className="w-[280px]"
         onResetValue={null}
         label="Статус репорта"
         multiple
@@ -24,7 +55,23 @@ const SearchFilters = () => {
           { label: "Решён", value: 1 },
         ]}
       />
-    </>
+      <div>
+        <div className="mb-1 text-xs font-semibold">Участник</div>
+        <Autosuggest
+          onSelect={(entity) => updateUserFilter(entity ? { id: entity.id, name: entity.display } : null)}
+          externalString={userFilter?.name}
+          autocompleteFn={autocompleteUsers}
+        />
+      </div>
+      <div>
+        <div className="mb-1 text-xs font-semibold">Команда</div>
+        <Autosuggest
+          onSelect={(entity) => updateTeamFilter(entity ? { id: entity.id, name: entity.display } : null)}
+          externalString={teamFilter?.name}
+          autocompleteFn={autocompleteTeams}
+        />
+      </div>
+    </div>
   );
 };
 

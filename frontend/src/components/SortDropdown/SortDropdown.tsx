@@ -46,12 +46,12 @@ const SortDropdown = <T,>({
   return (
     <div
       ref={ref}
-      className={`inline-flex items-center rounded-md border border-gray-300 shadow-sm ${className}`}
+      className={`flex justify-between rounded-md border border-gray-300 shadow-sm ${className}`}
     >
-      <div className="relative">
+      <div className="flex-1 relative">
         <button
           type="button"
-          className="px-4 py-2 inline-flex gap-2 items-center text-sm font-medium text-base-content hover:bg-base-200"
+          className=" w-full  px-4 py-2 inline-flex  gap-2 items-center justify-between text-sm font-medium text-base-content hover:bg-base-200 cursor-pointer"
           onClick={() => setOpen(!open)}
         >
           {selectedLabel}
@@ -64,7 +64,7 @@ const SortDropdown = <T,>({
               <li key={String(opt.value)}>
                 <button
                   type="button"
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-base-200 ${
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-base-200 cursor-pointer ${
                     opt.value === value ? "bg-base-200 font-semibold" : ""
                   }`}
                   onClick={() => {
@@ -82,7 +82,7 @@ const SortDropdown = <T,>({
 
       <button
         type="button"
-        className="border-l border-gray-300 px-3 py-2 text-base-content hover:bg-base-200"
+        className="border-l border-gray-300 px-3 py-2 text-base-content hover:bg-base-200 cursor-pointer"
         onClick={onToggleDirection}
       >
         {direction === "asc" ? (

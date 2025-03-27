@@ -35,7 +35,7 @@ export const resetReport = createEvent();
 
 export const updateTitle = createEvent<string>();
 export const updateStatus = createEvent<number>();
-export const updateResponsible = createEvent<User>();
+export const updateResponsible = createEvent<User | null>();
 
 export const setIsNewReport = createEvent<boolean>();
 
