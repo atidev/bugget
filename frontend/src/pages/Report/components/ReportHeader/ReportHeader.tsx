@@ -54,10 +54,11 @@ const ReportHeader = () => {
 
   return (
     <div
-      className={`report-form p-4 mb-3 card card-border shadow-lg border-gray-300 ${reportForm.status === Number(ReportStatuses.READY)
+      className={`report-form p-4 mb-3 card card-border shadow-lg border-gray-300 ${
+        reportForm.status === Number(ReportStatuses.READY)
           ? "border-success"
           : ""
-        }`}
+      }`}
     >
       <div className="flex items-center justify-between items-start">
         {isNewReport ? (
@@ -72,8 +73,8 @@ const ReportHeader = () => {
           <Dropdown
             className="max-w-[150px]"
             value={reportForm.status}
-            onChange={(v) => {
-              setUpdateStatus(Number(v) as ReportStatuses);
+            onChange={(selected) => {
+              setUpdateStatus(Number(selected) as ReportStatuses);
             }}
             options={[
               { label: "Решён", value: ReportStatuses.READY },
@@ -100,20 +101,24 @@ const ReportHeader = () => {
 
           <div className="flex gap-4 items-center">
             <Autosuggest
-              onSelect={(entity) => handleUserSelect(entity ? { id: entity.id, name: entity.display } : null)}
+              onSelect={(entity) =>
+                handleUserSelect(
+                  entity ? { id: entity.id, name: entity.display } : null
+                )
+              }
               externalString={reportForm.responsible?.name}
               autocompleteFn={autocompleteUsers}
             />
             <div className="participants-wrapper">
               {reportForm.participants?.length > 0
                 ? reportForm.participants.map((p) => (
-                  <div className="tooltip" key={p.id}>
-                    <Avatar />
-                    <span key={p.id} className="tooltiptext rounded">
-                      {p.name}
-                    </span>
-                  </div>
-                ))
+                    <div className="tooltip" key={p.id}>
+                      <Avatar />
+                      <span key={p.id} className="tooltiptext rounded">
+                        {p.name}
+                      </span>
+                    </div>
+                  ))
                 : null}
             </div>
           </div>

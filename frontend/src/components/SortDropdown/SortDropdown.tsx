@@ -64,8 +64,9 @@ const SortDropdown = <T,>({
               <li key={String(opt.value)}>
                 <button
                   type="button"
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-base-200 cursor-pointer ${opt.value === value ? "bg-base-300 font-semibold" : ""
-                    }`}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-base-200 cursor-pointer ${
+                    opt.value === value ? "bg-base-300 font-semibold" : ""
+                  }`}
                   onClick={() => {
                     onChange(opt.value);
                     setOpen(false);
