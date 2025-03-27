@@ -36,7 +36,7 @@ const SearchResults = () => {
         return (
           <div
             key={report.id}
-            className={`border ${statusMeta.border} rounded-lg p-4 hover:bg-base-100 cursor-pointer`}
+            className={`card card-border ${statusMeta.border} p-4 hover:bg-base-200 cursor-pointer`}
             onClick={(e) => {
               if (e.ctrlKey || e.metaKey || e.button === 1) {
                 window.open(`/reports/${report.id}`, "_blank");
