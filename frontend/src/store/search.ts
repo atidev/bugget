@@ -5,7 +5,6 @@ import { $user } from "@/store/user";
 import { User } from "@/types/user";
 import { Team } from "@/types/team";
 
-
 export const searchFx = createEffect(async (params: SearchParams) => {
   const searchParams = new URLSearchParams();
   if (params.query) searchParams.append("query", params.query);
@@ -49,14 +48,13 @@ export const $statuses = createStore<number[] | null>(null).on(
 );
 
 export const $userFilter = createStore<User | null>(null)
-  .on($user, (_, user) => user ? { id: user.id, name: user.name } : null)
-  .on(
-    updateUserFilter,
-    (_, user) => user
-  );
+  .on($user, (_, user) => (user ? { id: user.id, name: user.name } : null))
+  .on(updateUserFilter, (_, user) => user);
 
-export const $teamFilter = createStore<Team | null>(null)
-  .on(updateTeamFilter, (_, team) => team);
+export const $teamFilter = createStore<Team | null>(null).on(
+  updateTeamFilter,
+  (_, team) => team
+);
 
 export const $searchResult = createStore<SearchResponse>({} as SearchResponse)
   .on(searchFx.doneData, (_, payload) => payload)
@@ -74,10 +72,17 @@ sample({
     sortDirection: $sortDirection,
     reportStatuses: $statuses,
     userFilter: $userFilter,
-    teamFilter: $teamFilter
+    teamFilter: $teamFilter,
   },
   clock: pageMounted,
-  fn: ({ query, sortField, sortDirection, reportStatuses, userFilter, teamFilter }) => ({
+  fn: ({
+    query,
+    sortField,
+    sortDirection,
+    reportStatuses,
+    userFilter,
+    teamFilter,
+  }) => ({
     query,
     sort: `${sortField}_${sortDirection}`,
     reportStatuses: reportStatuses ?? undefined,
@@ -96,7 +101,7 @@ sample({
     sortDirection: $sortDirection,
     reportStatuses: $statuses,
     userFilter: $userFilter,
-    teamFilter: $teamFilter
+    teamFilter: $teamFilter,
   },
   clock: [
     $query.updates,
@@ -106,7 +111,14 @@ sample({
     $userFilter.updates,
     $teamFilter.updates,
   ],
-  fn: ({ query, sortField, sortDirection, reportStatuses, userFilter, teamFilter }) => ({
+  fn: ({
+    query,
+    sortField,
+    sortDirection,
+    reportStatuses,
+    userFilter,
+    teamFilter,
+  }) => ({
     query,
     sort: `${sortField}_${sortDirection}`,
     reportStatuses: reportStatuses ?? undefined,

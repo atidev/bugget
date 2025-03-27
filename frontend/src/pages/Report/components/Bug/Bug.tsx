@@ -50,13 +50,13 @@ const Bug = ({ reportId, bugId }: BugProps) => {
       return id
         ? state[id]
         : ({
-          id: bugId,
-          status: Number(BugStatuses.IN_PROGRESS),
-          reportId,
-          receive: "",
-          expect: "",
-          isChanged: false,
-        } as BugStore);
+            id: bugId,
+            status: Number(BugStatuses.IN_PROGRESS),
+            reportId,
+            receive: "",
+            expect: "",
+            isChanged: false,
+          } as BugStore);
     },
   });
 
@@ -119,8 +119,9 @@ const Bug = ({ reportId, bugId }: BugProps) => {
 
   return (
     <div
-      className={`p-4 mb-3 rounded-box shadow-lg border border-gray-300 ${bug.status === Number(BugStatuses.READY) ? "border-success" : ""
-        }`}
+      className={`p-4 mb-3 rounded-box shadow-lg border border-gray-300 ${
+        bug.status === Number(BugStatuses.READY) ? "border-success" : ""
+      }`}
     >
       <div className="bug-content-wrapper">
         <div className="flex items-center justify-between">
@@ -159,10 +160,10 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               isNewBug
                 ? updateNewBugData({ receive: e.target.value })
                 : updateBugData({
-                  id: bug.id!,
-                  receive: e.target.value,
-                  status: bug.status,
-                })
+                    id: bug.id!,
+                    receive: e.target.value,
+                    status: bug.status,
+                  })
             }
             className="textarea bug-section p-4 bg-base-100 focus:outline-none"
           />
@@ -173,10 +174,10 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               isNewBug
                 ? updateNewBugData({ expect: e.target.value })
                 : updateBugData({
-                  id: bug.id!,
-                  expect: e.target.value,
-                  status: bug.status,
-                })
+                    id: bug.id!,
+                    expect: e.target.value,
+                    status: bug.status,
+                  })
             }
             className="textarea bug-section p-4 bg-base-100 focus:outline-none"
           />

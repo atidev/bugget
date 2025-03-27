@@ -2,17 +2,26 @@ import { employeesAutocomplete } from "@/api/users";
 import { teamsAutocomplete } from "@/api/teams";
 import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import { updateStatuses, $statuses, $userFilter, updateUserFilter, $teamFilter, updateTeamFilter } from "@/store/search";
+import {
+  updateStatuses,
+  $statuses,
+  $userFilter,
+  updateUserFilter,
+  $teamFilter,
+  updateTeamFilter,
+} from "@/store/search";
 import { User } from "@/types/user";
 import { Team } from "@/types/team";
 import { useUnit } from "effector-react";
 
 const SearchFilters = () => {
-  const [statuses, userFilter, teamFilter] = useUnit([$statuses, $userFilter, $teamFilter]);
+  const [statuses, userFilter, teamFilter] = useUnit([
+    $statuses,
+    $userFilter,
+    $teamFilter,
+  ]);
   return (
-
     <div className="flex flex-col gap-3">
-
       <div className="mb-4 text-lg font-base font-medium">
         Поисковые фильтры
       </div>
@@ -33,7 +42,9 @@ const SearchFilters = () => {
       <div>
         <div className="mb-1 text-xs font-semibold">Участник</div>
         <Autosuggest
-          onSelect={(entity) => updateUserFilter({ id: entity.id, name: entity.display })}
+          onSelect={(entity) =>
+            updateUserFilter({ id: entity.id, name: entity.display })
+          }
           externalString={userFilter?.name}
           autocompleteFn={async (searchString) => {
             const response = await employeesAutocomplete(searchString);
@@ -47,7 +58,9 @@ const SearchFilters = () => {
       <div>
         <div className="mb-1 text-xs font-semibold">Команда</div>
         <Autosuggest
-          onSelect={(entity) => updateTeamFilter({ id: entity.id, name: entity.display })}
+          onSelect={(entity) =>
+            updateTeamFilter({ id: entity.id, name: entity.display })
+          }
           externalString={teamFilter?.name}
           autocompleteFn={async (searchString) => {
             const response = await teamsAutocomplete(searchString);
