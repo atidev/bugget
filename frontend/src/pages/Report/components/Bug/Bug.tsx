@@ -196,7 +196,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               {/* Кнопка "плюс" — открывает окно выбора файла */}
               {!isNewBug && (
                 <button
-                  className="btn btn-accent btn-outline mt-2"
+                  className="btn btn-info btn-outline mt-2"
                   onClick={() => fileInputRefRecieve.current?.click()}
                 >
                   + Добавить файл
@@ -221,7 +221,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               {/* Кнопка "плюс" — открывает окно выбора файла */}
               {!isNewBug && (
                 <button
-                  className="btn btn-accent btn-outline mt-2"
+                  className="btn btn-info btn-outline mt-2"
                   onClick={() => fileInputRefExpected.current?.click()}
                 >
                   + Добавить файл
