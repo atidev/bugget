@@ -95,7 +95,7 @@ const ReportPage = () => {
 
       {!isNewReport && bugsIds.length > 0 && !isExists && (
         <button
-          className="btn btn-block btn-outline btn-primary mt-5"
+          className="btn btn-block btn-outline btn-info mt-5"
           onClick={() => setExistsHandler(true)}
         >
           + Добавить баг

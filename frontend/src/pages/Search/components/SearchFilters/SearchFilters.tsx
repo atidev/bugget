@@ -58,7 +58,11 @@ const SearchFilters = () => {
       <div>
         <div className="mb-1 text-xs font-semibold">Участник</div>
         <Autosuggest
-          onSelect={(entity) => updateUserFilter(entity ? { id: entity.id, name: entity.display } : null)}
+          onSelect={(entity) =>
+            updateUserFilter(
+              entity ? { id: entity.id, name: entity.display } : null
+            )
+          }
           externalString={userFilter?.name}
           autocompleteFn={autocompleteUsers}
         />
@@ -66,7 +70,11 @@ const SearchFilters = () => {
       <div>
         <div className="mb-1 text-xs font-semibold">Команда</div>
         <Autosuggest
-          onSelect={(entity) => updateTeamFilter(entity ? { id: entity.id, name: entity.display } : null)}
+          onSelect={(entity) =>
+            updateTeamFilter(
+              entity ? { id: entity.id, name: entity.display } : null
+            )
+          }
           externalString={teamFilter?.name}
           autocompleteFn={autocompleteTeams}
         />

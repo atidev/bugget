@@ -14,8 +14,8 @@ export interface StatusMeta {
 export const reportStatusMap: Record<number, StatusMeta> = {
   0: {
     title: "В работе",
-    color: "badge-warning",
-    border: "border-warning",
+    color: "badge-error",
+    border: "border-error",
   },
   1: {
     title: "Решён",

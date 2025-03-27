@@ -34,12 +34,12 @@ const Search = () => {
 
   return (
     <div className="flex gap-6 p-4">
-      <aside>
+      <div>
         <SearchFilters />
-      </aside>
+      </div>
 
       <div className="flex-1">
-        <div className="">
+        <div>
           <SearchInput />
           <div className="flex justify-end my-3">
             <SortDropdown
@@ -48,9 +48,7 @@ const Search = () => {
               value={sortField}
               direction={sortDirection}
               onChange={setSortField}
-              onToggleDirection={() =>
-                setSortDirection(sortDirection === "asc" ? "desc" : "asc")
-              }
+              onToggleDirection={() => setSortDirection(sortDirection || "asc")}
             />
           </div>
         </div>
