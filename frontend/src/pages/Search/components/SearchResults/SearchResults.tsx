@@ -7,17 +7,21 @@ import { useNavigate } from "react-router-dom";
 import { Report } from "@/types/report";
 
 const getLatestUpdateDate = (report: Report) => {
-  return new Date(
-    Math.max(
-      new Date(report.updatedAt).getTime(),
-      ...report.bugs.map((bug) =>
-        Math.max(
-          new Date(bug.updatedAt).getTime(),
-          ...bug.comments.map((c) => new Date(c.updatedAt).getTime())
-        )
-      )
+  let latestTime = new Date(report.updatedAt).getTime();
+  report.bugs.forEach((bug) => {
+    const bugTime = new Date(bug.updatedAt).getTime();
+    if (bugTime > latestTime) {
+      latestTime = bugTime;
+    }
+    bug.comments.forEach((comment) => {
+      const commentTime = new Date(comment.updatedAt).getTime();
+      if (commentTime > latestTime) {
+        latestTime = commentTime;
+      }
+    }
     )
-  );
+  })
+  return new Date(latestTime);
 };
 
 const SearchResults = () => {

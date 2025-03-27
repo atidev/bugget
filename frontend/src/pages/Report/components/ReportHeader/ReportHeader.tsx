@@ -19,6 +19,14 @@ import Dropdown from "@/components/Dropdown/Dropdown";
 import { employeesAutocomplete } from "@/api/users";
 import { User } from "@/types/user";
 
+const autocompleteUsers = async (searchString: string) => {
+  const response = await employeesAutocomplete(searchString);
+  return (response.employees ?? []).map((employee: User) => ({
+    id: employee.id,
+    display: employee.name,
+  }));
+};
+
 const ReportHeader = () => {
   const [
     reportForm,
@@ -40,11 +48,8 @@ const ReportHeader = () => {
     updateReportEvent,
   ]);
 
-  const handleUserSelect = (id: string, name: string) => {
-    setResponsibleId({
-      id,
-      name,
-    });
+  const handleUserSelect = (user: User | null) => {
+    setResponsibleId(user);
   };
 
   return (
@@ -95,15 +100,9 @@ const ReportHeader = () => {
 
           <div className="flex gap-4 items-center">
             <Autosuggest
-              onSelect={(entity) => handleUserSelect(entity.id, entity.display)}
+              onSelect={(entity) => handleUserSelect(entity ? { id: entity.id, name: entity.display } : null)}
               externalString={reportForm.responsible?.name}
-              autocompleteFn={async (searchString) => {
-                const response = await employeesAutocomplete(searchString);
-                return (response.employees ?? []).map((e: User) => ({
-                  id: e.id,
-                  display: e.name,
-                }));
-              }}
+              autocompleteFn={autocompleteUsers}
             />
             <div className="participants-wrapper">
               {reportForm.participants?.length > 0

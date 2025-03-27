@@ -7,6 +7,22 @@ import { User } from "@/types/user";
 import { Team } from "@/types/team";
 import { useUnit } from "effector-react";
 
+const autocompleteUsers = async (searchString: string) => {
+  const response = await employeesAutocomplete(searchString);
+  return (response.employees ?? []).map((employee: User) => ({
+    id: employee.id,
+    display: employee.name,
+  }));
+};
+
+const autocompleteTeams = async (searchString: string) => {
+  const response = await teamsAutocomplete(searchString);
+  return (response.teams ?? []).map((team: Team) => ({
+    id: team.id,
+    display: team.name,
+  }));
+};
+
 const SearchFilters = () => {
   const [statuses, userFilter, teamFilter] = useUnit([$statuses, $userFilter, $teamFilter]);
   return (
@@ -33,29 +49,17 @@ const SearchFilters = () => {
       <div>
         <div className="mb-1 text-xs font-semibold">Участник</div>
         <Autosuggest
-          onSelect={(entity) => updateUserFilter({ id: entity.id, name: entity.display })}
+          onSelect={(entity) => updateUserFilter(entity ? { id: entity.id, name: entity.display } : null)}
           externalString={userFilter?.name}
-          autocompleteFn={async (searchString) => {
-            const response = await employeesAutocomplete(searchString);
-            return (response.employees ?? []).map((e: User) => ({
-              id: e.id,
-              display: e.name,
-            }));
-          }}
+          autocompleteFn={autocompleteUsers}
         />
       </div>
       <div>
         <div className="mb-1 text-xs font-semibold">Команда</div>
         <Autosuggest
-          onSelect={(entity) => updateTeamFilter({ id: entity.id, name: entity.display })}
+          onSelect={(entity) => updateTeamFilter(entity ? { id: entity.id, name: entity.display } : null)}
           externalString={teamFilter?.name}
-          autocompleteFn={async (searchString) => {
-            const response = await teamsAutocomplete(searchString);
-            return (response.teams ?? []).map((t: Team) => ({
-              id: t.id,
-              display: t.name,
-            }));
-          }}
+          autocompleteFn={autocompleteTeams}
         />
       </div>
     </div>

@@ -35,11 +35,15 @@ public sealed class TeamsController(EmployeesService service) : ApiController
             skip,
             take,
             depth);
-        
-        return Ok(new FoundedTeamsView { Teams = teams.Select(t=>new TeamView
+
+        return Ok(new FoundedTeamsView
         {
-            Id = t.Id,
-            Name = t.Name
-        }), Total = total });
+            Teams = teams.Select(t => new TeamView
+            {
+                Id = t.Id,
+                Name = t.Name
+            }),
+            Total = total
+        });
     }
 }

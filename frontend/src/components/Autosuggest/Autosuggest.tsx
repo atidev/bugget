@@ -6,7 +6,7 @@ import "./Autosuggest.css";
 
 type Props = {
   externalString?: string;
-  onSelect: (entity: AutocompleteEntity) => void;
+  onSelect: (entity: AutocompleteEntity | null) => void;
   autocompleteFn: (searchString: string) => Promise<AutocompleteEntity[]>;
 };
 
@@ -49,7 +49,7 @@ const Autosuggest = ({ externalString, onSelect, autocompleteFn }: Props) => {
     }
   };
 
-  const handleUserSelect = (item: AutocompleteEntity) => {
+  const handleSelect = (item: AutocompleteEntity) => {
     setSearchString(item.display);
     onSelect(item);
     inputRef.current?.blur();
@@ -60,13 +60,13 @@ const Autosuggest = ({ externalString, onSelect, autocompleteFn }: Props) => {
     item: AutocompleteEntity
   ) => {
     event.preventDefault();
-    handleUserSelect(item);
+    handleSelect(item);
   };
 
   const clearInput = () => {
     setSearchString("");
     setFilteredItems([]);
-    onSelect({} as AutocompleteEntity);
+    onSelect(null);
     inputRef.current?.focus();
   };
 

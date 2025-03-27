@@ -59,7 +59,7 @@ const SortDropdown = <T,>({
         </button>
 
         {open && (
-          <ul className="absolute z-50 mt-1 w-full bg-base-100 border border-gray-300 rounded-md shadow cu ">
+          <ul className="absolute z-50 mt-1 w-full bg-base-100 border border-gray-300 rounded-md shadow">
             {options.map((opt) => (
               <li key={String(opt.value)}>
                 <button
