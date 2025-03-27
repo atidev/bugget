@@ -54,10 +54,11 @@ const ReportHeader = () => {
 
   return (
     <div
-      className={`report-form p-4 mb-3 rounded-box shadow-lg border border-gray-300 ${reportForm.status === Number(ReportStatuses.READY)
-        ? "border-success"
-        : ""
-        }`}
+      className={`report-form p-4 mb-3 rounded-box shadow-lg border border-gray-300 ${
+        reportForm.status === Number(ReportStatuses.READY)
+          ? "border-success"
+          : ""
+      }`}
     >
       <div className="flex items-center justify-between items-start">
         {isNewReport ? (
@@ -107,13 +108,13 @@ const ReportHeader = () => {
             <div className="participants-wrapper">
               {reportForm.participants?.length > 0
                 ? reportForm.participants.map((p) => (
-                  <div className="tooltip" key={p.id}>
-                    <Avatar />
-                    <span key={p.id} className="tooltiptext rounded">
-                      {p.name}
-                    </span>
-                  </div>
-                ))
+                    <div className="tooltip" key={p.id}>
+                      <Avatar />
+                      <span key={p.id} className="tooltiptext rounded">
+                        {p.name}
+                      </span>
+                    </div>
+                  ))
                 : null}
             </div>
           </div>
