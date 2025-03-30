@@ -24,7 +24,6 @@ const ReportPage = () => {
 
   const isNewReport = !reportId;
 
-  // Используем Effector для управления формой
   const [reportForm, newBugStore, setExistsHandler, isExists, getComments] =
     useUnit([$reportForm, $newBugStore, setExists, $isExists, getCommentsFx]);
 
@@ -32,19 +31,20 @@ const ReportPage = () => {
   const bugsList = useList($bugsIds, (id) => (
     <Bug key={id} reportId={reportForm.id} bugId={id} />
   ));
+
+  const receiveReportHandler = (reportId: number) => {
+    fetchReportFx(reportId);
+  }
+
+  const receiveCommentsHandler = (reportId: number, bugId: number) => {
+    getComments({ reportId, bugId });
+  }
+
   // Используем хук для работы с SignalR
   useWebSocketReportPage(
     Number(reportForm.id),
-    (bugId: number) => {
-      // При получении события "ReceiveComments" перезапрашиваем комментарии для нужного бага
-      console.log("Перезапрос комментариев для бага", bugId);
-      getComments({ reportId: Number(reportId), bugId });
-    },
-    (reportId: number) => {
-      // При событии "ReceiveReport" обновляем весь отчет
-      console.log("Перезапрос отчета", reportId);
-      fetchReportFx(reportId);
-    }
+    receiveCommentsHandler,
+    receiveReportHandler
   );
 
   // Загружаем отчет, если есть ID
@@ -65,9 +65,9 @@ const ReportPage = () => {
         isNewReport
           ? { label: "Новый репорт", path: `/reports` }
           : {
-              label: `Репорт #${reportId}`,
-              path: `/reports/${reportId}`,
-            },
+            label: `Репорт #${reportId}`,
+            path: `/reports/${reportId}`,
+          },
       ].filter(Boolean)
     );
   }, [reportId, isNewReport]);

@@ -32,6 +32,10 @@ const Search = () => {
     pageMounted();
   }, []);
 
+  const onToggleDirectionHandler = () => {
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+  }
+
   return (
     <div className="flex gap-6 p-4">
       <div>
@@ -48,7 +52,7 @@ const Search = () => {
               value={sortField}
               direction={sortDirection}
               onChange={setSortField}
-              onToggleDirection={() => setSortDirection(sortDirection || "asc")}
+              onToggleDirection={onToggleDirectionHandler}
             />
           </div>
         </div>
