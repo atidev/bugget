@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "localMigrator": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "POSTGRES_CONNECTION_STRING": "Host=postgres_bugget;Port=5432;Database=postgres;Username=postgres"
+      }
+    }
+  }
+}

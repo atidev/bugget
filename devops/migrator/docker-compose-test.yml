@@ -9,7 +9,12 @@ services:
     restart: unless-stopped
   migrator:
     container_name: migrator_bugget
-    image: gently4005/bugget-migrator:latest
+    image: migrator_bugget_local
+    build:
+      context: .
+      dockerfile: Dockerfile_local
     environment:
       - POSTGRES_CONNECTION_STRING=Host=postgres_bugget;Port=5432;Database=postgres;Username=postgres
-    depends_on: postgres
+    depends_on: 
+      - postgres
+    command: ["sh", "-c", "/wait-for-it.sh postgres_bugget:5432 -- dotnet migrator.dll"]
