@@ -15,7 +15,7 @@ const Header = () => {
   const location = useLocation();
 
   return (
-    <header className="h-16 justify-between bg-base-100 shadow-sm px-3 flex items-center">
+    <header className="h-16 justify-between bg-base-200 shadow-sm px-3 flex items-center">
       <label htmlFor="my-drawer" className="btn bg-base-200 drawer-button ">
         <svg
           xmlns="http://www.w3.org/2000/svg"

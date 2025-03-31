@@ -73,7 +73,7 @@ export const Chat = ({ reportId, bugId }: BugChatProps) => {
         <button
           onClick={handleAddComment}
           disabled={isAdding}
-          className="btn btn-accent text-white px-4 py-1 rounded disabled:opacity-50 flex items-center justify-center h-[32px]"
+          className="btn btn-info text-white px-4 py-1 rounded disabled:opacity-50 flex items-center justify-center h-[32px]"
         >
           <SendHorizonal className="size-6" />
         </button>
