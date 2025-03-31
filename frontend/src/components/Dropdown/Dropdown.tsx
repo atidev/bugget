@@ -98,9 +98,9 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
             <ul className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full z-[1]">
                 {!multiple && hasCustomResetValue && (
                     <li key="none">
-                        <a
+                        <button
                             onClick={(e) => {
-                                onChange(null as T);
+                                onChange(null);
                                 (e.currentTarget.closest(".dropdown") as HTMLElement)?.blur();
                             }}
                             className={value === null || value === undefined ? "active" : ""}
@@ -108,12 +108,12 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
                             <div className="flex justify-between items-center text-gray-500 italic">
                                 Не выбрано
                             </div>
-                        </a>
+                        </button>
                     </li>
                 )}
                 {options.map((opt) => (
                     <li key={String(opt.value)}>
-                        <a
+                        <button
                             onClick={(e) => {
                                 if (multiple) {
                                     const current = Array.isArray(value) ? value : [];
@@ -135,7 +135,7 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
                                     <span className="text-success text-xs ml-2">✔</span>
                                 )}
                             </div>
-                        </a>
+                        </button>
                     </li>
                 ))}
             </ul>
