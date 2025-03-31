@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Layout from "../components/Layout/Layout";
-import Home from "../pages/Home/Home";
-import Reports from "../pages/Report/Report";
+import Layout from "@/components/Layout/Layout";
+import Home from "@/pages/Home/Home";
+import Reports from "@/pages/Report/Report";
 
 import "../styles/tailwind.css";
 import { useEffect } from "react";

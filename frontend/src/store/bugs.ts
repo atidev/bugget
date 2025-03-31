@@ -2,13 +2,13 @@ import { createEffect, createEvent, createStore, sample } from "effector";
 import { createBugFx } from "./newBug";
 import { $initialReportForm, clearReport } from "./report";
 import { updateBugApi } from "@/api/reports/bug";
-import { BugUpdateRequest } from "@/api/reports/models";
+import { BugUpdatePayload } from "@/api/reports/models";
 import { Bug } from "@/types/bug";
 
 type UpdateBugParams = {
   reportId: number;
   bugId: number;
-  bug: BugUpdateRequest;
+  bug: BugUpdatePayload;
 }
 
 export const updateBugFx = createEffect(
@@ -18,7 +18,7 @@ export const updateBugFx = createEffect(
 );
 
 export const updateBugEvent = createEvent<Partial<Bug>>();
-export const updateBugApiEvent = createEvent<Bug>();
+export const updateBugApiEvent = createEvent<Partial<Bug>>();
 export const resetBug = createEvent<number>();
 
 // todo maybe replace with new Map()
@@ -110,7 +110,7 @@ sample({
         expect: bug.expect ?? null,
         receive: bug.receive ?? null,
         status: bug.status ?? null,
-      } as BugUpdateRequest,
+      },
     }) as UpdateBugParams,
   target: updateBugFx,
 });

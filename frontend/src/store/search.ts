@@ -1,5 +1,5 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
-import { searchReports } from "@/api/search";
+import { searchReports } from "@/api/reports/search";
 import { SearchParams, SearchResponse } from "@/types/search";
 import { $user } from "@/store/user";
 import { User } from "@/types/user";

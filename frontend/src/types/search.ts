@@ -1,5 +1,5 @@
 import { Report } from "./report";
-export interface SearchParams {
+export type SearchParams = {
   query?: string;
   reportStatuses?: number[];
   userId?: string;
@@ -9,7 +9,7 @@ export interface SearchParams {
   take?: number;
 }
 
-export interface SearchResponse {
+export type SearchResponse = {
   reports: Report[];
   total: number;
 }

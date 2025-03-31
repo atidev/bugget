@@ -9,8 +9,8 @@ export type Bug = {
   receive?: string;
   expect?: string;
   creator?: User;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
   status: BugStatuses;
   attachments: Attachment[];
   comments: Comment[];

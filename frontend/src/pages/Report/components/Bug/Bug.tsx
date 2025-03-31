@@ -22,7 +22,7 @@ import { uploadAttachmentFx } from "@/store/attachments";
 import ImageCarousel from "./components/ImageCarousel/ImageCarousel";
 
 type BugProps = {
-  reportId: number | null;
+  reportId?: number | null;
   bugId?: number;
 }
 
@@ -50,7 +50,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
         : ({
             id: bugId || null,
             status: Number(BugStatuses.IN_PROGRESS),
-            reportId: reportId,
+            reportId,
             receive: "",
             expect: "",
             isChanged: false,

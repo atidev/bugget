@@ -9,4 +9,3 @@ export const fetchAuth = async () => {
     return null;
   }
 };
-

@@ -1,8 +1,16 @@
+import { BugStatuses, ReportStatuses } from "@/const";
 
 
 export type User = {
   id: string;
   name: string;
+};
+
+export type AttachmentPayload = {
+  bugId: number;
+  reportId: number;
+  file: File;
+  attachType: number;
 };
 
 export type AttachmentResponse = {
@@ -27,29 +35,23 @@ export type BugResponse = {
   comments: Comment[];
 };
 
-export type Bug = {
+export type BugUpdateResponse = {
   id: number;
-  receive: string | null;
-  expect: string | null;
-  status: number | null;
+  receive: string;
+  expect: string;
+  status: BugStatuses;
 };
 
-export type BugCreateRequest = {
+export type BugCreatePayload = {
   receive: string;
   expect: string;
 };
 
-export type BugUpdateRequest = {
+export type BugUpdatePayload = {
   id: number;
   receive: string | null;
   expect: string | null;
-  status: number | null;
-};
-
-export type BugUpdateResponse = {
-  receive: string | null;
-  expect: string | null;
-  status: number | null;
+  status: BugStatuses | null;
 };
 
 export type Comment = {
@@ -64,31 +66,31 @@ export type Comment = {
 export type Report = {
   id: number;
   title: string;
-  status: number;
+  status: ReportStatuses;
   responsible: User;
   creator: User;
   createdAt: string;
   updatedAt: string;
   participants: User[];
-  bugs: Bug[];
+  bugs: BugResponse[];
 };
 
 export type CreateReportPayload = {
   title: string;
   responsibleId: string;
   participants?: User[];
-  bugs?: BugCreateRequest[];
+  bugs?: BugCreatePayload[];
 };
 
 
 export type ReportPayload = {
   title: string;
-  status: number;
+  status: ReportStatuses;
   responsible?: User;
   responsibleId: string;
   creator?: User;
   createdAt?: string;
   updatedAt?: string;
   participants?: User[];
-  bugs?: BugCreateRequest[];
+  bugs?: BugCreatePayload[];
 };

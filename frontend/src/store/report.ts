@@ -54,8 +54,8 @@ export const $initialReportForm = createStore<Report>({
     responsible: null,
     responsibleId: "",
     creator: null,
-    createdAt: "",
-    updatedAt: "",
+    createdAt: null,
+    updatedAt: null,
     participants: [],
     bugs: [],
 })
@@ -66,13 +66,13 @@ export const $initialReportForm = createStore<Report>({
 export const $reportForm = createStore<{
   id: number | null;
   title: string;
-  status: number;
+  status: ReportStatuses;
   responsible: User | null;
   participants: User[];
 }>({
   id: null,
   title: "",
-  status: 0,
+  status: ReportStatuses.IN_PROGRESS,
   responsible: null,
   participants: [],
 })
@@ -80,7 +80,7 @@ export const $reportForm = createStore<{
     return {
       id: report.id,
       title: report.title || "",
-      status: report.status || 0,
+      status: report.status || ReportStatuses.IN_PROGRESS,
       responsible: report.responsible || {},
       participants: report.participants || [],
     };

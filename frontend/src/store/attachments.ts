@@ -1,17 +1,18 @@
 import { createEffect, createStore } from "effector";
-import { uploadAttachmentApi } from "../api/reports/attachment";
+import { uploadAttachmentApi } from "@/api/reports/attachment";
 import { $initialReportForm } from "./report";
 import { Attachment } from "@/types/attachement";
 import { Bug } from "@/types/bug";
 
 export const uploadAttachmentFx = createEffect(
-  async (params: {
-    reportId: number;
-    bugId: number;
-    file: File;
-    attachType: number;
-  }) => {
-    return await uploadAttachmentApi(params);
+  async (params: Attachment) => {
+    const payload = {
+      bugId: params.bugId,
+      reportId: params.reportId,
+      file: params.file,
+      attachType: params.attachType
+    }
+    return await uploadAttachmentApi(payload);
   }
 );
 

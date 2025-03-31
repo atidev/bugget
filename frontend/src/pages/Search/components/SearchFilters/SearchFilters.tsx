@@ -1,4 +1,4 @@
-import { employeesAutocomplete } from "@/api/users";
+import { employeesAutocomplete } from "@/api/employees";
 import { teamsAutocomplete } from "@/api/teams";
 import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Dropdown from "@/components/Dropdown/Dropdown";

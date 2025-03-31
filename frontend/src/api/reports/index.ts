@@ -1,6 +1,4 @@
 import axios from "../axios";
-// import dataMock from "../mocks/report.json";
-import reportsSummaryMockData from "../../mocks/reportsSummary.json";
 import { CreateReportPayload, ReportPayload } from "./models";
 
 export const fetchReport = async (id: number) => {
@@ -39,7 +37,8 @@ export const fetchReportsSummary = async () => {
     return data;
   } catch (error) {
     console.error(error);
-    return reportsSummaryMockData;
+    return [];
   }
 };
+
 

@@ -7,31 +7,33 @@ import { useNavigate } from "react-router-dom";
 import { Report } from "@/types/report";
 
 const getLatestUpdateDate = (report: Report) => {
-  let latestTime = new Date(report.updatedAt).getTime();
+  let latestTime: number | null = report.updatedAt ? new Date(report.updatedAt).getTime() : null;
   report.bugs.forEach((bug) => {
-    const bugTime = new Date(bug.updatedAt).getTime();
-    if (bugTime > latestTime) {
+    const bugTime = bug.updatedAt ? new Date(bug.updatedAt).getTime() : null;
+    if (bugTime !== null && (latestTime === null || bugTime > latestTime)) {
       latestTime = bugTime;
     }
     bug.comments.forEach((comment) => {
-      const commentTime = new Date(comment.updatedAt).getTime();
-      if (commentTime > latestTime) {
+      const commentTime = comment.updatedAt ? new Date(comment.updatedAt).getTime() : null;
+      if (commentTime !== null && (latestTime === null || commentTime > latestTime)) {
         latestTime = commentTime;
       }
     }
     )
   })
-  return new Date(latestTime);
+  return latestTime ? new Date(latestTime) : null;
 };
 
 const SearchResults = () => {
-  const [searhResult] = useUnit([$searchResult]);
+  const [searchResult] = useUnit([$searchResult]);
   const navigate = useNavigate();
+
 
   return (
     <div className="space-y-4">
-      {searhResult?.reports?.map((report) => {
+      {searchResult?.reports?.map((report) => {
         const statusMeta = getStatusMeta("report", report.status);
+        const latestUpdateDate = getLatestUpdateDate(report);
 
         return (
           <div
@@ -54,21 +56,28 @@ const SearchResults = () => {
                 {statusMeta.title}
               </span>
             </div>
-
+            
+            
             <div className="text-sm text-base-content/70 mt-1">
-              Автор: {report.creator.name} • Создан:{" "}
-              {formatDistanceToNow(new Date(report.createdAt), {
-                addSuffix: true,
-                locale: ru,
-              })}
+              {report.creator?.name &&
+                `Автор: ${report.creator.name}`
+              }
+              {report.createdAt &&
+                ` • Создан: ${formatDistanceToNow(new Date(report.createdAt), {
+                  addSuffix: true,
+                  locale: ru,
+                })}`
+              }              
             </div>
-            <div className="text-sm text-base-content/70">
-              Последнее обновление:{" "}
-              {formatDistanceToNow(getLatestUpdateDate(report), {
-                addSuffix: true,
-                locale: ru,
-              })}
-            </div>
+            {latestUpdateDate &&
+              <div className="text-sm text-base-content/70">
+                Последнее обновление:{" "}
+                {formatDistanceToNow(latestUpdateDate, {
+                  addSuffix: true,
+                  locale: ru,
+                })}
+              </div>
+            }
             <div className="text-sm text-base-content/70">
               Ответственный: {report.responsible?.name ?? "—"}
             </div>

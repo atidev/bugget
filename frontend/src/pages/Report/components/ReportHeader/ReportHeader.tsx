@@ -16,7 +16,7 @@ import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Avatar from "@/components/Avatar/Avatar";
 import { ReportStatuses } from "../../../../const";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import { employeesAutocomplete } from "@/api/users";
+import { employeesAutocomplete } from "@/api/employees";
 import { User } from "@/types/user";
 
 const autocompleteUsers = async (searchString: string) => {

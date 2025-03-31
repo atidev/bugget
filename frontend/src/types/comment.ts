@@ -4,7 +4,7 @@ export type Comment = {
   id: number;
   bugId: number;
   text: string;
-  creator: User;
-  createdAt: string;
-  updatedAt: string;
+  creator: User | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
 };
