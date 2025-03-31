@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="scripts/**/*.sql" />
+        <EmbeddedResource Include="sql/*.sql" />
     </ItemGroup>
 
     <ItemGroup>

@@ -16,13 +16,13 @@ DECLARE
     bug_json      JSONB;
 BEGIN
     -- Создаём Report
-    INSERT INTO public."Report" (title, status, responsible_user_id, creator_user_id)
+    INSERT INTO public.report (title, status, responsible_user_id, creator_user_id)
     VALUES (_title, _status, _responsible_user_id, _creator_user_id)
     RETURNING id INTO new_report_id;
 
     -- Добавляем участников
     IF _participants IS NOT NULL AND array_length(_participants, 1) > 0 THEN
-        INSERT INTO public."ReportParticipants" (report_id, user_id)
+        INSERT INTO public.report_participants (report_id, user_id)
         SELECT new_report_id, unnest(_participants);
     END IF;
 
@@ -30,7 +30,7 @@ BEGIN
     FOR bug_json IN
         SELECT * FROM jsonb_array_elements(_bugs_json::jsonb)
         LOOP
-            INSERT INTO public."Bug" (report_id, receive, expect, status, creator_user_id)
+            INSERT INTO public.bug (report_id, receive, expect, status, creator_user_id)
             VALUES (new_report_id,
                     (bug_json ->> 'receive')::TEXT,
                     (bug_json ->> 'expect')::TEXT,
@@ -79,7 +79,7 @@ BEGIN
                                                                                                             'created_at', a.created_at
                                                                                                     )
                                                                                             )
-                                                                                     FROM public."Attachment" a
+                                                                                     FROM public.attachment a
                                                                                      WHERE a.bug_id = b.id), '[]'::jsonb),
                                                             'comments', COALESCE((SELECT jsonb_agg(
                                                                                                  jsonb_build_object(
@@ -91,18 +91,18 @@ BEGIN
                                                                                                          'updated_at', c.updated_at
                                                                                                  )
                                                                                          )
-                                                                                  FROM public."Comment" c
+                                                                                  FROM public.comment c
                                                                                   WHERE c.bug_id = b.id), '[]'::jsonb)
                                                     )
                                             )
-                                     FROM public."Bug" b
+                                     FROM public.bug b
                                      WHERE b.report_id = r.id), '[]'::jsonb),
                    'participants_user_ids', COALESCE((SELECT jsonb_agg(user_id)
-                                                      FROM public."ReportParticipants"
+                                                      FROM public.report_participants
                                                       WHERE report_id = r.id), '[]'::jsonb)
            )
     INTO result
-    FROM public."Report" r
+    FROM public.report r
     WHERE r.id = _report_id;
 
     RETURN result;
@@ -120,10 +120,10 @@ $$
 BEGIN
     RETURN QUERY
         SELECT public.get_report(r.id)
-        FROM public."Report" r
+        FROM public.report r
         WHERE r.status = 0
           AND r.id IN (SELECT report_id
-                       FROM public."ReportParticipants"
+                       FROM public.report_participants
                        WHERE user_id = _user_id);
 END;
 $$;
@@ -141,7 +141,7 @@ AS
 $$
 BEGIN
     -- Обновляем report, если параметры не null
-    UPDATE public."Report"
+    UPDATE public.report
     SET title               = COALESCE(_title, title),
         status              = COALESCE(_status, status),
         responsible_user_id = COALESCE(_responsible_user_id, responsible_user_id),
@@ -150,7 +150,7 @@ BEGIN
 
     -- Добавляем участников, если переданы
     IF array_length(_participants, 1) > 0 THEN
-        INSERT INTO public."ReportParticipants" (report_id, user_id)
+        INSERT INTO public.report_participants (report_id, user_id)
         SELECT _report_id, unnest(_participants)
         ON CONFLICT (report_id, user_id) DO NOTHING;
     END IF;

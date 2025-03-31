@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0.100-alpine3.20 AS build
 WORKDIR /app
 
 COPY . ./
-COPY Migrations ./scripts
+COPY sql ./sql
 RUN dotnet restore
 
 RUN dotnet publish -c Release -o /out
@@ -12,4 +12,4 @@ WORKDIR /app
 
 COPY --from=build /out ./
 
-#ENTRYPOINT ["dotnet", "migrator.dll"]
+ENTRYPOINT ["dotnet", "migrator.dll"]

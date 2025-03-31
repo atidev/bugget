@@ -7,9 +7,5 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
-  migrator:
-    container_name: migrator_bugget
-    image: gently4005/bugget-migrator:latest
-    environment:
-      - POSTGRES_CONNECTION_STRING=Host=postgres_bugget;Port=5432;Database=postgres;Username=postgres
-    depends_on: postgres
+    volumes:
+      - ../../migrator/sql:/docker-entrypoint-initdb.d

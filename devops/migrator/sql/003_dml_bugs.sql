@@ -24,7 +24,7 @@ SELECT jsonb_build_object(
                                                                'created_at', a.created_at
                                                        )
                                                )
-                                        FROM public."Attachment" a
+                                        FROM public.attachment a
                                         WHERE a.bug_id = b.id), '[]' ::jsonb),
                'comments', COALESCE((SELECT jsonb_agg(
                                                     jsonb_build_object(
@@ -36,11 +36,11 @@ SELECT jsonb_build_object(
                                                             'updated_at', c.updated_at
                                                     )
                                             )
-                                     FROM public."Comment" c
+                                     FROM public.comment c
                                      WHERE c.bug_id = b.id), '[]' ::jsonb)
        )
 INTO result
-FROM public."Bug" b
+FROM public.bug b
 WHERE b.id = _bug_id;
 
 RETURN result;
@@ -63,12 +63,12 @@ DECLARE
 new_bug_id INTEGER;
 BEGIN
     -- Создаём новую запись в таблице Bug
-INSERT INTO public."Bug" (report_id, receive, expect, status, creator_user_id)
+INSERT INTO public.bug (report_id, receive, expect, status, creator_user_id)
 VALUES (_report_id, _receive, _expect, _status, _creator_user_id) RETURNING id
 INTO new_bug_id;
 
 -- Добавляем creator_user_id в ReportParticipants, если его там нет
-INSERT INTO public."ReportParticipants" (report_id, user_id)
+INSERT INTO public.report_participants (report_id, user_id)
 VALUES (_report_id, _creator_user_id) ON CONFLICT (report_id, user_id) DO NOTHING;
 
 -- Возвращаем созданный Bug через get_report
@@ -90,7 +90,7 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
     -- Обновляем bug, если параметры не null
-UPDATE public."Bug"
+UPDATE public.bug
 SET receive    = COALESCE(_receive, receive),
     expect     = COALESCE(_expect, expect),
     status     = COALESCE(_status, status),
@@ -98,7 +98,7 @@ SET receive    = COALESCE(_receive, receive),
 WHERE id = _bug_id;
 
 -- Добавляем updater_user_id в ReportParticipants, если его там нет
-INSERT INTO public."ReportParticipants" (report_id, user_id)
+INSERT INTO public.report_participants (report_id, user_id)
 VALUES (_report_id, _updater_user_id) ON CONFLICT (report_id, user_id) DO NOTHING;
 
 -- Возвращаем обновленный Bug через get_bug
