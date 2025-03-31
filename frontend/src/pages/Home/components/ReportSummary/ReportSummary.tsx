@@ -14,8 +14,8 @@ const ReportSummary = ({ report, highlight }: ReportProps) => {
   return (
     <div
       key={report.id}
-      className={`card border shadow-lg cursor-pointer ${
-        highlight ? "border-error bg-warning/10" : "border-gray-300"
+      className={`card card-border shadow-lg cursor-pointer hover:bg-base-200 ${
+        highlight ? "border-error" : "border-gray-300"
       }`}
       onClick={() => navigate(`/reports/${report.id}`)}
     >
