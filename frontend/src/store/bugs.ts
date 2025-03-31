@@ -1,12 +1,11 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { createBugFx } from "./newBug";
 import { $initialReportForm, clearReport } from "./report";
-import { updateBugApi } from "@/api/bug";
-import { BugUpdateRequest } from "@/types/requests";
+import { updateBugApi } from "@/api/reports/bug";
+import { BugUpdateRequest } from "@/api/reports/models";
 import { Bug } from "@/types/bug";
-import { BugStore } from "@/types/stores";
 
-interface UpdateBugParams {
+type UpdateBugParams = {
   reportId: number;
   bugId: number;
   bug: BugUpdateRequest;
@@ -18,27 +17,28 @@ export const updateBugFx = createEffect(
   }
 );
 
-export const updateBugEvent = createEvent<Partial<Bug> & { id: number }>();
-export const updateBugApiEvent = createEvent<Partial<Bug>>();
+export const updateBugEvent = createEvent<Partial<Bug>>();
+export const updateBugApiEvent = createEvent<Bug>();
 export const resetBug = createEvent<number>();
 
+// todo maybe replace with new Map()
 export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
-  .on($initialReportForm, (_, report) => {
-    if (!report?.bugs.length) return;
-
-    return report.bugs.reduce(
+  .on($initialReportForm, (_, report) =>
+    report.bugs.reduce(
       (acc: Record<number, Bug>, bug: Bug) => {
-        acc[bug.id] = bug;
+        if (bug.id) {
+          acc[bug.id] = bug;
+        }
         return acc;
       },
-      {} as Record<number, Bug>
-    );
-  })
+      {}
+    )
+  )
   .on(updateBugFx.done, (state, { result }) => {
     if (!result) return state;
-
     const { id, receive, expect, status } = result;
-    const bug = state[id];
+    const bugId: keyof typeof state = id;
+    const bug = state[bugId];
 
     if (!bug) return state;
 
@@ -59,12 +59,12 @@ export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
   }))
   .reset(clearReport);
 
-export const $bugsByBugId = createStore<Record<number, BugStore>>({})
+export const $bugsByBugId = createStore<Record<number, Bug>>({})
   .on($initialBugsByBugId, (_, bugs) => bugs)
   .on(updateBugEvent, (state, payload) => {
     const { id, receive, expect, status } = payload;
+    if (!id || !state[id]) return state;
     const bug = state[id];
-    if (!bug) return state;
 
     const updatedBug = {
       ...bug,

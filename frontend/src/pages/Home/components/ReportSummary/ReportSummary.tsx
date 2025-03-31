@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./ReportSummary.css";
 import { Report } from "@/types/report";
 
-interface ReportProps {
+type ReportProps = {
   report: Report;
   highlight?: boolean;
 }
@@ -19,10 +19,12 @@ const ReportSummary = ({ report, highlight }: ReportProps) => {
       }`}
       onClick={() => navigate(`/reports/${report.id}`)}
     >
-      <div className="card-body p-4">
-        <h3 className="card-title text-lg font-semibold">{report.title}</h3>
-        <p className="text-sm dark:text-stone-300">
-          Ответственный: {report.responsible.name}
+      <div className="card-body p-4 bg-base-300">
+        <h3 className="card-title text-lg font-semibold dark:text-stone-50">
+          {report.title}
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-stone-300">
+          Ответственный: {report.responsible?.name}
         </p>
         <p className="text-sm dark:text-stone-200">
           Участники:{" "}

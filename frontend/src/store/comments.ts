@@ -1,6 +1,6 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
-import { getCommentsApi, createCommentApi } from "../api/comment";
 import { $initialReportForm, clearReport } from "./report";
+import { getCommentsApi, createCommentApi } from "@/api/reports/comment";
 import { Comment } from "@/types/comment";
 
 export const getCommentsFx = createEffect<

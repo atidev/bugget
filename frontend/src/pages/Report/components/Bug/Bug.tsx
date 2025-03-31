@@ -4,28 +4,26 @@ import {
   $newBugStore,
   updateNewBug,
   createBugEventByApi,
-} from "../../../../store/newBug";
+} from "@/store/newBug";
 
 import {
   $bugsByBugId,
   updateBugEvent,
   resetBug,
   updateBugApiEvent,
-} from "../../../../store/bugs";
-import { $attachmentsByBugId } from "../../../../store/attachments";
+} from "@/store/bugs";
+import { $attachmentsByBugId } from "@/store/attachments";
 import "./Bug.css";
-import CancelButton from "../../../../components/CancelButton/CancelButton";
-import SaveButton from "../../../../components/SaveButton/SaveButton";
+import CancelButton from "@/components/CancelButton/CancelButton";
+import SaveButton from "@/components/SaveButton/SaveButton";
 import { BugStatuses } from "../../../../const";
 import { Chat } from "./components/Chat/Chat";
-import { uploadAttachmentFx } from "../../../../store/attachments";
+import { uploadAttachmentFx } from "@/store/attachments";
 import ImageCarousel from "./components/ImageCarousel/ImageCarousel";
-import { BugStore } from "../../../../types/stores";
-import Dropdown from "@/components/Dropdown/Dropdown";
 
-interface BugProps {
-  reportId?: number | null;
-  bugId?: number | null;
+type BugProps = {
+  reportId: number | null;
+  bugId?: number;
 }
 
 const Bug = ({ reportId, bugId }: BugProps) => {
@@ -50,13 +48,15 @@ const Bug = ({ reportId, bugId }: BugProps) => {
       return id
         ? state[id]
         : ({
-            id: bugId,
+            id: bugId || null,
             status: Number(BugStatuses.IN_PROGRESS),
-            reportId,
+            reportId: reportId,
             receive: "",
             expect: "",
             isChanged: false,
-          } as BugStore);
+            attachments: [],
+            comments: []
+          });
     },
   });
 
@@ -68,7 +68,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
     },
   });
 
-  const isNewBug = bug.id === null || bug.id === undefined;
+  const isNewBug = bug.id === null;
 
   const isBugChanged = isNewBug
     ? newBugData.receive !== "" && newBugData.expect !== ""
@@ -117,6 +117,16 @@ const Bug = ({ reportId, bugId }: BugProps) => {
     }
   }, [bug.receive, bug.expect]);
 
+  const handleSave = () => {
+    if (!bug.reportId) return;
+    if (isNewBug) {
+      // Вызываем событие для создания нового бага
+      createBugApi({ reportId: bug.reportId, bug: newBugData });
+      return;
+    }
+    updateBugApi(bug);
+  }
+
   return (
     <div
       className={`p-4 mb-3 rounded-box shadow-lg border border-gray-300 ${
@@ -135,17 +145,24 @@ const Bug = ({ reportId, bugId }: BugProps) => {
 
           {/* Селект статуса (только для существующего бага) */}
           {!isNewBug && (
-            <Dropdown
-              className="max-w-[150px]"
-              onChange={(v) => {
-                updateBugData({ id: bug.id!, status: Number(v) });
-              }}
-              value={bug.status}
-              options={[
-                { label: "Исправлен", value: BugStatuses.READY },
-                { label: "Открыт", value: BugStatuses.IN_PROGRESS },
-              ]}
-            />
+            <div className="select-wrapper">
+              <select
+                id="status"
+                className={`select ${
+                  bug.status === Number(BugStatuses.READY)
+                    ? "select-success border-success"
+                    : ""
+                } text-sm rounded-lg block w-full p-2.5`}
+                onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+                  const newStatus = event.target.value;
+                  updateBugData({ id: bug.id || null, status: Number(newStatus) });
+                }}
+                value={bug.status}
+              >
+                <option value={Number(BugStatuses.READY)}>Решён</option>
+                <option value={Number(BugStatuses.IN_PROGRESS)}>Активен</option>
+              </select>
+            </div>
           )}
         </div>
         <div className="flex gap-3 text-xs font-semibold mb-1 mt-3">
@@ -250,15 +267,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
             />
             <SaveButton
               isChanged={isBugChanged}
-              onSave={() => {
-                if (isNewBug) {
-                  // Вызываем событие для создания нового бага
-                  createBugApi({ reportId: bug.reportId!, bug: newBugData });
-                } else {
-                  // Обновляем существующий баг
-                  updateBugApi(bug);
-                }
-              }}
+              onSave={handleSave}
             />
           </div>
         )}

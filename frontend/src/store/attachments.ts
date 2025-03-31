@@ -1,5 +1,5 @@
 import { createEffect, createStore } from "effector";
-import { uploadAttachmentApi } from "../api/attachment";
+import { uploadAttachmentApi } from "../api/reports/attachment";
 import { $initialReportForm } from "./report";
 import { Attachment } from "@/types/attachement";
 import { Bug } from "@/types/bug";
@@ -15,15 +15,16 @@ export const uploadAttachmentFx = createEffect(
   }
 );
 
-export const $attachmentsByBugId = createStore<Record<number, Attachment[]>>({})
-  .on($initialReportForm, (_, report) => {
-    if (!report?.bugs.length) return;
-
-    return report.bugs.reduce((acc: Record<number, Attachment[]>, bug: Bug) => {
-      acc[bug.id] = bug.attachments || [];
+export const $attachmentsByBugId = createStore<
+  Record<number, Attachment[]>
+>({})
+  .on($initialReportForm, (_, report) =>
+    report?.bugs.reduce((acc: Record<number, Attachment[]>, bug: Bug) => {
+      if (bug.id) {
+        acc[bug.id] = bug.attachments;
+      }
       return acc;
-    }, {});
-  })
+    }, {}))
   .on(uploadAttachmentFx.doneData, (state, data) => {
     return {
       ...state,

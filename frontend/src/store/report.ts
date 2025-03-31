@@ -5,28 +5,30 @@ import {
   createStore,
   sample,
 } from "effector";
-import { fetchReport, createReport, updateReport } from "../api/report";
+import { fetchReport, createReport, updateReport } from "../api/reports";
 import { Report } from "@/types/report";
 import { User } from "@/types/user";
-import { ReportStore } from "@/types/stores";
+import { CreateReportPayload } from "@/api/reports/models";
+import { ReportStatuses } from "@/const";
 
 export const fetchReportFx = createEffect(async (id: number) => {
   const data = await fetchReport(id);
   return data;
 });
 
-export const createReportFx = createEffect(async (newReport: ReportStore) => {
+export const createReportFx = createEffect(async (newReport: CreateReportPayload) => {
   const data = await createReport(newReport);
   return data;
 });
 
-export const updateReportFx = createEffect(async (request: Report) => {
+export const updateReportFx = createEffect(async (currentReport: Report) => {
+  if (!currentReport.responsible || !currentReport.id) return;
   const payload = {
-    title: request.title,
-    status: request.status,
-    responsibleUserId: request.responsible?.id,
+    title: currentReport.title,
+    status: currentReport.status,
+    responsibleId: currentReport.responsible.id,
   };
-  return await updateReport(payload, request?.id);
+  return await updateReport(payload, currentReport.id);
 });
 
 export const updateReportEvent = createEvent();
@@ -45,7 +47,18 @@ export const $isNewReport = createStore<boolean>(true)
 
 export const $isReportChanged = createStore<boolean>(false).reset(clearReport);
 
-export const $initialReportForm = createStore<Report | null>(null)
+export const $initialReportForm = createStore<Report>({
+    id: null,
+    title: "",
+    status: ReportStatuses.IN_PROGRESS,
+    responsible: null,
+    responsibleId: "",
+    creator: null,
+    createdAt: "",
+    updatedAt: "",
+    participants: [],
+    bugs: [],
+})
   .on(fetchReportFx.doneData, (_, report) => report)
   .reset(clearReport);
 
@@ -65,7 +78,7 @@ export const $reportForm = createStore<{
 })
   .on(fetchReportFx.doneData, (_, report) => {
     return {
-      id: report.id || null,
+      id: report.id,
       title: report.title || "",
       status: report.status || 0,
       responsible: report.responsible || {},
