@@ -14,7 +14,7 @@ SELECT jsonb_build_object(
                'created_at', c.created_at,
                'updated_at', c.updated_at
        ) INTO result
-FROM public."Comment" c
+FROM public.comment c
 WHERE c.id = _comment_id;
 
 RETURN result;
@@ -34,12 +34,12 @@ DECLARE
 new_comment_id INTEGER;
 BEGIN
     -- Создаём новую запись в таблице Comment
-INSERT INTO public."Comment" (bug_id, text, creator_user_id, created_at, updated_at)
+INSERT INTO public.comment (bug_id, text, creator_user_id, created_at, updated_at)
 VALUES (_bug_id, _text, _creator_user_id, NOW(), NOW())
     RETURNING id INTO new_comment_id;
 
 -- Добавляем creator_user_id в ReportParticipants, если его там нет
-INSERT INTO public."ReportParticipants" (report_id, user_id)
+INSERT INTO public.report_participants (report_id, user_id)
 VALUES (_report_id, _creator_user_id)
     ON CONFLICT (report_id, user_id) DO NOTHING;
 
@@ -58,9 +58,9 @@ AS $$
 BEGIN
 RETURN QUERY
 SELECT public.get_comment(c.id)
-FROM public."Comment" c
+FROM public.comment c
 WHERE c.bug_id = _bug_id AND EXISTS (
-    SELECT 1 FROM public."Bug" b WHERE b.id = _bug_id AND b.report_id = _report_id
+    SELECT 1 FROM public.bug b WHERE b.id = _bug_id AND b.report_id = _report_id
 );
 END;
 $$;
@@ -77,16 +77,16 @@ BEGIN
 
     IF EXISTS (
         SELECT 1
-        FROM public."Comment" c
-        JOIN public."Bug" b ON b.id = c.bug_id
-        JOIN public."Report" r ON r.id = b.report_id
+        FROM public.comment c
+        JOIN public.bug b ON b.id = c.bug_id
+        JOIN public.report r ON r.id = b.report_id
         WHERE c.id = p_comment_id
           AND c.bug_id = p_bug_id
           AND r.id = p_report_id
           AND c.creator_user_id = p_user_id 
     )
     THEN
-        DELETE FROM public."Comment"
+        DELETE FROM public.comment
         WHERE id = p_comment_id AND bug_id = p_bug_id;
     END IF;
 END;
