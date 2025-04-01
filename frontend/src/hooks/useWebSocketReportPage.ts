@@ -1,32 +1,36 @@
 import { useEffect, useRef } from "react";
-import * as signalR from "@microsoft/signalr";
+import {
+  HubConnectionBuilder,
+  HttpTransportType,
+  LogLevel,
+  HubConnectionState,
+} from "@microsoft/signalr";
 
 const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
 
 const useWebSocketReportPage = (
   reportId: number,
-  onNewComment: (bugId: number) => void,
+  onNewComment: (reportId: number, bugId: number) => void,
   onReportUpdate: (reportId: number) => void
 ) => {
   const connectionRef = useRef<signalR.HubConnection | null>(null);
-  const previousReportIdRef = useRef<number | null>(null);
+  const reportIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!reportId) {
       return;
     }
 
+    const previousReportId = reportIdRef.current;
     if (!connectionRef.current) {
       console.log("🚀 Создаём новое соединение SignalR...");
 
-      previousReportIdRef.current = reportId;
-
-      connectionRef.current = new signalR.HubConnectionBuilder()
+      connectionRef.current = new HubConnectionBuilder()
         .withUrl(`${API_URL}v1/report-page-hub`, {
-          transport: signalR.HttpTransportType.WebSockets,
+          transport: HttpTransportType.WebSockets,
         })
         .withAutomaticReconnect([0, 2000, 5000, 10000])
-        .configureLogging(signalR.LogLevel.Information)
+        .configureLogging(LogLevel.Information)
         .build();
 
       const connection = connectionRef.current;
@@ -40,23 +44,27 @@ const useWebSocketReportPage = (
         .then(() => console.log(`✅ Присоединились к группе: ${reportId}`))
         .catch((err) => console.error("❌ Ошибка подключения SignalR:", err));
 
+      reportIdRef.current = reportId;
+
       // 📌 Получаем баг, комменты которого нужно обновить
       connection.on("ReceiveComments", (bugId: number) => {
-        console.log(`🔔 Новый комментарий для бага ${bugId}`);
-        onNewComment(bugId);
+        console.log(
+          `🔔 Новый комментарий для бага ${bugId}, репорта ${reportIdRef.current}`
+        );
+        if (reportIdRef.current) onNewComment(reportIdRef.current, bugId);
       });
 
       // 📌 Обновление всего репорта
       connection.on("ReceiveReport", () => {
-        console.log("🔄 Обновление репорта...");
-        onReportUpdate(reportId);
+        console.log("🔄 Обновление репорта...", reportIdRef.current);
+        if (reportIdRef.current) onReportUpdate(reportIdRef.current);
       });
 
       // ⚠️ Обработчик разрыва соединения
       connection.onclose((error) => {
         console.error("⚠️ SignalR разорвал соединение:", error || "Нет ошибки");
         setTimeout(() => {
-          if (connection.state === signalR.HubConnectionState.Disconnected) {
+          if (connection.state === HubConnectionState.Disconnected) {
             connection
               .start()
               .catch((err) =>
@@ -68,11 +76,11 @@ const useWebSocketReportPage = (
     }
 
     const connection = connectionRef.current;
-    if (connection?.state === signalR.HubConnectionState.Connected) {
-      if (previousReportIdRef.current !== null) {
-        console.log(`🚪 Выходим из группы: ${previousReportIdRef.current}`);
+    if (connection?.state === HubConnectionState.Connected) {
+      if (previousReportId !== null) {
+        console.log(`🚪 Выходим из группы: ${previousReportId}`);
         connection
-          .invoke("LeaveReportGroupAsync", previousReportIdRef.current)
+          .invoke("LeaveReportGroupAsync", previousReportId)
           .catch((err) =>
             console.error("❌ Ошибка при выходе из группы:", err)
           );
@@ -86,7 +94,7 @@ const useWebSocketReportPage = (
           console.error("❌ Ошибка при смене группы SignalR:", err)
         );
 
-      previousReportIdRef.current = reportId;
+      reportIdRef.current = reportId;
     }
   }, [reportId]);
 

@@ -133,7 +133,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
 
   return (
     <div
-      className={`p-4 mb-3 rounded-box shadow-lg border border-gray-300 ${
+      className={`card card-border p-4 mb-3 shadow-lg border-gray-300 ${
         bug.status === Number(BugStatuses.READY) ? "border-success" : ""
       }`}
     >
@@ -151,8 +151,8 @@ const Bug = ({ reportId, bugId }: BugProps) => {
           {!isNewBug && (
             <Dropdown
               className="max-w-[150px]"
-              onChange={(value) => {
-                updateBugData({ id: bug.id!, status: Number(value) });
+              onChange={(selected) => {
+                updateBugData({ id: bug.id!, status: Number(selected) });
               }}
               value={bug.status}
               options={[
@@ -211,7 +211,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               {/* Кнопка "плюс" — открывает окно выбора файла */}
               {!isNewBug && (
                 <button
-                  className="btn btn-accent btn-outline mt-2"
+                  className="btn btn-info btn-outline mt-2"
                   onClick={() => fileInputRefRecieve.current?.click()}
                 >
                   + Добавить файл
@@ -236,7 +236,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               {/* Кнопка "плюс" — открывает окно выбора файла */}
               {!isNewBug && (
                 <button
-                  className="btn btn-accent btn-outline mt-2"
+                  className="btn btn-info btn-outline mt-2"
                   onClick={() => fileInputRefExpected.current?.click()}
                 >
                   + Добавить файл

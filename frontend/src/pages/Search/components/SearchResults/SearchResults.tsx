@@ -34,6 +34,23 @@ const SearchResults = () => {
   const [searchResult] = useUnit([$searchResult]);
   const navigate = useNavigate();
 
+  const handleClick = (
+    e: React.MouseEvent<HTMLDivElement>,
+    reportId: number
+  ) => {
+    if (e.ctrlKey || e.metaKey || e.button === 1) {
+      window.open(`/reports/${reportId}`, "_blank");
+    } else {
+      navigate(`/reports/${reportId}`);
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.button === 1) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="space-y-4">
       {searchResult?.reports?.map((report) => {
@@ -43,15 +60,9 @@ const SearchResults = () => {
         return (
           <div
             key={report.id}
-            className={`border ${statusMeta.border} rounded-lg p-4 hover:bg-base-100 cursor-pointer`}
-            onClick={(e) => {
-              if (e.ctrlKey || e.metaKey || e.button === 1) {
-                window.open(`/reports/${report.id}`, "_blank");
-              } else {
-                navigate(`/reports/${report.id}`);
-              }
-            }}
-            onMouseDown={(e) => e.button === 1 && e.preventDefault()}
+            className={`card card-border ${statusMeta.border} p-4 hover:bg-base-200 cursor-pointer`}
+            onClick={(e) => handleClick(e, report.id)}
+            onMouseDown={handleMouseDown}
           >
             <div className="flex justify-between items-start">
               <div className="font-bold text-base">

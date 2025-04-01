@@ -54,7 +54,7 @@ const ReportHeader = () => {
 
   return (
     <div
-      className={`report-form p-4 mb-3 rounded-box shadow-lg border border-gray-300 ${
+      className={`report-form p-4 mb-3 card card-border shadow-lg border-gray-300 ${
         reportForm.status === Number(ReportStatuses.READY)
           ? "border-success"
           : ""
@@ -73,8 +73,8 @@ const ReportHeader = () => {
           <Dropdown
             className="max-w-[150px]"
             value={reportForm.status}
-            onChange={(v) => {
-              setUpdateStatus(Number(v) as ReportStatuses);
+            onChange={(selected) => {
+              setUpdateStatus(Number(selected) as ReportStatuses);
             }}
             options={[
               { label: "Решён", value: ReportStatuses.READY },

@@ -1,5 +1,5 @@
 -- Таблица отчётов
-CREATE TABLE IF NOT EXISTS public."Report" (
+CREATE TABLE IF NOT EXISTS public.report (
     id integer generated always as identity
         primary key,
     title TEXT NOT NULL,
@@ -11,17 +11,17 @@ CREATE TABLE IF NOT EXISTS public."Report" (
 );
 
 -- Таблица участников
-CREATE TABLE IF NOT EXISTS public."ReportParticipants" (
+CREATE TABLE IF NOT EXISTS public.report_participants (
     report_id INT NOT NULL,
     user_id text NOT NULL,
     PRIMARY KEY (report_id, user_id),
     CONSTRAINT fk_report
         FOREIGN KEY (report_id)
-        REFERENCES public."Report"(id)
+        REFERENCES public.report(id)
 );
 
--- Таблица "Bug"
-CREATE TABLE IF NOT EXISTS public."Bug" (
+-- Таблица bug
+CREATE TABLE IF NOT EXISTS public.bug (
     id integer generated always as identity
         primary key,
     report_id INT NOT NULL,
@@ -34,11 +34,11 @@ CREATE TABLE IF NOT EXISTS public."Bug" (
 
     CONSTRAINT fk_bug_report
         FOREIGN KEY (report_id)
-        REFERENCES public."Report"(id)
+        REFERENCES public.report(id)
 );
 
--- Таблица вложений (Attachment)
-CREATE TABLE IF NOT EXISTS public."Attachment" (
+-- Таблица вложений (attachment)
+CREATE TABLE IF NOT EXISTS public.attachment (
     id integer generated always as identity
         primary key,
     bug_id INT NOT NULL,
@@ -48,11 +48,11 @@ CREATE TABLE IF NOT EXISTS public."Attachment" (
 
     CONSTRAINT fk_attachment_bug
         FOREIGN KEY (bug_id)
-        REFERENCES public."Bug"(id)
+        REFERENCES public.bug(id)
 );
 
--- Таблица комментариев (Comment)
-CREATE TABLE IF NOT EXISTS public."Comment" (
+-- Таблица комментариев (comment)
+CREATE TABLE IF NOT EXISTS public.comment (
     id integer generated always as identity
         primary key,
     bug_id INT NOT NULL,
@@ -64,5 +64,5 @@ CREATE TABLE IF NOT EXISTS public."Comment" (
 
     CONSTRAINT fk_comment_bug
         FOREIGN KEY (bug_id)
-        REFERENCES public."Bug"(id)
+        REFERENCES public.bug(id)
 );

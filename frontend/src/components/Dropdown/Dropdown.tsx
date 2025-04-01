@@ -1,5 +1,19 @@
 import { ChevronDown, X } from "lucide-react";
 
+function getSingleSelectedLabel<T>(
+  options: DropdownOption<T>[],
+  value: T | null | undefined
+): string {
+  if (value === null || value === undefined) return "";
+  return options.find((opt) => opt.value === value)?.label ?? "";
+}
+
+function getMultiSelectedLabel<T>(value: T[] | T | null | undefined): string {
+  if (!Array.isArray(value)) return "";
+  if (value.length === 0) return "";
+  return `${value.length} выбрано`;
+}
+
 type DropdownOption<T = string> = {
   label: string;
   value: T;
@@ -32,14 +46,8 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
     multiple ? Array.isArray(value) && value.includes(val) : val === value;
 
   const selected = multiple
-    ? Array.isArray(value)
-      ? value.length === 0
-        ? ""
-        : `${value.length} выбрано`
-      : ""
-    : value === null || value === undefined
-      ? ""
-      : (options.find((opt) => opt.value === value)?.label ?? "");
+    ? getMultiSelectedLabel(value)
+    : getSingleSelectedLabel(options, value as T);
 
   const hasValue = multiple
     ? Array.isArray(value) && value.length > 0
@@ -48,7 +56,7 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
   return (
     <div className={`dropdown ${className}`} tabIndex={0}>
       {label && <div className="mb-1 text-xs font-semibold">{label}</div>}
-      <div className="btn w-full justify-between">
+      <div className="btn bg-base-100 w-full justify-between">
         <span className="flex gap-1 flex-wrap items-center font-normal">
           {!hasValue ? (
             <span className="text-gray-400 font-normal">Любой</span>
@@ -60,7 +68,7 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
               .map((opt) => (
                 <span
                   key={String(opt.value)}
-                  className="bg-gray-200 rounded-full px-2 py-0.5 text-xs text-gray-700"
+                  className="bg-base-300 rounded-full px-2 py-0.5 text-xs text-gray-700"
                 >
                   {opt.label}
                 </span>
@@ -80,7 +88,7 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
                 (e.currentTarget.closest(".dropdown") as HTMLElement)?.blur();
               }}
             >
-              <X className="w-4 h-4 text-gray-400 hover:text-red-500" />
+              <X className="w-4 h-4 text-gray-400 hover:text-neutral cursor-pointer" />
             </button>
           )}
           <ChevronDown className="w-4 h-4 opacity-70" />
@@ -90,9 +98,9 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
       <ul className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full z-[1]">
         {!multiple && hasCustomResetValue && (
           <li key="none">
-            <a
+            <button
               onClick={(e) => {
-                onChange(null as T);
+                onChange(null);
                 (e.currentTarget.closest(".dropdown") as HTMLElement)?.blur();
               }}
               className={value === null || value === undefined ? "active" : ""}
@@ -100,12 +108,12 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
               <div className="flex justify-between items-center text-gray-500 italic">
                 Не выбрано
               </div>
-            </a>
+            </button>
           </li>
         )}
         {options.map((opt) => (
           <li key={String(opt.value)}>
-            <a
+            <button
               onClick={(e) => {
                 if (multiple) {
                   const current = Array.isArray(value) ? value : [];
@@ -119,7 +127,9 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
                   (e.currentTarget.closest(".dropdown") as HTMLElement)?.blur();
                 }
               }}
-              className={isSelected(opt.value) ? "active" : ""}
+              className={`hover:bg-base-200 ${
+                isSelected(opt.value) ? "active bg-base-300" : ""
+              }`}
             >
               <div className="flex justify-between items-center">
                 {opt.label}
@@ -127,7 +137,7 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
                   <span className="text-success text-xs ml-2">✔</span>
                 )}
               </div>
-            </a>
+            </button>
           </li>
         ))}
       </ul>

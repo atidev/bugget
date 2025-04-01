@@ -19,8 +19,7 @@ export const searchFx = createEffect(async (params: SearchRequestParams) => {
     }
   }
 
-  const data = await searchReports(searchParams.toString());
-  return data as SearchResponse;
+  return await searchReports(searchParams.toString());
 });
 
 export const searchStarted = createEvent<SearchRequestParams>();
