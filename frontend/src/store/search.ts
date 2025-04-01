@@ -1,11 +1,11 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { searchReports } from "@/api/reports/search";
-import { SearchParams, SearchResponse } from "@/types/search";
+import { SearchResponse, SearchRequestParams } from "@/api/reports/models";
 import { $user } from "@/store/user";
 import { User } from "@/types/user";
 import { Team } from "@/types/team";
 
-export const searchFx = createEffect(async (params: SearchParams) => {
+export const searchFx = createEffect(async (params: SearchRequestParams) => {
   const searchParams = new URLSearchParams();
   if (params.query) searchParams.append("query", params.query);
   if (params.sort) searchParams.append("sort", params.sort);
@@ -23,7 +23,7 @@ export const searchFx = createEffect(async (params: SearchParams) => {
   return data as SearchResponse;
 });
 
-export const searchStarted = createEvent<SearchParams>();
+export const searchStarted = createEvent<SearchRequestParams>();
 export const pageMounted = createEvent();
 
 export const updateQuery = createEvent<string>();

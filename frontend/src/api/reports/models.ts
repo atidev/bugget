@@ -29,9 +29,9 @@ export type BugResponse = {
   creator: User;
   createdAt: string;
   updatedAt: string;
-  status: number;
+  status: BugStatuses;
   attachments: AttachmentResponse[];
-  comments: Comment[];
+  comments: CommentResponse[];
 };
 
 export type BugCreateRequest = {
@@ -71,7 +71,7 @@ export type CreateReportRequest = {
   title: string;
   responsibleId: string;
   participants?: User[];
-  bugs?: BugCreateRequest[];
+  bugs: BugCreateRequest[];
 };
 
 export type UpdateReportRequest = {
@@ -84,4 +84,19 @@ export type UpdateReportRequest = {
   updatedAt?: string;
   participants?: User[];
   bugs?: BugCreateRequest[];
+};
+
+export type SearchResponse = {
+  reports: ReportResponse[];
+  total: number;
+};
+
+export type SearchRequestParams = {
+  query?: string;
+  reportStatuses?: number[];
+  userId?: string;
+  teamId?: string;
+  sort?: string;
+  skip?: number;
+  take?: number;
 };

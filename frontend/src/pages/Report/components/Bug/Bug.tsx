@@ -49,7 +49,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
       return id
         ? state[id]
         : {
-            id: bugId || null,
+            id: bugId,
             status: Number(BugStatuses.IN_PROGRESS),
             reportId,
             receive: "",
@@ -125,6 +125,9 @@ const Bug = ({ reportId, bugId }: BugProps) => {
       createBugApi({ reportId: bug.reportId, bug: newBugData });
       return;
     }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // todo fix types
     updateBugApi(bug);
   };
 

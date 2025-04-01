@@ -2,17 +2,15 @@ import { createStore, createEvent, createEffect, sample } from "effector";
 import { createBugApi } from "@/api/reports/bug";
 import { createReportFx, clearReport } from "./report";
 import { BugCreateRequest } from "@/api/reports/models";
+import { NewBug } from "@/types/bug";
 
 export const createBugFx = createEffect(
-  async ({ reportId, bug }: { reportId: number; bug: BugCreateRequest }) => {
-    return await createBugApi(reportId, bug);
+  ({ reportId, bug }: { reportId: number; bug: BugCreateRequest }) => {
+    return createBugApi(reportId, bug);
   }
 );
 
-export const updateNewBug = createEvent<{
-  receive?: string;
-  expect?: string;
-}>();
+export const updateNewBug = createEvent<Partial<NewBug>>();
 
 export const setExists = createEvent<boolean>();
 
@@ -45,7 +43,7 @@ export const $isExists = createStore<boolean>(false)
 
 export const createBugEventByApi = createEvent<{
   reportId: number;
-  bug: { receive: string; expect: string };
+  bug: NewBug;
 }>();
 
 sample({

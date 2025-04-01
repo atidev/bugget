@@ -5,5 +5,5 @@ export type Attachment = {
   path?: string;
   createdAt?: string;
   attachType: number;
-  file: File;
+  file?: File;
 };

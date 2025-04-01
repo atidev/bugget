@@ -22,8 +22,8 @@ export const addCommentFx = createEffect<
   },
   Comment,
   Error
->(async ({ reportId, bugId, text }) => {
-  return await createCommentApi(reportId, bugId, text);
+>(({ reportId, bugId, text }) => {
+  return createCommentApi(reportId, bugId, text);
 });
 
 export const newBugComments = createEvent<{

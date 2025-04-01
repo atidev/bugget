@@ -4,9 +4,9 @@ import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import { getStatusMeta } from "@/constants/status";
 import { useNavigate } from "react-router-dom";
-import { Report } from "@/types/report";
+import { ReportResponse } from "@/api/reports/models";
 
-const getLatestUpdateDate = (report: Report) => {
+const getLatestUpdateDate = (report: ReportResponse) => {
   let latestTime: number | null = report.updatedAt
     ? new Date(report.updatedAt).getTime()
     : null;

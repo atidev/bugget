@@ -15,6 +15,7 @@ import Bug from "./components/Bug/Bug";
 import ReportHeader from "./components/ReportHeader/ReportHeader";
 import "./Report.css";
 import useWebSocketReportPage from "@/hooks/useWebSocketReportPage";
+import { ReportStatuses } from "@/const";
 
 const reportsPageBreadcrumb = { label: "Репорты", path: "/" };
 
@@ -77,11 +78,13 @@ const ReportPage = () => {
     if (!responsibleId) return;
     const newReport = await createReportFx({
       title: reportForm.title,
-      responsibleId: responsibleId,
+      responsibleId,
+      status: ReportStatuses.IN_PROGRESS,
       bugs: [
         {
           receive: newBugStore.receive,
           expect: newBugStore.expect,
+          isReady: false,
         },
       ],
     });

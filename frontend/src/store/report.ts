@@ -6,9 +6,8 @@ import {
   sample,
 } from "effector";
 import { fetchReport, createReport, updateReport } from "@/api/reports";
-import { Report } from "@/types/report";
+import { NewReport, Report } from "@/types/report";
 import { User } from "@/types/user";
-import { CreateReportRequest } from "@/api/reports/models";
 import { ReportStatuses } from "@/const";
 
 export const fetchReportFx = createEffect(async (id: number) => {
@@ -16,12 +15,10 @@ export const fetchReportFx = createEffect(async (id: number) => {
   return data;
 });
 
-export const createReportFx = createEffect(
-  async (newReport: CreateReportRequest) => {
-    const data = await createReport(newReport);
-    return data;
-  }
-);
+export const createReportFx = createEffect(async (newReport: NewReport) => {
+  const data = await createReport(newReport);
+  return data;
+});
 
 export const updateReportFx = createEffect(async (currentReport: Report) => {
   if (!currentReport.responsible || !currentReport.id) return;
@@ -47,7 +44,7 @@ export const $isNewReport = createStore<boolean>(true)
   .on(setIsNewReport, (_, isNew) => isNew)
   .reset(clearReport);
 
-export const $isReportChanged = createStore<boolean>(false).reset(clearReport);
+export const $isReportChanged = createStore(false).reset(clearReport);
 
 export const $initialReportForm = createStore<Report>({
   id: null,
@@ -61,22 +58,44 @@ export const $initialReportForm = createStore<Report>({
   participants: [],
   bugs: [],
 })
-  .on(fetchReportFx.doneData, (_, report) => report)
+  .on(fetchReportFx.doneData, (_, report) => ({
+    id: report.id,
+    title: report.title,
+    status: report.status,
+    responsible: report.responsible,
+    creator: report.creator,
+    createdAt: new Date(report.createdAt),
+    updatedAt: new Date(report.updatedAt),
+    participants: report.participants,
+    bugs: report.bugs.map((bug) => {
+      return {
+        ...bug,
+        isChanged: false,
+        createdAt: new Date(bug.createdAt),
+        updatedAt: new Date(bug.updatedAt),
+        comments: bug.comments.map((comment) => ({
+          ...comment,
+          createdAt: new Date(comment.createdAt),
+          updatedAt: new Date(comment.updatedAt),
+        })),
+      };
+    }),
+    responsibleId: report.responsible.id,
+  }))
   .reset(clearReport);
 
-// Текущее состояние репорта (изменяемые данные)
-export const $reportForm = createStore<{
-  id: number | null;
-  title: string;
-  status: ReportStatuses;
-  responsible: User | null;
-  participants: User[];
-}>({
+// Текущее состояние репорта (изменяемые данные, вводимые в форму)
+export const $reportForm = createStore<Report>({
   id: null,
   title: "",
   status: ReportStatuses.IN_PROGRESS,
   responsible: null,
   participants: [],
+  responsibleId: "",
+  creator: null,
+  createdAt: null,
+  updatedAt: null,
+  bugs: [],
 })
   .on(fetchReportFx.doneData, (_, report) => {
     return {
@@ -85,6 +104,23 @@ export const $reportForm = createStore<{
       status: report.status || ReportStatuses.IN_PROGRESS,
       responsible: report.responsible || {},
       participants: report.participants || [],
+      responsibleId: report.responsible.id,
+      creator: report.creator,
+      createdAt: new Date(report.createdAt),
+      updatedAt: new Date(report.updatedAt),
+      bugs: report.bugs.map((bug) => {
+        return {
+          ...bug,
+          createdAt: new Date(bug.createdAt),
+          updatedAt: new Date(bug.updatedAt),
+          comments: bug.comments.map((comment) => ({
+            ...comment,
+            createdAt: new Date(comment.createdAt),
+            updatedAt: new Date(comment.updatedAt),
+          })),
+          isChanged: false,
+        };
+      }),
     };
   })
   .on(updateTitle, (state, title) => ({ ...state, title }))
@@ -111,11 +147,8 @@ sample({
   target: $isReportChanged, // Записываем в стор
 });
 
-// сбарасываем report при сбросе
+// сбрасываем report при сбросе
 sample({
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  // todo fix ts-ignore
   source: $initialReportForm, // Берём данные из исходного стейта (загруженного с сервера)
   clock: resetReport, // Ждём, когда сработает resetReport
   target: $reportForm, // Копируем данные в редактируемый стор

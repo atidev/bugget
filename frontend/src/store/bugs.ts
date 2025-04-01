@@ -2,30 +2,37 @@ import { createEffect, createEvent, createStore, sample } from "effector";
 import { createBugFx } from "./newBug";
 import { $initialReportForm, clearReport } from "./report";
 import { updateBugApi } from "@/api/reports/bug";
-import { BugUpdateRequest } from "@/api/reports/models";
 import { Bug } from "@/types/bug";
 
 type UpdateBugParams = {
   reportId: number;
   bugId: number;
-  bug: BugUpdateRequest;
+  bug: Bug;
 };
 
 export const updateBugFx = createEffect(
-  async ({ reportId, bugId, bug }: UpdateBugParams) => {
-    return await updateBugApi(reportId, bugId, bug);
+  ({ reportId, bugId, bug }: UpdateBugParams) => {
+    const bugPayload = {
+      id: bug.id,
+      receive: bug.receive,
+      expect: bug.expect,
+      status: bug.status,
+    };
+    return updateBugApi(reportId, bugId, bugPayload);
   }
 );
 
 export const updateBugEvent = createEvent<Partial<Bug>>();
-export const updateBugApiEvent = createEvent<Partial<Bug>>();
+export const updateBugApiEvent = createEvent<Bug>();
 export const resetBug = createEvent<number>();
 
 // todo maybe replace with new Map()
 export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
   .on($initialReportForm, (_, report) =>
-    report.bugs.reduce((acc: Record<number, Bug>, bug: Bug) => {
+    report.bugs.reduce((acc, bug) => {
       if (bug.id) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         acc[bug.id] = bug;
       }
       return acc;
@@ -98,15 +105,10 @@ export const $bugsIds = createStore<number[]>([])
 
 sample({
   source: updateBugApiEvent,
-  fn: (bug) =>
-    ({
-      reportId: bug.reportId,
-      bugId: bug.id,
-      bug: {
-        expect: bug.expect ?? null,
-        receive: bug.receive ?? null,
-        status: bug.status ?? null,
-      },
-    } as UpdateBugParams),
+  fn: (bug) => ({
+    reportId: bug.reportId,
+    bugId: bug.id,
+    bug: bug,
+  }),
   target: updateBugFx,
 });

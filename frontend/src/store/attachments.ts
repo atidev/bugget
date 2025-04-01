@@ -5,6 +5,7 @@ import { Attachment } from "@/types/attachement";
 import { Bug } from "@/types/bug";
 
 export const uploadAttachmentFx = createEffect(async (params: Attachment) => {
+  if (!params.file) return;
   const payload = {
     bugId: params.bugId,
     reportId: params.reportId,
