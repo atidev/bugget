@@ -16,10 +16,12 @@ export const fetchReportFx = createEffect(async (id: number) => {
   return data;
 });
 
-export const createReportFx = createEffect(async (newReport: CreateReportRequest) => {
-  const data = await createReport(newReport);
-  return data;
-});
+export const createReportFx = createEffect(
+  async (newReport: CreateReportRequest) => {
+    const data = await createReport(newReport);
+    return data;
+  }
+);
 
 export const updateReportFx = createEffect(async (currentReport: Report) => {
   if (!currentReport.responsible || !currentReport.id) return;
@@ -48,16 +50,16 @@ export const $isNewReport = createStore<boolean>(true)
 export const $isReportChanged = createStore<boolean>(false).reset(clearReport);
 
 export const $initialReportForm = createStore<Report>({
-    id: null,
-    title: "",
-    status: ReportStatuses.IN_PROGRESS,
-    responsible: null,
-    responsibleId: "",
-    creator: null,
-    createdAt: null,
-    updatedAt: null,
-    participants: [],
-    bugs: [],
+  id: null,
+  title: "",
+  status: ReportStatuses.IN_PROGRESS,
+  responsible: null,
+  responsibleId: "",
+  creator: null,
+  createdAt: null,
+  updatedAt: null,
+  participants: [],
+  bugs: [],
 })
   .on(fetchReportFx.doneData, (_, report) => report)
   .reset(clearReport);

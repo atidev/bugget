@@ -7,9 +7,9 @@ export type SearchParams = {
   sort?: string;
   skip?: number;
   take?: number;
-}
+};
 
 export type SearchResponse = {
   reports: Report[];
   total: number;
-}
+};

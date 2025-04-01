@@ -6,7 +6,7 @@ import { Report } from "@/types/report";
 type ReportProps = {
   report: Report;
   highlight?: boolean;
-}
+};
 
 const ReportSummary = ({ report, highlight }: ReportProps) => {
   const navigate = useNavigate();
@@ -20,9 +20,7 @@ const ReportSummary = ({ report, highlight }: ReportProps) => {
       onClick={() => navigate(`/reports/${report.id}`)}
     >
       <div className="card-body p-4 bg-base-300">
-        <h3 className="card-title text-lg font-semibold">
-          {report.title}
-        </h3>
+        <h3 className="card-title text-lg font-semibold">{report.title}</h3>
         <p className="text-sm dark:text-stone-300">
           Ответственный: {report.responsible?.name}
         </p>

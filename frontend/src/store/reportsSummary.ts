@@ -16,7 +16,9 @@ sample({
   clock: loadReportsFx.doneData,
   source: $user,
   fn: (user, reports: Report[]) => {
-    return reports.filter((report: Report) => report.responsible?.id === user?.id);
+    return reports.filter(
+      (report: Report) => report.responsible?.id === user?.id
+    );
   },
   target: $responsibleReports,
 });

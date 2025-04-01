@@ -1,6 +1,6 @@
 import { Bug } from "./bug";
 import { User } from "./user";
-import { ReportStatuses } from '../const/index';
+import { ReportStatuses } from "../const/index";
 
 export type Report = {
   id: number | null;

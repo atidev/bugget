@@ -7,27 +7,32 @@ import { useNavigate } from "react-router-dom";
 import { Report } from "@/types/report";
 
 const getLatestUpdateDate = (report: Report) => {
-  let latestTime: number | null = report.updatedAt ? new Date(report.updatedAt).getTime() : null;
+  let latestTime: number | null = report.updatedAt
+    ? new Date(report.updatedAt).getTime()
+    : null;
   report.bugs.forEach((bug) => {
     const bugTime = bug.updatedAt ? new Date(bug.updatedAt).getTime() : null;
     if (bugTime !== null && (latestTime === null || bugTime > latestTime)) {
       latestTime = bugTime;
     }
     bug.comments.forEach((comment) => {
-      const commentTime = comment.updatedAt ? new Date(comment.updatedAt).getTime() : null;
-      if (commentTime !== null && (latestTime === null || commentTime > latestTime)) {
+      const commentTime = comment.updatedAt
+        ? new Date(comment.updatedAt).getTime()
+        : null;
+      if (
+        commentTime !== null &&
+        (latestTime === null || commentTime > latestTime)
+      ) {
         latestTime = commentTime;
       }
-    }
-    )
-  })
+    });
+  });
   return latestTime ? new Date(latestTime) : null;
 };
 
 const SearchResults = () => {
   const [searchResult] = useUnit([$searchResult]);
   const navigate = useNavigate();
-
 
   return (
     <div className="space-y-4">
@@ -56,20 +61,16 @@ const SearchResults = () => {
                 {statusMeta.title}
               </span>
             </div>
-            
-            
+
             <div className="text-sm text-base-content/70 mt-1">
-              {report.creator?.name &&
-                `Автор: ${report.creator.name}`
-              }
+              {report.creator?.name && `Автор: ${report.creator.name}`}
               {report.createdAt &&
                 ` • Создан: ${formatDistanceToNow(new Date(report.createdAt), {
                   addSuffix: true,
                   locale: ru,
-                })}`
-              }              
+                })}`}
             </div>
-            {latestUpdateDate &&
+            {latestUpdateDate && (
               <div className="text-sm text-base-content/70">
                 Последнее обновление:{" "}
                 {formatDistanceToNow(latestUpdateDate, {
@@ -77,7 +78,7 @@ const SearchResults = () => {
                   locale: ru,
                 })}
               </div>
-            }
+            )}
             <div className="text-sm text-base-content/70">
               Ответственный: {report.responsible?.name ?? "—"}
             </div>

@@ -21,7 +21,10 @@ export const createReport = async (report: CreateReportRequest) => {
   }
 };
 
-export const updateReport = async (updateRequest: ReportRequest, reportId: number) => {
+export const updateReport = async (
+  updateRequest: ReportRequest,
+  reportId: number
+) => {
   try {
     const { data } = await axios.put(`/v1/reports/${reportId}`, updateRequest);
     return data;
@@ -40,5 +43,3 @@ export const fetchReportsSummary = async () => {
     return [];
   }
 };
-
-

@@ -1,6 +1,5 @@
 import { BugStatuses, ReportStatuses } from "@/const";
 
-
 export type User = {
   id: string;
   name: string;
@@ -81,7 +80,6 @@ export type CreateReportRequest = {
   participants?: User[];
   bugs?: BugCreateRequest[];
 };
-
 
 export type ReportRequest = {
   title: string;

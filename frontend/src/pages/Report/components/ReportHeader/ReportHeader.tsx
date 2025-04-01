@@ -101,7 +101,11 @@ const ReportHeader = () => {
 
           <div className="flex gap-4 items-center">
             <Autosuggest
-              onSelect={(entity) => handleUserSelect(entity ? { id: entity.id, name: entity.display } : null)}
+              onSelect={(entity) =>
+                handleUserSelect(
+                  entity ? { id: entity.id, name: entity.display } : null
+                )
+              }
               externalString={reportForm.responsible?.name}
               autocompleteFn={autocompleteUsers}
             />

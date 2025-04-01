@@ -1,5 +1,9 @@
 import axios from "../axios";
-import { BugUpdateResponse, BugCreateRequest, BugUpdateRequest } from "./models";
+import {
+  BugUpdateResponse,
+  BugCreateRequest,
+  BugUpdateRequest,
+} from "./models";
 export const createBugApi = async (
   reportId: number,
   createBugRequest: BugCreateRequest

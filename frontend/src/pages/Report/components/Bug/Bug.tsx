@@ -25,7 +25,7 @@ import ImageCarousel from "./components/ImageCarousel/ImageCarousel";
 type BugProps = {
   reportId?: number | null;
   bugId?: number;
-}
+};
 
 const Bug = ({ reportId, bugId }: BugProps) => {
   const textareaRefReceive = useRef<HTMLTextAreaElement>(null);
@@ -48,7 +48,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
     fn: (state, [id]) => {
       return id
         ? state[id]
-        : ({
+        : {
             id: bugId || null,
             status: Number(BugStatuses.IN_PROGRESS),
             reportId,
@@ -56,8 +56,8 @@ const Bug = ({ reportId, bugId }: BugProps) => {
             expect: "",
             isChanged: false,
             attachments: [],
-            comments: []
-          });
+            comments: [],
+          };
     },
   });
 
@@ -70,7 +70,6 @@ const Bug = ({ reportId, bugId }: BugProps) => {
   });
 
   const isNewBug = bug.id === null || bug.id === undefined;
-
 
   const isBugChanged = isNewBug
     ? newBugData.receive !== "" && newBugData.expect !== ""
@@ -127,7 +126,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
       return;
     }
     updateBugApi(bug);
-  }
+  };
 
   return (
     <div
@@ -260,10 +259,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
                 }
               }}
             />
-            <SaveButton
-              isChanged={isBugChanged}
-              onSave={handleSave}
-            />
+            <SaveButton isChanged={isBugChanged} onSave={handleSave} />
           </div>
         )}
         {!isNewBug && (

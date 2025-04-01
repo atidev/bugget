@@ -9,7 +9,7 @@ type UpdateBugParams = {
   reportId: number;
   bugId: number;
   bug: BugUpdateRequest;
-}
+};
 
 export const updateBugFx = createEffect(
   async ({ reportId, bugId, bug }: UpdateBugParams) => {
@@ -24,15 +24,12 @@ export const resetBug = createEvent<number>();
 // todo maybe replace with new Map()
 export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
   .on($initialReportForm, (_, report) =>
-    report.bugs.reduce(
-      (acc: Record<number, Bug>, bug: Bug) => {
-        if (bug.id) {
-          acc[bug.id] = bug;
-        }
-        return acc;
-      },
-      {}
-    )
+    report.bugs.reduce((acc: Record<number, Bug>, bug: Bug) => {
+      if (bug.id) {
+        acc[bug.id] = bug;
+      }
+      return acc;
+    }, {})
   )
   .on(updateBugFx.done, (state, { result }) => {
     if (!result) return state;
@@ -110,6 +107,6 @@ sample({
         receive: bug.receive ?? null,
         status: bug.status ?? null,
       },
-    }) as UpdateBugParams,
+    } as UpdateBugParams),
   target: updateBugFx,
 });

@@ -9,8 +9,10 @@ export const createBugFx = createEffect(
   }
 );
 
-export const updateNewBug =
-  createEvent<{ receive?: string; expect?: string }>();
+export const updateNewBug = createEvent<{
+  receive?: string;
+  expect?: string;
+}>();
 
 export const setExists = createEvent<boolean>();
 
