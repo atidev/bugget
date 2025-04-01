@@ -1,9 +1,5 @@
 import axios from "../axios";
-import {
-  BugUpdateResponse,
-  BugCreateRequest,
-  BugUpdateRequest,
-} from "./models";
+import { BugResponse, BugCreateRequest, BugUpdateRequest } from "./models";
 export const createBugApi = async (
   reportId: number,
   createBugRequest: BugCreateRequest
@@ -24,7 +20,7 @@ export const updateBugApi = async (
   reportId: number,
   bugId: number,
   bug: BugUpdateRequest
-): Promise<BugUpdateResponse | null> => {
+): Promise<BugResponse | null> => {
   try {
     const { data } = await axios.put(
       `/v1/reports/${reportId}/bugs/${bugId}`,

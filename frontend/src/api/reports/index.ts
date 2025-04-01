@@ -1,5 +1,5 @@
 import axios from "../axios";
-import { CreateReportRequest, ReportRequest } from "./models";
+import { CreateReportRequest, UpdateReportRequest } from "./models";
 
 export const fetchReport = async (id: number) => {
   try {
@@ -22,7 +22,7 @@ export const createReport = async (report: CreateReportRequest) => {
 };
 
 export const updateReport = async (
-  updateRequest: ReportRequest,
+  updateRequest: UpdateReportRequest,
   reportId: number
 ) => {
   try {

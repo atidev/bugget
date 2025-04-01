@@ -34,13 +34,6 @@ export type BugResponse = {
   comments: Comment[];
 };
 
-export type BugUpdateResponse = {
-  id: number;
-  receive: string;
-  expect: string;
-  status: BugStatuses;
-};
-
 export type BugCreateRequest = {
   receive: string;
   expect: string;
@@ -53,7 +46,7 @@ export type BugUpdateRequest = {
   status: BugStatuses | null;
 };
 
-export type Comment = {
+export type CommentResponse = {
   id: number;
   bugId: number;
   text: string;
@@ -62,7 +55,7 @@ export type Comment = {
   updatedAt: string;
 };
 
-export type Report = {
+export type ReportResponse = {
   id: number;
   title: string;
   status: ReportStatuses;
@@ -81,7 +74,7 @@ export type CreateReportRequest = {
   bugs?: BugCreateRequest[];
 };
 
-export type ReportRequest = {
+export type UpdateReportRequest = {
   title: string;
   status: ReportStatuses;
   responsible?: User;
