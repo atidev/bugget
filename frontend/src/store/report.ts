@@ -5,10 +5,10 @@ import {
   createStore,
   sample,
 } from "effector";
-import { fetchReport, createReport, updateReport } from "../api/reports";
+import { fetchReport, createReport, updateReport } from "@/api/reports";
 import { Report } from "@/types/report";
 import { User } from "@/types/user";
-import { CreateReportPayload } from "@/api/reports/models";
+import { CreateReportRequest } from "@/api/reports/models";
 import { ReportStatuses } from "@/const";
 
 export const fetchReportFx = createEffect(async (id: number) => {
@@ -16,7 +16,7 @@ export const fetchReportFx = createEffect(async (id: number) => {
   return data;
 });
 
-export const createReportFx = createEffect(async (newReport: CreateReportPayload) => {
+export const createReportFx = createEffect(async (newReport: CreateReportRequest) => {
   const data = await createReport(newReport);
   return data;
 });

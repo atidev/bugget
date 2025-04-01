@@ -16,7 +16,8 @@ import { $attachmentsByBugId } from "@/store/attachments";
 import "./Bug.css";
 import CancelButton from "@/components/CancelButton/CancelButton";
 import SaveButton from "@/components/SaveButton/SaveButton";
-import { BugStatuses } from "../../../../const";
+import Dropdown from "@/components/Dropdown/Dropdown";
+import { BugStatuses } from "@/const";
 import { Chat } from "./components/Chat/Chat";
 import { uploadAttachmentFx } from "@/store/attachments";
 import ImageCarousel from "./components/ImageCarousel/ImageCarousel";
@@ -68,7 +69,8 @@ const Bug = ({ reportId, bugId }: BugProps) => {
     },
   });
 
-  const isNewBug = bug.id === null;
+  const isNewBug = bug.id === null || bug.id === undefined;
+
 
   const isBugChanged = isNewBug
     ? newBugData.receive !== "" && newBugData.expect !== ""
@@ -145,24 +147,17 @@ const Bug = ({ reportId, bugId }: BugProps) => {
 
           {/* Селект статуса (только для существующего бага) */}
           {!isNewBug && (
-            <div className="select-wrapper">
-              <select
-                id="status"
-                className={`select ${
-                  bug.status === Number(BugStatuses.READY)
-                    ? "select-success border-success"
-                    : ""
-                } text-sm rounded-lg block w-full p-2.5`}
-                onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
-                  const newStatus = event.target.value;
-                  updateBugData({ id: bug.id || null, status: Number(newStatus) });
-                }}
-                value={bug.status}
-              >
-                <option value={Number(BugStatuses.READY)}>Решён</option>
-                <option value={Number(BugStatuses.IN_PROGRESS)}>Активен</option>
-              </select>
-            </div>
+            <Dropdown
+              className="max-w-[150px]"
+              onChange={(value) => {
+                updateBugData({ id: bug.id!, status: Number(value) });
+              }}
+              value={bug.status}
+              options={[
+                { label: "Исправлен", value: BugStatuses.READY },
+                { label: "Открыт", value: BugStatuses.IN_PROGRESS },
+              ]}
+            />
           )}
         </div>
         <div className="flex gap-3 text-xs font-semibold mb-1 mt-3">

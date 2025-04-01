@@ -1,7 +1,7 @@
 import axios from "../axios";
-import { AttachmentPayload } from "./models";
+import { AttachmentRequest } from "./models";
 
-export const uploadAttachmentApi = async (params: AttachmentPayload) => {
+export const uploadAttachmentApi = async (params: AttachmentRequest) => {
   try {
     const { reportId, bugId, file, attachType = 1 } = params;
     const formData = new FormData();

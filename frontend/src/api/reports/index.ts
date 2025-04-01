@@ -1,5 +1,5 @@
 import axios from "../axios";
-import { CreateReportPayload, ReportPayload } from "./models";
+import { CreateReportRequest, ReportRequest } from "./models";
 
 export const fetchReport = async (id: number) => {
   try {
@@ -11,7 +11,7 @@ export const fetchReport = async (id: number) => {
   }
 };
 
-export const createReport = async (report: CreateReportPayload) => {
+export const createReport = async (report: CreateReportRequest) => {
   try {
     const { data } = await axios.post(`/v1/reports`, report);
     return data;
@@ -21,7 +21,7 @@ export const createReport = async (report: CreateReportPayload) => {
   }
 };
 
-export const updateReport = async (updateRequest: ReportPayload, reportId: number) => {
+export const updateReport = async (updateRequest: ReportRequest, reportId: number) => {
   try {
     const { data } = await axios.put(`/v1/reports/${reportId}`, updateRequest);
     return data;

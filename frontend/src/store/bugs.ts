@@ -2,13 +2,13 @@ import { createEffect, createEvent, createStore, sample } from "effector";
 import { createBugFx } from "./newBug";
 import { $initialReportForm, clearReport } from "./report";
 import { updateBugApi } from "@/api/reports/bug";
-import { BugUpdatePayload } from "@/api/reports/models";
+import { BugUpdateRequest } from "@/api/reports/models";
 import { Bug } from "@/types/bug";
 
 type UpdateBugParams = {
   reportId: number;
   bugId: number;
-  bug: BugUpdatePayload;
+  bug: BugUpdateRequest;
 }
 
 export const updateBugFx = createEffect(
@@ -37,8 +37,7 @@ export const $initialBugsByBugId = createStore<Record<number, Bug>>({})
   .on(updateBugFx.done, (state, { result }) => {
     if (!result) return state;
     const { id, receive, expect, status } = result;
-    const bugId: keyof typeof state = id;
-    const bug = state[bugId];
+    const bug = state[id];
 
     if (!bug) return state;
 

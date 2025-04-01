@@ -20,10 +20,10 @@ const ReportSummary = ({ report, highlight }: ReportProps) => {
       onClick={() => navigate(`/reports/${report.id}`)}
     >
       <div className="card-body p-4 bg-base-300">
-        <h3 className="card-title text-lg font-semibold dark:text-stone-50">
+        <h3 className="card-title text-lg font-semibold">
           {report.title}
         </h3>
-        <p className="text-sm text-gray-600 dark:text-stone-300">
+        <p className="text-sm dark:text-stone-300">
           Ответственный: {report.responsible?.name}
         </p>
         <p className="text-sm dark:text-stone-200">

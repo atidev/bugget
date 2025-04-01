@@ -1,10 +1,10 @@
 import { createStore, createEvent, createEffect, sample } from "effector";
 import { createBugApi } from "@/api/reports/bug";
 import { createReportFx, clearReport } from "./report";
-import { BugCreatePayload } from "@/api/reports/models";
+import { BugCreateRequest } from "@/api/reports/models";
 
 export const createBugFx = createEffect(
-  async ({ reportId, bug }: { reportId: number; bug: BugCreatePayload }) => {
+  async ({ reportId, bug }: { reportId: number; bug: BugCreateRequest }) => {
     return await createBugApi(reportId, bug);
   }
 );

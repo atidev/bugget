@@ -13,7 +13,7 @@ import { $bugsIds } from "@/store/bugs";
 import { getCommentsFx } from "@/store/comments";
 import Bug from "./components/Bug/Bug";
 import ReportHeader from "./components/ReportHeader/ReportHeader";
-import "./ReportPage.css";
+import "./Report.css";
 import useWebSocketReportPage from "@/hooks/useWebSocketReportPage";
 
 const reportsPageBreadcrumb = { label: "Репорты", path: "/" };

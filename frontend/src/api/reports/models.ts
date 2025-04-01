@@ -6,7 +6,7 @@ export type User = {
   name: string;
 };
 
-export type AttachmentPayload = {
+export type AttachmentRequest = {
   bugId: number;
   reportId: number;
   file: File;
@@ -42,12 +42,12 @@ export type BugUpdateResponse = {
   status: BugStatuses;
 };
 
-export type BugCreatePayload = {
+export type BugCreateRequest = {
   receive: string;
   expect: string;
 };
 
-export type BugUpdatePayload = {
+export type BugUpdateRequest = {
   id: number;
   receive: string | null;
   expect: string | null;
@@ -75,15 +75,15 @@ export type Report = {
   bugs: BugResponse[];
 };
 
-export type CreateReportPayload = {
+export type CreateReportRequest = {
   title: string;
   responsibleId: string;
   participants?: User[];
-  bugs?: BugCreatePayload[];
+  bugs?: BugCreateRequest[];
 };
 
 
-export type ReportPayload = {
+export type ReportRequest = {
   title: string;
   status: ReportStatuses;
   responsible?: User;
@@ -92,5 +92,5 @@ export type ReportPayload = {
   createdAt?: string;
   updatedAt?: string;
   participants?: User[];
-  bugs?: BugCreatePayload[];
+  bugs?: BugCreateRequest[];
 };
