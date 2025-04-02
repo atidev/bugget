@@ -27,20 +27,20 @@ BEGIN
             CASE WHEN _sort_field = 'rank' THEN
             (
                 COALESCE(ts_rank(r.search_vector, ts_query), 0) * 1.5 +
-                COALESCE((SELECT MAX(ts_rank(b.search_vector, ts_query)) FROM public.bug b WHERE b.report_id = r.id), 0) * 1.2 +
-                COALESCE((SELECT MAX(ts_rank(c.search_vector, ts_query)) FROM public.comment c JOIN public.bug b ON c.bug_id = b.id WHERE b.report_id = r.id), 0)
+                COALESCE((SELECT MAX(ts_rank(b.search_vector, ts_query)) FROM public.bugs b WHERE b.report_id = r.id), 0) * 1.2 +
+                COALESCE((SELECT MAX(ts_rank(c.search_vector, ts_query)) FROM public.comments c JOIN public.bugs b ON c.bug_id = b.id WHERE b.report_id = r.id), 0)
             )
             ELSE 0 END AS rank
-        FROM public.report r
+        FROM public.reports r
         LEFT JOIN public.report_participants rp ON rp.report_id = r.id
         WHERE (_query IS NULL OR ts_query IS NULL OR
                r.search_vector @@ ts_query OR
-               EXISTS (SELECT 1 FROM public.bug b WHERE b.report_id = r.id AND b.search_vector @@ ts_query) OR
-               EXISTS (SELECT 1 FROM public.bug b JOIN public.comment c ON c.bug_id = b.id WHERE b.report_id = r.id AND c.search_vector @@ ts_query) OR
+               EXISTS (SELECT 1 FROM public.bugs b WHERE b.report_id = r.id AND b.search_vector @@ ts_query) OR
+               EXISTS (SELECT 1 FROM public.bugs b JOIN public.comments c ON c.bug_id = b.id WHERE b.report_id = r.id AND c.search_vector @@ ts_query) OR
                r.title ILIKE '%' || _query || '%' OR
-               EXISTS (SELECT 1 FROM public.bug b WHERE b.report_id = r.id AND 
+               EXISTS (SELECT 1 FROM public.bugs b WHERE b.report_id = r.id AND 
                        (b.receive ILIKE '%' || _query || '%' OR b.expect ILIKE '%' || _query || '%')) OR
-               EXISTS (SELECT 1 FROM public.bug b JOIN public.comment c ON c.bug_id = b.id WHERE b.report_id = r.id AND c.text ILIKE '%' || _query || '%'))
+               EXISTS (SELECT 1 FROM public.bugs b JOIN public.comments c ON c.bug_id = b.id WHERE b.report_id = r.id AND c.text ILIKE '%' || _query || '%'))
           AND (_statuses IS NULL OR r.status = ANY (_statuses))
           AND (_user_ids IS NULL OR rp.user_id = ANY (_user_ids))
     ),

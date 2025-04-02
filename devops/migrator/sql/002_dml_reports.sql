@@ -16,7 +16,7 @@ DECLARE
     bug_json      JSONB;
 BEGIN
     -- Создаём Report
-    INSERT INTO public.report (title, status, responsible_user_id, creator_user_id)
+    INSERT INTO public.reports (title, status, responsible_user_id, creator_user_id)
     VALUES (_title, _status, _responsible_user_id, _creator_user_id)
     RETURNING id INTO new_report_id;
 
@@ -30,7 +30,7 @@ BEGIN
     FOR bug_json IN
         SELECT * FROM jsonb_array_elements(_bugs_json::jsonb)
         LOOP
-            INSERT INTO public.bug (report_id, receive, expect, status, creator_user_id)
+            INSERT INTO public.bugs (report_id, receive, expect, status, creator_user_id)
             VALUES (new_report_id,
                     (bug_json ->> 'receive')::TEXT,
                     (bug_json ->> 'expect')::TEXT,
@@ -79,7 +79,7 @@ BEGIN
                                                                                                             'created_at', a.created_at
                                                                                                     )
                                                                                             )
-                                                                                     FROM public.attachment a
+                                                                                     FROM public.attachments a
                                                                                      WHERE a.bug_id = b.id), '[]'::jsonb),
                                                             'comments', COALESCE((SELECT jsonb_agg(
                                                                                                  jsonb_build_object(
@@ -91,18 +91,18 @@ BEGIN
                                                                                                          'updated_at', c.updated_at
                                                                                                  )
                                                                                          )
-                                                                                  FROM public.comment c
+                                                                                  FROM public.comments c
                                                                                   WHERE c.bug_id = b.id), '[]'::jsonb)
                                                     )
                                             )
-                                     FROM public.bug b
+                                     FROM public.bugs b
                                      WHERE b.report_id = r.id), '[]'::jsonb),
                    'participants_user_ids', COALESCE((SELECT jsonb_agg(user_id)
                                                       FROM public.report_participants
                                                       WHERE report_id = r.id), '[]'::jsonb)
            )
     INTO result
-    FROM public.report r
+    FROM public.reports r
     WHERE r.id = _report_id;
 
     RETURN result;
@@ -120,7 +120,7 @@ $$
 BEGIN
     RETURN QUERY
         SELECT public.get_report(r.id)
-        FROM public.report r
+        FROM public.reports r
         WHERE r.status = 0
           AND r.id IN (SELECT report_id
                        FROM public.report_participants
@@ -141,7 +141,7 @@ AS
 $$
 BEGIN
     -- Обновляем report, если параметры не null
-    UPDATE public.report
+    UPDATE public.reports
     SET title               = COALESCE(_title, title),
         status              = COALESCE(_status, status),
         responsible_user_id = COALESCE(_responsible_user_id, responsible_user_id),
