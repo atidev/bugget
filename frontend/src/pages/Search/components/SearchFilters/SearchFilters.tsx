@@ -63,7 +63,7 @@ const SearchFilters = () => {
               entity ? { id: entity.id, name: entity.display } : null
             )
           }
-          externalString={userFilter?.name}
+          externalString={userFilter?.name || ""}
           autocompleteFn={autocompleteUsers}
         />
       </div>
@@ -75,7 +75,7 @@ const SearchFilters = () => {
               entity ? { id: entity.id, name: entity.display } : null
             )
           }
-          externalString={teamFilter?.name}
+          externalString={teamFilter?.name || ""}
           autocompleteFn={autocompleteTeams}
         />
       </div>

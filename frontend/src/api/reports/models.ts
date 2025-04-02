@@ -1,22 +1,19 @@
 import { BugStatuses, ReportStatuses } from "@/const";
 
 export type User = {
-  id: string;
-  name: string;
+  id: string | null;
+  name: string | null;
 };
 
 export type AttachmentRequest = {
-  bugId: number;
-  reportId: number;
   file: File;
-  attachType: number;
 };
 
 export type AttachmentResponse = {
   id: number;
   bugId: number;
   reportId: number;
-  path: string;
+  path: string | null;
   createdAt: string;
   attachType: number;
 };
@@ -24,8 +21,8 @@ export type AttachmentResponse = {
 export type BugResponse = {
   id: number;
   reportId: number;
-  receive: string;
-  expect: string;
+  receive: string | null;
+  expect: string | null;
   creator: User;
   createdAt: string;
   updatedAt: string;
@@ -35,12 +32,11 @@ export type BugResponse = {
 };
 
 export type BugCreateRequest = {
-  receive: string;
-  expect: string;
+  receive: string | null;
+  expect: string | null;
 };
 
 export type BugUpdateRequest = {
-  id: number;
   receive: string | null;
   expect: string | null;
   status: BugStatuses | null;
@@ -49,7 +45,7 @@ export type BugUpdateRequest = {
 export type CommentResponse = {
   id: number;
   bugId: number;
-  text: string;
+  text: string | null;
   creator: User;
   createdAt: string;
   updatedAt: string;
@@ -57,33 +53,31 @@ export type CommentResponse = {
 
 export type ReportResponse = {
   id: number;
-  title: string;
+  title: string | null;
   status: ReportStatuses;
   responsible: User;
   creator: User;
   createdAt: string;
   updatedAt: string;
-  participants: User[];
-  bugs: BugResponse[];
+  participants: User[] | null;
+  bugs: BugResponse[] | null;
 };
 
 export type CreateReportRequest = {
-  title: string;
-  responsibleId: string;
-  participants?: User[];
-  bugs: BugCreateRequest[];
+  title: string | null;
+  responsibleId: string | null;
+  bugs:
+    | {
+        receive: string | null;
+        expect: string | null;
+      }[]
+    | null;
 };
 
 export type UpdateReportRequest = {
-  title: string;
-  status: ReportStatuses;
-  responsible?: User;
-  responsibleId: string;
-  creator?: User;
-  createdAt?: string;
-  updatedAt?: string;
-  participants?: User[];
-  bugs?: BugCreateRequest[];
+  title: string | null;
+  status: ReportStatuses | null;
+  responsibleUserId: string | null;
 };
 
 export type SearchResponse = {
@@ -91,7 +85,7 @@ export type SearchResponse = {
   total: number;
 };
 
-export type SearchRequestParams = {
+export type SearchRequestQueryParams = {
   query?: string;
   reportStatuses?: number[];
   userId?: string;

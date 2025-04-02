@@ -9,6 +9,33 @@ import { fetchReport, createReport, updateReport } from "@/api/reports";
 import { NewReport, Report } from "@/types/report";
 import { User } from "@/types/user";
 import { ReportStatuses } from "@/const";
+import { ReportResponse } from "@/api/reports/models";
+
+const convertBackResponseToStoreModel = (reportResponse: ReportResponse) => ({
+  id: reportResponse.id,
+  title: reportResponse.title || "",
+  status: reportResponse.status,
+  responsible: reportResponse.responsible,
+  creator: reportResponse.creator,
+  createdAt: new Date(reportResponse.createdAt),
+  updatedAt: new Date(reportResponse.updatedAt),
+  participants: reportResponse.participants,
+  bugs:
+    reportResponse.bugs?.map((bug) => {
+      return {
+        ...bug,
+        createdAt: new Date(bug.createdAt),
+        updatedAt: new Date(bug.updatedAt),
+        comments: bug.comments.map((comment) => ({
+          ...comment,
+          createdAt: new Date(comment.createdAt),
+          updatedAt: new Date(comment.updatedAt),
+        })),
+        isChanged: false,
+      };
+    }) || [],
+  responsibleId: reportResponse.responsible.id,
+});
 
 export const fetchReportFx = createEffect(async (id: number) => {
   const data = await fetchReport(id);
@@ -25,7 +52,7 @@ export const updateReportFx = createEffect(async (currentReport: Report) => {
   const payload = {
     title: currentReport.title,
     status: currentReport.status,
-    responsibleId: currentReport.responsible.id,
+    responsibleUserId: currentReport.responsible.id,
   };
   return await updateReport(payload, currentReport.id);
 });
@@ -58,30 +85,9 @@ export const $initialReportForm = createStore<Report>({
   participants: [],
   bugs: [],
 })
-  .on(fetchReportFx.doneData, (_, report) => ({
-    id: report.id,
-    title: report.title,
-    status: report.status,
-    responsible: report.responsible,
-    creator: report.creator,
-    createdAt: new Date(report.createdAt),
-    updatedAt: new Date(report.updatedAt),
-    participants: report.participants,
-    bugs: report.bugs.map((bug) => {
-      return {
-        ...bug,
-        isChanged: false,
-        createdAt: new Date(bug.createdAt),
-        updatedAt: new Date(bug.updatedAt),
-        comments: bug.comments.map((comment) => ({
-          ...comment,
-          createdAt: new Date(comment.createdAt),
-          updatedAt: new Date(comment.updatedAt),
-        })),
-      };
-    }),
-    responsibleId: report.responsible.id,
-  }))
+  .on(fetchReportFx.doneData, (_, report) =>
+    convertBackResponseToStoreModel(report)
+  )
   .reset(clearReport);
 
 // Текущее состояние репорта (изменяемые данные, вводимые в форму)
@@ -97,32 +103,9 @@ export const $reportForm = createStore<Report>({
   updatedAt: null,
   bugs: [],
 })
-  .on(fetchReportFx.doneData, (_, report) => {
-    return {
-      id: report.id,
-      title: report.title || "",
-      status: report.status || ReportStatuses.IN_PROGRESS,
-      responsible: report.responsible || {},
-      participants: report.participants || [],
-      responsibleId: report.responsible.id,
-      creator: report.creator,
-      createdAt: new Date(report.createdAt),
-      updatedAt: new Date(report.updatedAt),
-      bugs: report.bugs.map((bug) => {
-        return {
-          ...bug,
-          createdAt: new Date(bug.createdAt),
-          updatedAt: new Date(bug.updatedAt),
-          comments: bug.comments.map((comment) => ({
-            ...comment,
-            createdAt: new Date(comment.createdAt),
-            updatedAt: new Date(comment.updatedAt),
-          })),
-          isChanged: false,
-        };
-      }),
-    };
-  })
+  .on(fetchReportFx.doneData, (_, report) =>
+    convertBackResponseToStoreModel(report)
+  )
   .on(updateTitle, (state, title) => ({ ...state, title }))
   .on(updateResponsible, (state, responsible) => ({ ...state, responsible }))
   .on(updateStatus, (state, status) => ({ ...state, status }))

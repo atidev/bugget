@@ -1,4 +1,4 @@
-import { Bug, ExistingBug, NewBug } from "./bug";
+import { Bug, NewBug } from "./bug";
 import { User } from "./user";
 import { ReportStatuses } from "../const/index";
 
@@ -7,11 +7,11 @@ export type Report = {
   title: string;
   status: ReportStatuses;
   responsible: User | null;
-  responsibleId: string;
+  responsibleId: string | null;
   creator: User | null;
   createdAt: Date | null;
   updatedAt: Date | null;
-  participants: User[];
+  participants: User[] | null;
   bugs: Bug[];
 };
 
@@ -24,17 +24,4 @@ export type NewReport = {
   creator?: User;
   participants?: User[] | never[];
   bugs: NewBug[];
-};
-
-export type ExistingReport = {
-  id: number | null;
-  title: string;
-  status: ReportStatuses;
-  responsible: User | null;
-  responsibleId: string;
-  creator: User | null;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-  participants: User[];
-  bugs: ExistingBug[];
 };

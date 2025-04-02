@@ -169,7 +169,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
         <div className="bug-content">
           <textarea
             ref={textareaRefReceive}
-            value={isNewBug ? newBugData.receive : bug?.receive}
+            value={isNewBug ? newBugData.receive : bug?.receive || ""}
             onChange={(e) =>
               isNewBug
                 ? updateNewBugData({ receive: e.target.value })
@@ -183,7 +183,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
           />
           <textarea
             ref={textareaRefExpect}
-            value={isNewBug ? newBugData.expect : bug?.expect}
+            value={isNewBug ? newBugData.expect : bug?.expect || ""}
             onChange={(e) =>
               isNewBug
                 ? updateNewBugData({ expect: e.target.value })

@@ -24,12 +24,14 @@ const ReportSummary = ({ report, highlight }: ReportProps) => {
         <p className="text-sm dark:text-stone-300">
           Ответственный: {report.responsible?.name}
         </p>
-        <p className="text-sm dark:text-stone-200">
-          Участники:{" "}
-          {report.participants
-            .map((participant) => participant.name)
-            .join(", ")}
-        </p>
+        {!!report.participants?.length && (
+          <p className="text-sm dark:text-stone-200">
+            Участники:{" "}
+            {report.participants
+              .map((participant) => participant.name)
+              .join(", ")}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -47,7 +47,7 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
 
   const selected = multiple
     ? getMultiSelectedLabel(value)
-    : getSingleSelectedLabel(options, value as T);
+    : getSingleSelectedLabel(options, value);
 
   const hasValue = multiple
     ? Array.isArray(value) && value.length > 0

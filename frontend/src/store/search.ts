@@ -1,28 +1,30 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { searchReports } from "@/api/reports/search";
-import { SearchResponse, SearchRequestParams } from "@/api/reports/models";
+import { SearchResponse, SearchRequestQueryParams } from "@/api/reports/models";
 import { $user } from "@/store/user";
 import { User } from "@/types/user";
 import { Team } from "@/types/team";
 
-export const searchFx = createEffect(async (params: SearchRequestParams) => {
-  const searchParams = new URLSearchParams();
-  if (params.query) searchParams.append("query", params.query);
-  if (params.sort) searchParams.append("sort", params.sort);
-  if (params.userId) searchParams.append("userId", params.userId);
-  if (params.teamId) searchParams.append("teamId", params.teamId);
-  if (params.skip != null) searchParams.append("skip", String(params.skip));
-  if (params.take != null) searchParams.append("take", String(params.take));
-  if (params.reportStatuses) {
-    for (const status of params.reportStatuses) {
-      searchParams.append("reportStatuses", String(status));
+export const searchFx = createEffect(
+  async (params: SearchRequestQueryParams) => {
+    const searchParams = new URLSearchParams();
+    if (params.query) searchParams.append("query", params.query);
+    if (params.sort) searchParams.append("sort", params.sort);
+    if (params.userId) searchParams.append("userId", params.userId);
+    if (params.teamId) searchParams.append("teamId", params.teamId);
+    if (params.skip != null) searchParams.append("skip", String(params.skip));
+    if (params.take != null) searchParams.append("take", String(params.take));
+    if (params.reportStatuses) {
+      for (const status of params.reportStatuses) {
+        searchParams.append("reportStatuses", String(status));
+      }
     }
+
+    return await searchReports(searchParams.toString());
   }
+);
 
-  return await searchReports(searchParams.toString());
-});
-
-export const searchStarted = createEvent<SearchRequestParams>();
+export const searchStarted = createEvent<SearchRequestQueryParams>();
 export const pageMounted = createEvent();
 
 export const updateQuery = createEvent<string>();
@@ -69,7 +71,7 @@ sample({
     query: $query,
     sortField: $sortField,
     sortDirection: $sortDirection,
-    reportStatuses: $statuses,
+    reportStatuses: $statuses || undefined,
     userFilter: $userFilter,
     teamFilter: $teamFilter,
   },
@@ -85,8 +87,8 @@ sample({
     query,
     sort: `${sortField}_${sortDirection}`,
     reportStatuses: reportStatuses ?? undefined,
-    userId: userFilter?.id,
-    teamId: teamFilter?.id,
+    userId: userFilter?.id ?? undefined,
+    teamId: teamFilter?.id ?? undefined,
     skip: 0,
     take: 100,
   }),
@@ -121,8 +123,8 @@ sample({
     query,
     sort: `${sortField}_${sortDirection}`,
     reportStatuses: reportStatuses ?? undefined,
-    userId: userFilter?.id,
-    teamId: teamFilter?.id,
+    userId: userFilter?.id ?? undefined,
+    teamId: teamFilter?.id ?? undefined,
     skip: 0,
     // TODO пагинация
     take: 100,
