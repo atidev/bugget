@@ -20,6 +20,23 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
     steps:
+      - name: Validate version format
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+
+          # Разрешить форматы типа v1.2.3 и v1.2.3-suffix
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9._]+)?$ ]]; then
+            echo "❌ Неверный формат версии. Используйте формат vX.Y.Z или vX.Y.Z-suffix (например, v1.2.3 или v1.2.3-beta)"
+            exit 1
+          fi
+
+          # Установим переменную IS_PLAIN_VERSION, если версия без суффикса
+          if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "IS_PLAIN_VERSION=true" >> $GITHUB_ENV
+          else
+            echo "IS_PLAIN_VERSION=false" >> $GITHUB_ENV
+          fi
+
       - name: Checkout
         uses: actions/checkout@master
 
@@ -51,10 +68,15 @@ jobs:
             -t ${{ secrets.DOCKER_LOGIN }}/bugget-migrator:${{ env.VERSION }} \
             --push \
             -f ./Dockerfile .
-          docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            --cache-from=type=gha \
-            --cache-to=type=gha,mode=max \
-            -t ${{ secrets.DOCKER_LOGIN }}/bugget-migrator:latest \
-            --push \
-            -f ./Dockerfile .
+
+          if [[ "${{ env.IS_PLAIN_VERSION }}" == "true" ]]; then
+            docker buildx build \
+              --platform linux/amd64,linux/arm64 \
+              --cache-from=type=gha \
+              --cache-to=type=gha,mode=max \
+              -t ${{ secrets.DOCKER_LOGIN }}/bugget-migrator:latest \
+              --push \
+              -f ./Dockerfile .
+          else
+            echo "🔁 Пропущен пуш latest, так как версия не в виде vX.Y.Z"
+          fi
