@@ -24,7 +24,7 @@ SELECT jsonb_build_object(
                                                                'created_at', a.created_at
                                                        )
                                                )
-                                        FROM public.attachment a
+                                        FROM public.attachments a
                                         WHERE a.bug_id = b.id), '[]' ::jsonb),
                'comments', COALESCE((SELECT jsonb_agg(
                                                     jsonb_build_object(
@@ -36,11 +36,11 @@ SELECT jsonb_build_object(
                                                             'updated_at', c.updated_at
                                                     )
                                             )
-                                     FROM public.comment c
+                                     FROM public.comments c
                                      WHERE c.bug_id = b.id), '[]' ::jsonb)
        )
 INTO result
-FROM public.bug b
+FROM public.bugs b
 WHERE b.id = _bug_id;
 
 RETURN result;
@@ -63,7 +63,7 @@ DECLARE
 new_bug_id INTEGER;
 BEGIN
     -- Создаём новую запись в таблице Bug
-INSERT INTO public.bug (report_id, receive, expect, status, creator_user_id)
+INSERT INTO public.bugs (report_id, receive, expect, status, creator_user_id)
 VALUES (_report_id, _receive, _expect, _status, _creator_user_id) RETURNING id
 INTO new_bug_id;
 
@@ -90,7 +90,7 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
     -- Обновляем bug, если параметры не null
-UPDATE public.bug
+UPDATE public.bugs
 SET receive    = COALESCE(_receive, receive),
     expect     = COALESCE(_expect, expect),
     status     = COALESCE(_status, status),

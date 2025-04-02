@@ -1,5 +1,4 @@
--- ====== Report #1 ======
-INSERT INTO public.report (title, status, responsible_user_id, creator_user_id)
+INSERT INTO public.reports (title, status, responsible_user_id, creator_user_id)
 VALUES ('Проблема с логином', 0, '1', 'default-user');
 
 -- допустим id = 1
@@ -10,7 +9,7 @@ INSERT INTO public.report_participants (report_id, user_id) VALUES
 (1, 'any-ldap-id');
 
 -- Баг #1
-INSERT INTO public.bug (report_id, receive, expect, creator_user_id, status)
+INSERT INTO public.bugs (report_id, receive, expect, creator_user_id, status)
 VALUES (
   1,
   'Появляется ошибка 401 при вводе корректных данных',
@@ -20,7 +19,7 @@ VALUES (
 );
 
 -- допустим id = 1
-INSERT INTO public.comment (bug_id, text, creator_user_id)
+INSERT INTO public.comments (bug_id, text, creator_user_id)
 VALUES (
   1,
   'У меня тоже возникает ошибка 401 при входе',
@@ -28,7 +27,7 @@ VALUES (
 );
 
 -- Баг #2
-INSERT INTO public.bug (report_id, receive, expect, creator_user_id, status)
+INSERT INTO public.bugs (report_id, receive, expect, creator_user_id, status)
 VALUES (
   1,
   'Пользователь остаётся на той же странице',
@@ -38,7 +37,7 @@ VALUES (
 );
 
 -- ====== Report #2 ======
-INSERT INTO public.report (title, status, responsible_user_id, creator_user_id)
+INSERT INTO public.reports (title, status, responsible_user_id, creator_user_id)
 VALUES ('UI не обновляется после создания бага', 1, 'guid', 'int');
 
 -- допустим id = 2
@@ -50,7 +49,7 @@ INSERT INTO public.report_participants (report_id, user_id) VALUES
 (2, 'default-user');
 
 -- Баг #1
-INSERT INTO public.bug (report_id, receive, expect, creator_user_id, status)
+INSERT INTO public.bugs (report_id, receive, expect, creator_user_id, status)
 VALUES (
   2,
   'После добавления бага список не обновляется',
@@ -60,7 +59,7 @@ VALUES (
 );
 
 -- Баг #2 (без комментариев)
-INSERT INTO public.bug (report_id, receive, expect, creator_user_id, status)
+INSERT INTO public.bugs (report_id, receive, expect, creator_user_id, status)
 VALUES (
   2,
   'Баг создаётся, но не отображается badge',

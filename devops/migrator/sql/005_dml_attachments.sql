@@ -6,7 +6,7 @@ AS $$
 DECLARE
 result JSONB;
 BEGIN
--- Формируем JSON с Comment
+
 SELECT jsonb_build_object(
                'id', c.id,
                'bug_id', c.bug_id,
@@ -14,7 +14,7 @@ SELECT jsonb_build_object(
                'attach_type', c.attach_type,
                'path', c.path
        ) INTO result
-FROM public.attachment c
+FROM public.attachments c
 WHERE c.id = _attachment_id;
 
 RETURN result;
@@ -35,7 +35,7 @@ DECLARE
 new_bug_id INTEGER;
 BEGIN
 -- Создаём новую запись в таблице Attachment
-INSERT INTO public.attachment (bug_id, path, attach_type, created_at)
+INSERT INTO public.attachments (bug_id, path, attach_type, created_at)
 VALUES (_bug_id, _path, _attach_type, _created_at) RETURNING id
 INTO new_bug_id;
 
@@ -52,7 +52,7 @@ AS $$
 BEGIN
 
 DELETE
-FROM public.attachment a
+FROM public.attachments a
 WHERE a.id = _attachment_id;
 
 END;
