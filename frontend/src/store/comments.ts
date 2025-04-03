@@ -1,6 +1,6 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
-import { getCommentsApi, createCommentApi } from "../api/comment";
 import { $initialReportForm, clearReport } from "./report";
+import { getCommentsApi, createCommentApi } from "@/api/reports/comment";
 import { Comment } from "@/types/comment";
 
 export const getCommentsFx = createEffect<
@@ -22,8 +22,8 @@ export const addCommentFx = createEffect<
   },
   Comment,
   Error
->(async ({ reportId, bugId, text }) => {
-  return await createCommentApi(reportId, bugId, text);
+>(({ reportId, bugId, text }) => {
+  return createCommentApi(reportId, bugId, text);
 });
 
 export const newBugComments = createEvent<{

@@ -1,3 +1,4 @@
+import { BugStatuses } from "@/const";
 import { Attachment } from "./attachement";
 import { Comment } from "./comment";
 import { User } from "./user";
@@ -5,12 +6,19 @@ import { User } from "./user";
 export type Bug = {
   id: number;
   reportId: number;
+  receive: string | null;
+  expect: string | null;
+  creator?: User;
+  createdAt?: Date;
+  updatedAt?: Date;
+  status: BugStatuses;
+  attachments?: Attachment[];
+  comments?: Comment[];
+  isChanged: boolean;
+};
+
+export type NewBug = {
   receive: string;
   expect: string;
-  creator: User;
-  createdAt: string;
-  updatedAt: string;
-  status: number;
-  attachments: Attachment[];
-  comments: Comment[];
+  isReady?: boolean;
 };

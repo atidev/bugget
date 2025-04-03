@@ -1,9 +1,9 @@
 import { createStore, createEffect } from "effector";
-import { fetchAuth } from "../api/auth";
+import { fetchAuth } from "@/api/auth";
 import { AuthUser } from "@/types/user";
 
 export const authFx = createEffect(async () => {
-  const data: Promise<AuthUser> = await fetchAuth();
+  const data = await fetchAuth();
   return data;
 });
 

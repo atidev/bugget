@@ -33,7 +33,7 @@ const Autosuggest = ({ externalString, onSelect, autocompleteFn }: Props) => {
           setFilteredItems([]);
         }
       }),
-    []
+    [autocompleteFn]
   );
 
   useEffect(() => {

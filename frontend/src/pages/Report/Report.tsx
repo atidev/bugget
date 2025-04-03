@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { setBreadcrumbs } from "../../store/breadcrumbs";
+import { setBreadcrumbs } from "@/store/breadcrumbs";
 import { useList, useUnit } from "effector-react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -7,14 +7,15 @@ import {
   clearReport,
   createReportFx,
   $reportForm,
-} from "../../store/report";
-import { $newBugStore, setExists, $isExists } from "../../store/newBug";
-import { $bugsIds } from "../../store/bugs";
-import { getCommentsFx } from "../../store/comments";
+} from "@/store/report";
+import { $newBugStore, setExists, $isExists } from "@/store/newBug";
+import { $bugsIds } from "@/store/bugs";
+import { getCommentsFx } from "@/store/comments";
 import Bug from "./components/Bug/Bug";
 import ReportHeader from "./components/ReportHeader/ReportHeader";
-import "./ReportPage.css";
-import useWebSocketReportPage from "../../hooks/useWebSocketReportPage";
+import "./Report.css";
+import useWebSocketReportPage from "@/hooks/useWebSocketReportPage";
+import { ReportStatuses } from "@/const";
 
 const reportsPageBreadcrumb = { label: "Репорты", path: "/" };
 
@@ -34,11 +35,11 @@ const ReportPage = () => {
 
   const receiveReportHandler = (reportId: number) => {
     fetchReportFx(reportId);
-  }
+  };
 
   const receiveCommentsHandler = (reportId: number, bugId: number) => {
     getComments({ reportId, bugId });
-  }
+  };
 
   // Используем хук для работы с SignalR
   useWebSocketReportPage(
@@ -65,21 +66,25 @@ const ReportPage = () => {
         isNewReport
           ? { label: "Новый репорт", path: `/reports` }
           : {
-            label: `Репорт #${reportId}`,
-            path: `/reports/${reportId}`,
-          },
+              label: `Репорт #${reportId}`,
+              path: `/reports/${reportId}`,
+            },
       ].filter(Boolean)
     );
   }, [reportId, isNewReport]);
 
   const handleCreateReport = async () => {
+    const responsibleId = reportForm.responsible?.id;
+    if (!responsibleId) return;
     const newReport = await createReportFx({
       title: reportForm.title,
-      responsibleId: reportForm.responsible?.id,
+      responsibleId,
+      status: ReportStatuses.IN_PROGRESS,
       bugs: [
         {
           receive: newBugStore.receive,
           expect: newBugStore.expect,
+          isReady: false,
         },
       ],
     });

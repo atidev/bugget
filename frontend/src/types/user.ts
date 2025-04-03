@@ -1,6 +1,6 @@
 export type User = {
-  name: string;
-  id: string;
+  name: string | null;
+  id: string | null;
 };
 
 export type AuthUser = {

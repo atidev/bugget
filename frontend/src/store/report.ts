@@ -5,28 +5,56 @@ import {
   createStore,
   sample,
 } from "effector";
-import { fetchReport, createReport, updateReport } from "../api/report";
-import { Report } from "@/types/report";
+import { fetchReport, createReport, updateReport } from "@/api/reports";
+import { NewReport, Report } from "@/types/report";
 import { User } from "@/types/user";
-import { ReportStore } from "@/types/stores";
+import { ReportStatuses } from "@/const";
+import { ReportResponse } from "@/api/reports/models";
+
+const convertBackResponseToStoreModel = (reportResponse: ReportResponse) => ({
+  id: reportResponse.id,
+  title: reportResponse.title || "",
+  status: reportResponse.status,
+  responsible: reportResponse.responsible,
+  creator: reportResponse.creator,
+  createdAt: new Date(reportResponse.createdAt),
+  updatedAt: new Date(reportResponse.updatedAt),
+  participants: reportResponse.participants,
+  bugs:
+    reportResponse.bugs?.map((bug) => {
+      return {
+        ...bug,
+        createdAt: new Date(bug.createdAt),
+        updatedAt: new Date(bug.updatedAt),
+        comments: bug.comments.map((comment) => ({
+          ...comment,
+          createdAt: new Date(comment.createdAt),
+          updatedAt: new Date(comment.updatedAt),
+        })),
+        isChanged: false,
+      };
+    }) || [],
+  responsibleId: reportResponse.responsible.id,
+});
 
 export const fetchReportFx = createEffect(async (id: number) => {
   const data = await fetchReport(id);
   return data;
 });
 
-export const createReportFx = createEffect(async (newReport: ReportStore) => {
+export const createReportFx = createEffect(async (newReport: NewReport) => {
   const data = await createReport(newReport);
   return data;
 });
 
-export const updateReportFx = createEffect(async (request: Report) => {
+export const updateReportFx = createEffect(async (currentReport: Report) => {
+  if (!currentReport.responsible || !currentReport.id) return;
   const payload = {
-    title: request.title,
-    status: request.status,
-    responsibleUserId: request.responsible?.id,
+    title: currentReport.title,
+    status: currentReport.status,
+    responsibleUserId: currentReport.responsible.id,
   };
-  return await updateReport(payload, request?.id);
+  return await updateReport(payload, currentReport.id);
 });
 
 export const updateReportEvent = createEvent();
@@ -43,35 +71,41 @@ export const $isNewReport = createStore<boolean>(true)
   .on(setIsNewReport, (_, isNew) => isNew)
   .reset(clearReport);
 
-export const $isReportChanged = createStore<boolean>(false).reset(clearReport);
+export const $isReportChanged = createStore(false).reset(clearReport);
 
-export const $initialReportForm = createStore<Report | null>(null)
-  .on(fetchReportFx.doneData, (_, report) => report)
-  .reset(clearReport);
-
-// Текущее состояние репорта (изменяемые данные)
-export const $reportForm = createStore<{
-  id: number | null;
-  title: string;
-  status: number;
-  responsible: User | null;
-  participants: User[];
-}>({
+export const $initialReportForm = createStore<Report>({
   id: null,
   title: "",
-  status: 0,
+  status: ReportStatuses.IN_PROGRESS,
+  responsible: null,
+  responsibleId: "",
+  creator: null,
+  createdAt: null,
+  updatedAt: null,
+  participants: [],
+  bugs: [],
+})
+  .on(fetchReportFx.doneData, (_, report) =>
+    convertBackResponseToStoreModel(report)
+  )
+  .reset(clearReport);
+
+// Текущее состояние репорта (изменяемые данные, вводимые в форму)
+export const $reportForm = createStore<Report>({
+  id: null,
+  title: "",
+  status: ReportStatuses.IN_PROGRESS,
   responsible: null,
   participants: [],
+  responsibleId: "",
+  creator: null,
+  createdAt: null,
+  updatedAt: null,
+  bugs: [],
 })
-  .on(fetchReportFx.doneData, (_, report) => {
-    return {
-      id: report.id || null,
-      title: report.title || "",
-      status: report.status || 0,
-      responsible: report.responsible || {},
-      participants: report.participants || [],
-    };
-  })
+  .on(fetchReportFx.doneData, (_, report) =>
+    convertBackResponseToStoreModel(report)
+  )
   .on(updateTitle, (state, title) => ({ ...state, title }))
   .on(updateResponsible, (state, responsible) => ({ ...state, responsible }))
   .on(updateStatus, (state, status) => ({ ...state, status }))
@@ -96,11 +130,8 @@ sample({
   target: $isReportChanged, // Записываем в стор
 });
 
-// сбарасываем report при сбросе
+// сбрасываем report при сбросе
 sample({
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  // todo fix ts-ignore
   source: $initialReportForm, // Берём данные из исходного стейта (загруженного с сервера)
   clock: resetReport, // Ждём, когда сработает resetReport
   target: $reportForm, // Копируем данные в редактируемый стор

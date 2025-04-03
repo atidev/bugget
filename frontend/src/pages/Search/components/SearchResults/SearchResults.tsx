@@ -4,27 +4,30 @@ import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import { getStatusMeta } from "@/constants/status";
 import { useNavigate } from "react-router-dom";
-import { Report } from "@/types/report";
+import { ReportResponse } from "@/api/reports/models";
 
-const getLatestUpdateDate = (report: Report) => {
-  let latestTime = new Date(report.updatedAt).getTime();
-  report.bugs.forEach((bug) => {
+const getLatestUpdateDate = (report: ReportResponse) => {
+  let latestTime: number = new Date(report.updatedAt).getTime();
+  report.bugs?.forEach((bug) => {
     const bugTime = new Date(bug.updatedAt).getTime();
-    if (bugTime > latestTime) {
+    if (bugTime !== null && (latestTime === null || bugTime > latestTime)) {
       latestTime = bugTime;
     }
     bug.comments.forEach((comment) => {
       const commentTime = new Date(comment.updatedAt).getTime();
-      if (commentTime > latestTime) {
+      if (
+        commentTime !== null &&
+        (latestTime === null || commentTime > latestTime)
+      ) {
         latestTime = commentTime;
       }
     });
   });
-  return new Date(latestTime);
+  return latestTime;
 };
 
 const SearchResults = () => {
-  const [searсhResult] = useUnit([$searchResult]);
+  const [searchResult] = useUnit([$searchResult]);
   const navigate = useNavigate();
 
   const handleClick = (
@@ -46,8 +49,9 @@ const SearchResults = () => {
 
   return (
     <div className="space-y-4">
-      {searсhResult?.reports?.map((report) => {
+      {searchResult?.reports?.map((report) => {
         const statusMeta = getStatusMeta("report", report.status);
+        const latestUpdateDate = getLatestUpdateDate(report);
 
         return (
           <div
@@ -66,7 +70,7 @@ const SearchResults = () => {
             </div>
 
             <div className="text-sm text-base-content/70 mt-1">
-              Автор: {report.creator.name} • Создан:{" "}
+              Автор: {report.creator.name} • Создан:
               {formatDistanceToNow(new Date(report.createdAt), {
                 addSuffix: true,
                 locale: ru,
@@ -74,7 +78,7 @@ const SearchResults = () => {
             </div>
             <div className="text-sm text-base-content/70">
               Последнее обновление:{" "}
-              {formatDistanceToNow(getLatestUpdateDate(report), {
+              {formatDistanceToNow(latestUpdateDate, {
                 addSuffix: true,
                 locale: ru,
               })}
@@ -82,10 +86,12 @@ const SearchResults = () => {
             <div className="text-sm text-base-content/70">
               Ответственный: {report.responsible?.name ?? "—"}
             </div>
-            <div className="text-sm mt-1">
-              🐞 Багов: {report.bugs.length} • 💬 Комментариев:{" "}
-              {report.bugs.reduce((sum, bug) => sum + bug.comments.length, 0)}
-            </div>
+            {!!report.bugs?.length && (
+              <div className="text-sm mt-1">
+                🐞 Багов: {report.bugs.length} • 💬 Комментариев:{" "}
+                {report.bugs.reduce((sum, bug) => sum + bug.comments.length, 0)}
+              </div>
+            )}
           </div>
         );
       })}

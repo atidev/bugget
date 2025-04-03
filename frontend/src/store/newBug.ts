@@ -1,16 +1,16 @@
 import { createStore, createEvent, createEffect, sample } from "effector";
-import { createBugApi } from "../api/bug";
-import { BugCreateRequest } from "@/types/requests";
+import { createBugApi } from "@/api/reports/bug";
 import { createReportFx, clearReport } from "./report";
+import { BugCreateRequest } from "@/api/reports/models";
+import { NewBug } from "@/types/bug";
 
 export const createBugFx = createEffect(
-  async ({ reportId, bug }: { reportId: number; bug: BugCreateRequest }) => {
-    return await createBugApi(reportId, bug);
+  ({ reportId, bug }: { reportId: number; bug: BugCreateRequest }) => {
+    return createBugApi(reportId, bug);
   }
 );
 
-export const updateNewBug =
-  createEvent<Partial<{ receive: string; expect: string }>>();
+export const updateNewBug = createEvent<Partial<NewBug>>();
 
 export const setExists = createEvent<boolean>();
 
@@ -25,9 +25,11 @@ export const $newBugStore = createStore<{
 })
   .on(updateNewBug, (state, payload) => {
     const newState = { ...state, ...payload };
+    const receive = newState.receive || "";
+    const expect = newState.expect || "";
     return {
       ...newState,
-      isReady: newState.receive.trim() !== "" && newState.expect.trim() !== "",
+      isReady: receive.trim() !== "" && expect.trim() !== "",
     };
   })
   .reset(createBugFx.done)
@@ -41,7 +43,7 @@ export const $isExists = createStore<boolean>(false)
 
 export const createBugEventByApi = createEvent<{
   reportId: number;
-  bug: { receive: string; expect: string };
+  bug: NewBug;
 }>();
 
 sample({
@@ -51,7 +53,7 @@ sample({
     bug: {
       receive: bug.receive,
       expect: bug.expect,
-    } as BugCreateRequest,
+    },
   }),
   target: createBugFx,
 });
