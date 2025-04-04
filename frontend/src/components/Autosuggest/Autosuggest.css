@@ -1,7 +1,3 @@
-.dropdown {
-  flex-grow: 1;
-}
-
 .dropdown-content.menu .user-option {
   display: flex;
   flex-direction: row;
@@ -18,7 +14,6 @@ ul.users-list {
   width: max-content;
 }
 
-.clear-button.btn :active:not(.btn-active) {
+.clear-button.btn:active:not(.btn-active) {
   transform: none;
-  translate: none;
 }
