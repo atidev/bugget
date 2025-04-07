@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { setBreadcrumbs } from "@/store/breadcrumbs";
-import { useList, useUnit } from "effector-react";
+import { useList, useUnit, createGate, useGate } from "effector-react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   fetchReportFx,
@@ -16,12 +16,17 @@ import ReportHeader from "./components/ReportHeader/ReportHeader";
 import "./Report.css";
 import useWebSocketReportPage from "@/hooks/useWebSocketReportPage";
 import { ReportStatuses } from "@/const";
+// import Skeleton from "./components/Skeleton/Skeleton";
 
 const reportsPageBreadcrumb = { label: "Репорты", path: "/" };
+const SampleCompGate = createGate();
 
 const ReportPage = () => {
   const { reportId } = useParams();
   const navigate = useNavigate();
+
+  useGate(SampleCompGate); // instead of use Effect
+  const isLoading = useUnit(fetchReportFx.pending);
 
   const isNewReport = !reportId;
 
@@ -30,7 +35,7 @@ const ReportPage = () => {
 
   const bugsIds = useUnit($bugsIds);
   const bugsList = useList($bugsIds, (id) => (
-    <Bug key={id} reportId={reportForm.id} bugId={id} />
+    <Bug key={id} reportId={reportForm.id} bugId={id} isLoading={isLoading} />
   ));
 
   const receiveReportHandler = (reportId: number) => {
@@ -95,8 +100,8 @@ const ReportPage = () => {
 
   return (
     <div className="reports-wrapper">
-      <ReportHeader />
-      {bugsIds.length > 0 ? bugsList : <Bug />}
+      <ReportHeader isLoading={isLoading} />
+      {bugsIds.length > 0 ? bugsList : <Bug isLoading={isLoading} />}
 
       {!isNewReport && bugsIds.length > 0 && !isExists && (
         <button
@@ -107,7 +112,7 @@ const ReportPage = () => {
         </button>
       )}
 
-      {isExists && <Bug reportId={reportForm.id} />}
+      {isExists && <Bug reportId={reportForm.id} isLoading={isLoading} />}
 
       {isNewReport && newBugStore.isReady && reportForm.responsible?.id && (
         <div className="button-wrapper">

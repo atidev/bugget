@@ -1,9 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useStoreMap } from "effector-react";
-import {
-  addCommentFx,
-  $commentsByBugId,
-} from "../../../../../../store/comments";
+import { addCommentFx, $commentsByBugId } from "@/store/comments";
 import { SendHorizonal } from "lucide-react";
 
 type BugChatProps = {
@@ -11,7 +8,7 @@ type BugChatProps = {
   bugId: number;
 };
 
-export const Chat = ({ reportId, bugId }: BugChatProps) => {
+const Chat = ({ reportId, bugId }: BugChatProps) => {
   const [newCommentText, setNewCommentText] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -107,3 +104,5 @@ export const Chat = ({ reportId, bugId }: BugChatProps) => {
     </div>
   );
 };
+
+export default Chat;
