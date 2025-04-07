@@ -1,5 +1,5 @@
 -- Таблица отчётов
-CREATE TABLE IF NOT EXISTS public.report (
+CREATE TABLE IF NOT EXISTS public.reports (
     id integer generated always as identity
         primary key,
     title TEXT NOT NULL,
@@ -15,13 +15,13 @@ CREATE TABLE IF NOT EXISTS public.report_participants (
     report_id INT NOT NULL,
     user_id text NOT NULL,
     PRIMARY KEY (report_id, user_id),
-    CONSTRAINT fk_report
+    CONSTRAINT fk_reports
         FOREIGN KEY (report_id)
-        REFERENCES public.report(id)
+        REFERENCES public.reports(id)
 );
 
--- Таблица bug
-CREATE TABLE IF NOT EXISTS public.bug (
+-- Таблица багов
+CREATE TABLE IF NOT EXISTS public.bugs (
     id integer generated always as identity
         primary key,
     report_id INT NOT NULL,
@@ -32,13 +32,13 @@ CREATE TABLE IF NOT EXISTS public.bug (
     creator_user_id text NOT NULL,
     status INT NOT NULL,
 
-    CONSTRAINT fk_bug_report
+    CONSTRAINT fk_bugs_reports
         FOREIGN KEY (report_id)
-        REFERENCES public.report(id)
+        REFERENCES public.reports(id)
 );
 
--- Таблица вложений (attachment)
-CREATE TABLE IF NOT EXISTS public.attachment (
+-- Таблица вложений
+CREATE TABLE IF NOT EXISTS public.attachments (
     id integer generated always as identity
         primary key,
     bug_id INT NOT NULL,
@@ -46,13 +46,13 @@ CREATE TABLE IF NOT EXISTS public.attachment (
     created_at timestamp with time zone not null default now(),
     attach_type INT NOT NULL,
 
-    CONSTRAINT fk_attachment_bug
+    CONSTRAINT fk_attachments_bugs
         FOREIGN KEY (bug_id)
-        REFERENCES public.bug(id)
+        REFERENCES public.bugs(id)
 );
 
--- Таблица комментариев (comment)
-CREATE TABLE IF NOT EXISTS public.comment (
+-- Таблица комментариев
+CREATE TABLE IF NOT EXISTS public.comments (
     id integer generated always as identity
         primary key,
     bug_id INT NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS public.comment (
     updated_at timestamp with time zone not null default now(),
 
 
-    CONSTRAINT fk_comment_bug
+    CONSTRAINT fk_comments_bugs
         FOREIGN KEY (bug_id)
-        REFERENCES public.bug(id)
+        REFERENCES public.bugs(id)
 );

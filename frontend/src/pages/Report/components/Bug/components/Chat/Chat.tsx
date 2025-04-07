@@ -46,6 +46,28 @@ export const Chat = ({ reportId, bugId }: BugChatProps) => {
     }
   }, [newCommentText]);
 
+  const parseMessage = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+  
+    return text.split(urlRegex).map((part, index) => {
+      if (part.match(urlRegex)) {
+        const href = part.startsWith("http") ? part : `https://${part}`;
+        return (
+          <a 
+            key={index} 
+            href={href} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-500 underline"
+          >
+            {part}
+          </a>
+        );
+      }
+      return part; // Оставляем обычный текст
+    });
+  };
+
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex-1 overflow-auto mb-4 space-y-2">
@@ -55,7 +77,7 @@ export const Chat = ({ reportId, bugId }: BugChatProps) => {
             className="border bg-base-100 border-gray-300 p-2 rounded flex flex-col"
           >
             <div className="font-semibold text-sm">{comment.creator?.name}</div>
-            <div className="text-sm whitespace-pre-wrap">{comment.text}</div>
+            <div className="text-sm whitespace-pre-wrap">{parseMessage(comment.text)}</div>
           </div>
         ))}
       </div>

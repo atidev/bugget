@@ -88,7 +88,7 @@ const Autosuggest = ({ externalString, onSelect, autocompleteFn }: Props) => {
       />
       {searchString && (
         <button
-          className="clear-button btn btn-square btn-ghost bg-transparent hover:bg-transparent absolute right-1 top-1/2 transform -translate-y-1/2 shadow-none border-none"
+          className="clear-button btn btn-square btn-ghost bg-transparent hover:bg-transparent absolute right-2 top-1 shadow-none border-none h-6 w-6"
           onClick={clearInput}
           aria-label="Очистить"
         >
@@ -98,18 +98,16 @@ const Autosuggest = ({ externalString, onSelect, autocompleteFn }: Props) => {
       {!!filteredItems?.length && (
         <ul
           tabIndex={0}
-          className="users-list dropdown-content z-[2] menu p-2 shadow bg-base-200 rounded-box w-52 flex-nowrap overflow-auto"
+          className="users-list dropdown-content z-[2] menu p-2 shadow bg-base-200 rounded-box w-52 flex-nowrap overflow-auto absolute left-1/2 -translate-x-1/2"
         >
-          {filteredItems.map((user) => {
-            return (
-              <li key={user.id} className="user-option">
-                <Avatar width={2} />
-                <a onClick={(event) => handleItemClick(event, user)}>
-                  {user.display}
-                </a>
-              </li>
-            );
-          })}
+          {filteredItems.map((user) => (
+            <li key={user.id} className="user-option">
+              <Avatar width={2} />
+              <a onClick={(event) => handleItemClick(event, user)}>
+                {user.display}
+              </a>
+            </li>
+          ))}
         </ul>
       )}
     </div>
