@@ -48,15 +48,15 @@ export const Chat = ({ reportId, bugId }: BugChatProps) => {
 
   const parseMessage = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
-  
+
     return text.split(urlRegex).map((part, index) => {
       if (part.match(urlRegex)) {
         const href = part.startsWith("http") ? part : `https://${part}`;
         return (
-          <a 
-            key={index} 
-            href={href} 
-            target="_blank" 
+          <a
+            key={index}
+            href={href}
+            target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 underline"
           >
@@ -77,7 +77,11 @@ export const Chat = ({ reportId, bugId }: BugChatProps) => {
             className="border bg-base-100 border-gray-300 p-2 rounded flex flex-col"
           >
             <div className="font-semibold text-sm">{comment.creator?.name}</div>
-            <div className="text-sm whitespace-pre-wrap">{parseMessage(comment.text)}</div>
+            {comment.text && (
+              <div className="text-sm whitespace-pre-wrap">
+                {parseMessage(comment.text)}
+              </div>
+            )}
           </div>
         ))}
       </div>
