@@ -1,5 +1,10 @@
 import { useEffect, useRef } from "react";
-import { HubConnectionBuilder, HttpTransportType, LogLevel, HubConnectionState } from "@microsoft/signalr";
+import {
+  HubConnectionBuilder,
+  HttpTransportType,
+  LogLevel,
+  HubConnectionState,
+} from "@microsoft/signalr";
 
 const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
 
@@ -43,7 +48,9 @@ const useWebSocketReportPage = (
 
       // 📌 Получаем баг, комменты которого нужно обновить
       connection.on("ReceiveComments", (bugId: number) => {
-        console.log(`🔔 Новый комментарий для бага ${bugId}, репорта ${reportIdRef.current}`);
+        console.log(
+          `🔔 Новый комментарий для бага ${bugId}, репорта ${reportIdRef.current}`
+        );
         if (reportIdRef.current) onNewComment(reportIdRef.current, bugId);
       });
 
@@ -89,7 +96,6 @@ const useWebSocketReportPage = (
 
       reportIdRef.current = reportId;
     }
-
   }, [reportId]);
 
   return {};

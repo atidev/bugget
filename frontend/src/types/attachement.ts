@@ -1,8 +1,9 @@
 export type Attachment = {
-  id: number;
+  id?: number;
   bugId: number;
   reportId: number;
-  path: string;
-  createdAt: string;
+  path?: string | null;
+  createdAt?: string;
   attachType: number;
+  file?: File;
 };

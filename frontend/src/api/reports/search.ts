@@ -1,5 +1,6 @@
-import axios from "./axios";
-import type { SearchResponse } from "@/types/search";
+import axios from "../axios";
+
+import { SearchResponse } from "./models";
 
 export const searchReports = async (
   searchParams: string

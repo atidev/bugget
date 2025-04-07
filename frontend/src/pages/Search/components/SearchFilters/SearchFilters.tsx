@@ -1,4 +1,4 @@
-import { employeesAutocomplete } from "@/api/users";
+import { employeesAutocomplete } from "@/api/employees";
 import { teamsAutocomplete } from "@/api/teams";
 import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Dropdown from "@/components/Dropdown/Dropdown";
@@ -63,7 +63,7 @@ const SearchFilters = () => {
               entity ? { id: entity.id, name: entity.display } : null
             )
           }
-          externalString={userFilter?.name}
+          externalString={userFilter?.name || ""}
           autocompleteFn={autocompleteUsers}
         />
       </div>
@@ -75,7 +75,7 @@ const SearchFilters = () => {
               entity ? { id: entity.id, name: entity.display } : null
             )
           }
-          externalString={teamFilter?.name}
+          externalString={teamFilter?.name || ""}
           autocompleteFn={autocompleteTeams}
         />
       </div>

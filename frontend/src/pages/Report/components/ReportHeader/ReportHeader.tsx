@@ -16,7 +16,7 @@ import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Avatar from "@/components/Avatar/Avatar";
 import { ReportStatuses } from "../../../../const";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import { employeesAutocomplete } from "@/api/users";
+import { employeesAutocomplete } from "@/api/employees";
 import { User } from "@/types/user";
 
 const autocompleteUsers = async (searchString: string) => {
@@ -74,7 +74,7 @@ const ReportHeader = () => {
             className="max-w-[150px]"
             value={reportForm.status}
             onChange={(selected) => {
-              setUpdateStatus(Number(selected) as ReportStatuses);
+              setUpdateStatus(Number(selected));
             }}
             options={[
               { label: "Решён", value: ReportStatuses.READY },
@@ -106,20 +106,19 @@ const ReportHeader = () => {
                   entity ? { id: entity.id, name: entity.display } : null
                 )
               }
-              externalString={reportForm.responsible?.name}
+              externalString={reportForm.responsible?.name || ""}
               autocompleteFn={autocompleteUsers}
             />
             <div className="participants-wrapper">
-              {reportForm.participants?.length > 0
-                ? reportForm.participants.map((p) => (
-                    <div className="tooltip" key={p.id}>
-                      <Avatar />
-                      <span key={p.id} className="tooltiptext rounded">
-                        {p.name}
-                      </span>
-                    </div>
-                  ))
-                : null}
+              {!!reportForm.participants?.length &&
+                reportForm.participants.map((p) => (
+                  <div className="tooltip" key={p.id}>
+                    <Avatar />
+                    <span key={p.id} className="tooltiptext rounded">
+                      {p.name}
+                    </span>
+                  </div>
+                ))}
             </div>
           </div>
         </div>

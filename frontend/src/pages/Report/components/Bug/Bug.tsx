@@ -4,29 +4,28 @@ import {
   $newBugStore,
   updateNewBug,
   createBugEventByApi,
-} from "../../../../store/newBug";
+} from "@/store/newBug";
 
 import {
   $bugsByBugId,
   updateBugEvent,
   resetBug,
   updateBugApiEvent,
-} from "../../../../store/bugs";
-import { $attachmentsByBugId } from "../../../../store/attachments";
+} from "@/store/bugs";
+import { $attachmentsByBugId } from "@/store/attachments";
 import "./Bug.css";
-import CancelButton from "../../../../components/CancelButton/CancelButton";
-import SaveButton from "../../../../components/SaveButton/SaveButton";
-import { BugStatuses } from "../../../../const";
-import { Chat } from "./components/Chat/Chat";
-import { uploadAttachmentFx } from "../../../../store/attachments";
-import ImageCarousel from "./components/ImageCarousel/ImageCarousel";
-import { BugStore } from "../../../../types/stores";
+import CancelButton from "@/components/CancelButton/CancelButton";
+import SaveButton from "@/components/SaveButton/SaveButton";
 import Dropdown from "@/components/Dropdown/Dropdown";
+import { BugStatuses } from "@/const";
+import { Chat } from "./components/Chat/Chat";
+import { uploadAttachmentFx } from "@/store/attachments";
+import ImageCarousel from "./components/ImageCarousel/ImageCarousel";
 
-interface BugProps {
+type BugProps = {
   reportId?: number | null;
-  bugId?: number | null;
-}
+  bugId?: number;
+};
 
 const Bug = ({ reportId, bugId }: BugProps) => {
   const textareaRefReceive = useRef<HTMLTextAreaElement>(null);
@@ -49,14 +48,16 @@ const Bug = ({ reportId, bugId }: BugProps) => {
     fn: (state, [id]) => {
       return id
         ? state[id]
-        : ({
+        : {
             id: bugId,
             status: Number(BugStatuses.IN_PROGRESS),
             reportId,
             receive: "",
             expect: "",
             isChanged: false,
-          } as BugStore);
+            attachments: [],
+            comments: [],
+          };
     },
   });
 
@@ -117,6 +118,19 @@ const Bug = ({ reportId, bugId }: BugProps) => {
     }
   }, [bug.receive, bug.expect]);
 
+  const handleSave = () => {
+    if (!bug.reportId) return;
+    if (isNewBug) {
+      // Вызываем событие для создания нового бага
+      createBugApi({ reportId: bug.reportId, bug: newBugData });
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // todo fix types
+    updateBugApi(bug);
+  };
+
   return (
     <div
       className={`card card-border p-4 mb-3 shadow-lg border-gray-300 ${
@@ -155,7 +169,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
         <div className="bug-content">
           <textarea
             ref={textareaRefReceive}
-            value={isNewBug ? newBugData.receive : bug?.receive}
+            value={isNewBug ? newBugData.receive : bug?.receive || ""}
             onChange={(e) =>
               isNewBug
                 ? updateNewBugData({ receive: e.target.value })
@@ -169,7 +183,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
           />
           <textarea
             ref={textareaRefExpect}
-            value={isNewBug ? newBugData.expect : bug?.expect}
+            value={isNewBug ? newBugData.expect : bug?.expect || ""}
             onChange={(e) =>
               isNewBug
                 ? updateNewBugData({ expect: e.target.value })
@@ -248,18 +262,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
                 }
               }}
             />
-            <SaveButton
-              isChanged={isBugChanged}
-              onSave={() => {
-                if (isNewBug) {
-                  // Вызываем событие для создания нового бага
-                  createBugApi({ reportId: bug.reportId!, bug: newBugData });
-                } else {
-                  // Обновляем существующий баг
-                  updateBugApi(bug);
-                }
-              }}
-            />
+            <SaveButton isChanged={isBugChanged} onSave={handleSave} />
           </div>
         )}
         {!isNewBug && (

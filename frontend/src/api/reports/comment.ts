@@ -1,4 +1,4 @@
-import axios from "./axios";
+import axios from "../axios";
 
 export const getCommentsApi = async (reportId: number, bugId: number) => {
   try {

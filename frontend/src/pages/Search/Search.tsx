@@ -34,7 +34,7 @@ const Search = () => {
 
   const onToggleDirectionHandler = () => {
     setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-  }
+  };
 
   return (
     <div className="flex gap-6 p-4">
