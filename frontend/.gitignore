@@ -2,8 +2,4 @@
 /build
 /dist
 
-.vscode
 .DS_store
-
-tsconfig.node.tsbuildinfo
-tsconfig.tsbuildinfo
