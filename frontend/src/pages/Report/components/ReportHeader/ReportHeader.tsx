@@ -125,10 +125,7 @@ const ReportHeader = () => {
         {!isNewReport && isReportChanged && reportForm.responsible?.id && (
           <div className="flex gap-2 justify-end">
             <CancelButton isChanged={isReportChanged} onReset={reset} />
-            <SaveButton
-              isChanged={isReportChanged}
-              onSave={() => updateReport()}
-            />
+            <SaveButton isChanged={isReportChanged} onSave={updateReport} />
           </div>
         )}
       </div>
