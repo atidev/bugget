@@ -6,10 +6,23 @@ import {
   sample,
 } from "effector";
 import { fetchReport, createReport, updateReport } from "@/api/reports";
-import { NewReport, Report } from "@/types/report";
-import { User } from "@/types/user";
 import { ReportStatuses } from "@/const";
+import { User } from "@/types/user";
+import { NewReport, ReportFormUIData, Report } from "@/types/report";
 import { ReportResponse } from "@/api/reports/models";
+
+const defaultFormData = {
+  id: null,
+  title: "",
+  status: ReportStatuses.IN_PROGRESS,
+  responsible: null,
+  participants: [],
+  responsibleId: "",
+  creator: null,
+  createdAt: null,
+  updatedAt: null,
+  bugs: [],
+};
 
 const convertBackResponseToStoreModel = (reportResponse: ReportResponse) => ({
   id: reportResponse.id,
@@ -47,15 +60,22 @@ export const createReportFx = createEffect(async (newReport: NewReport) => {
   return data;
 });
 
-export const updateReportFx = createEffect(async (currentReport: Report) => {
-  if (!currentReport.responsible || !currentReport.id) return;
-  const payload = {
-    title: currentReport.title,
-    status: currentReport.status,
-    responsibleUserId: currentReport.responsible.id,
-  };
-  return await updateReport(payload, currentReport.id);
-});
+export const updateReportFx = createEffect(
+  async (report: {
+    id: number | null;
+    title: string | null;
+    status: ReportStatuses | null;
+    responsibleId: string | null;
+  }) => {
+    if (!report.id) return;
+    const payload = {
+      title: report.title,
+      status: report.status,
+      responsible: report.responsibleId,
+    };
+    return await updateReport(payload, report.id);
+  }
+);
 
 export const updateReportEvent = createEvent();
 export const clearReport = createEvent();
@@ -65,47 +85,31 @@ export const updateTitle = createEvent<string>();
 export const updateStatus = createEvent<number>();
 export const updateResponsible = createEvent<User | null>();
 
-export const setIsNewReport = createEvent<boolean>();
+export const setIsNewReport = createEvent();
 
-export const $isNewReport = createStore<boolean>(true)
+export const $isNewReport = createStore(true)
   .on(setIsNewReport, (_, isNew) => isNew)
   .reset(clearReport);
 
 export const $isReportChanged = createStore(false).reset(clearReport);
 
-export const $initialReportForm = createStore<Report>({
-  id: null,
-  title: "",
-  status: ReportStatuses.IN_PROGRESS,
-  responsible: null,
-  responsibleId: "",
-  creator: null,
-  createdAt: null,
-  updatedAt: null,
-  participants: [],
-  bugs: [],
-})
+export const $initialReportForm = createStore<Report>(defaultFormData)
   .on(fetchReportFx.doneData, (_, report) =>
     convertBackResponseToStoreModel(report)
   )
   .reset(clearReport);
 
-// Текущее состояние репорта (изменяемые данные, вводимые в форму)
-export const $reportForm = createStore<Report>({
-  id: null,
-  title: "",
-  status: ReportStatuses.IN_PROGRESS,
-  responsible: null,
-  participants: [],
-  responsibleId: "",
-  creator: null,
-  createdAt: null,
-  updatedAt: null,
-  bugs: [],
-})
-  .on(fetchReportFx.doneData, (_, report) =>
-    convertBackResponseToStoreModel(report)
-  )
+// Текущее состояние репорта (изменяемые данные)
+export const $reportForm = createStore<ReportFormUIData>(defaultFormData)
+  .on(fetchReportFx.doneData, (_, report) => {
+    return {
+      id: report.id,
+      title: report.title || "",
+      status: report.status || 0,
+      responsible: report.responsible || {},
+      participants: report.participants || [],
+    };
+  })
   .on(updateTitle, (state, title) => ({ ...state, title }))
   .on(updateResponsible, (state, responsible) => ({ ...state, responsible }))
   .on(updateStatus, (state, status) => ({ ...state, status }))
@@ -152,32 +156,26 @@ sample({
 });
 
 sample({
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  // todo fix ts-ignore
-  source: $combinedForm, // Здесь объект { reportForm, initialForm }
+  source: $combinedForm, // { reportForm, initialForm }
   clock: updateReportEvent,
   fn: ({ reportForm, initialForm }) => {
-    // Используем правильные имена
-    if (!initialForm) return null;
+    const responsibleId = reportForm.responsible?.id || null;
+    const initialResponsibleId = initialForm.responsible?.id || null;
 
-    const updatedReport: Partial<typeof reportForm> = {
+    const diff = {
       id: reportForm.id,
-      title:
-        reportForm.title !== initialForm.title ? reportForm.title : undefined,
+      title: reportForm.title !== initialForm.title ? reportForm.title : null,
       status:
-        reportForm.status !== initialForm.status
-          ? reportForm.status
-          : undefined,
-      responsible:
-        reportForm.responsible?.id !== initialForm.responsible?.id
-          ? reportForm.responsible
-          : undefined,
+        reportForm.status !== initialForm.status ? reportForm.status : null,
+      responsibleId:
+        responsibleId &&
+        initialResponsibleId &&
+        initialResponsibleId !== responsibleId
+          ? responsibleId
+          : null,
     };
 
-    return Object.values(updatedReport).some((value) => value !== undefined)
-      ? updatedReport
-      : null;
+    return diff;
   },
   target: updateReportFx,
 });
