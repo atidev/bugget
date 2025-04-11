@@ -6,7 +6,7 @@ import {
   sample,
 } from "effector";
 import { fetchReport, createReport, updateReport } from "@/api/reports";
-import { ReportStatuses } from "@/const";
+import { ReportStatuses, RequestStates } from "@/const";
 import { User } from "@/types/user";
 import { NewReport, ReportFormUIData, Report } from "@/types/report";
 import { ReportResponse } from "@/api/reports/models";
@@ -90,6 +90,17 @@ export const setIsNewReport = createEvent();
 export const $isNewReport = createStore(true)
   .on(setIsNewReport, (_, isNew) => isNew)
   .reset(clearReport);
+
+export const $reportRequestState = createStore(RequestStates.IDLE);
+$reportRequestState
+  .on(fetchReportFx.pending, (_, state) => {
+    console.log("pending", state);
+    return state ? RequestStates.PENDING : RequestStates.DONE;
+  })
+  .on(fetchReportFx.doneData, () => {
+    console.log("done data");
+    return RequestStates.DONE;
+  });
 
 export const $isReportChanged = createStore(false).reset(clearReport);
 

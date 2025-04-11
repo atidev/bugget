@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { setBreadcrumbs } from "@/store/breadcrumbs";
-import { useList, useUnit, createGate, useGate } from "effector-react";
+import { useUnit } from "effector-react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   fetchReportFx,
@@ -8,7 +8,7 @@ import {
   createReportFx,
   $reportForm,
 } from "@/store/report";
-import { $newBugStore, setExists, $isExists } from "@/store/newBug";
+import { $newBugStore, $isExists, setExists } from "@/store/newBug";
 import { $bugsIds } from "@/store/bugs";
 import { getCommentsFx } from "@/store/comments";
 import Bug from "./components/Bug/Bug";
@@ -16,42 +16,32 @@ import ReportHeader from "./components/ReportHeader/ReportHeader";
 import "./Report.css";
 import useWebSocketReportPage from "@/hooks/useWebSocketReportPage";
 import { ReportStatuses } from "@/const";
-// import Skeleton from "./components/Skeleton/Skeleton";
 
 const reportsPageBreadcrumb = { label: "Репорты", path: "/" };
-const SampleCompGate = createGate();
 
 const ReportPage = () => {
   const { reportId } = useParams();
   const navigate = useNavigate();
-
-  useGate(SampleCompGate); // instead of use Effect
-  const isLoading = useUnit(fetchReportFx.pending);
-
   const isNewReport = !reportId;
-
-  const [reportForm, newBugStore, setExistsHandler, isExists, getComments] =
-    useUnit([$reportForm, $newBugStore, setExists, $isExists, getCommentsFx]);
-
   const bugsIds = useUnit($bugsIds);
-  const bugsList = useList($bugsIds, (id) => (
-    <Bug key={id} reportId={reportForm.id} bugId={id} isLoading={isLoading} />
-  ));
 
-  const receiveReportHandler = (reportId: number) => {
-    fetchReportFx(reportId);
-  };
+  useEffect(() => {
+    setBreadcrumbs([
+      reportsPageBreadcrumb,
+      isNewReport
+        ? { label: "Новый репорт", path: `/reports` }
+        : {
+            label: `Репорт #${reportId}`,
+            path: `/reports/${reportId}`,
+          },
+    ]);
+  }, [reportId, isNewReport]);
 
-  const receiveCommentsHandler = (reportId: number, bugId: number) => {
-    getComments({ reportId, bugId });
-  };
-
-  // Используем хук для работы с SignalR
-  useWebSocketReportPage(
-    Number(reportForm.id),
-    receiveCommentsHandler,
-    receiveReportHandler
-  );
+  const [reportForm, newBugStore, isExists] = useUnit([
+    $reportForm,
+    $newBugStore,
+    $isExists,
+  ]);
 
   // Загружаем отчет, если есть ID
   useEffect(() => {
@@ -64,19 +54,20 @@ const ReportPage = () => {
     };
   }, [reportId]);
 
-  useEffect(() => {
-    setBreadcrumbs(
-      [
-        reportsPageBreadcrumb,
-        isNewReport
-          ? { label: "Новый репорт", path: `/reports` }
-          : {
-              label: `Репорт #${reportId}`,
-              path: `/reports/${reportId}`,
-            },
-      ].filter(Boolean)
-    );
-  }, [reportId, isNewReport]);
+  const receiveReportHandler = (reportId: number) => {
+    fetchReportFx(reportId);
+  };
+
+  const receiveCommentsHandler = (reportId: number, bugId: number) => {
+    getCommentsFx({ reportId, bugId });
+  };
+
+  // Используем хук для работы с SignalR
+  useWebSocketReportPage(
+    Number(reportForm.id),
+    receiveCommentsHandler,
+    receiveReportHandler
+  );
 
   const handleCreateReport = async () => {
     const responsibleId = reportForm.responsible?.id;
@@ -93,26 +84,32 @@ const ReportPage = () => {
         },
       ],
     });
-    if (newReport?.id) {
+    if (newReport.id) {
       navigate(`/reports/${newReport.id}`);
     }
   };
 
   return (
     <div className="reports-wrapper">
-      <ReportHeader isLoading={isLoading} />
-      {bugsIds.length > 0 ? bugsList : <Bug isLoading={isLoading} />}
+      <ReportHeader />
+      {bugsIds.length ? (
+        bugsIds.map((id) => (
+          <Bug key={id} reportId={reportForm.id} bugId={id} />
+        ))
+      ) : (
+        <Bug />
+      )}
 
       {!isNewReport && bugsIds.length > 0 && !isExists && (
         <button
           className="btn btn-block btn-outline btn-info mt-5"
-          onClick={() => setExistsHandler(true)}
+          onClick={() => setExists(true)}
         >
           + Добавить баг
         </button>
       )}
 
-      {isExists && <Bug reportId={reportForm.id} isLoading={isLoading} />}
+      {isExists && <Bug reportId={reportForm.id} />}
 
       {isNewReport && newBugStore.isReady && reportForm.responsible?.id && (
         <div className="button-wrapper">
