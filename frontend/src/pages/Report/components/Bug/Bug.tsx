@@ -4,13 +4,13 @@ import {
   updateNewBug,
   createBugEventByApi,
 } from "@/store/newBug";
-
 import {
   $bugsByBugId,
   updateBugEvent,
   resetBug,
   updateBugApiEvent,
 } from "@/store/bugs";
+import { $reportRequestState } from "@/store/report";
 import { $attachmentsByBugId } from "@/store/attachments";
 import "./Bug.css";
 import CancelButton from "@/components/CancelButton/CancelButton";
@@ -19,16 +19,18 @@ import Dropdown from "@/components/Dropdown/Dropdown";
 import { BugStatuses } from "@/const";
 import Chat from "./components/Chat/Chat";
 import { uploadAttachmentFx } from "@/store/attachments";
+import { Bug as BugType } from "@/types/bug";
 import Result from "./components/Result/Result";
 import { ChangeEvent } from "react";
+import Heading from "./components/Heading/Heading";
+import { RequestStates } from "../../../../const/index";
 
 type BugProps = {
   reportId?: number | null;
   bugId?: number;
-  isLoading: boolean;
 };
 
-const Bug = ({ reportId, bugId, isLoading }: BugProps) => {
+const Bug = ({ reportId, bugId }: BugProps) => {
   const [updateBugData, reset, updateBugApi, createBugApi, uploadAttachment] =
     useUnit([
       updateBugEvent,
@@ -40,11 +42,13 @@ const Bug = ({ reportId, bugId, isLoading }: BugProps) => {
 
   const [newBugData, updateNewBugData] = useUnit([$newBugStore, updateNewBug]);
 
+  const [reportRequestState] = useUnit([$reportRequestState]);
+
   const bug = useStoreMap({
     store: $bugsByBugId,
     keys: [bugId],
     fn: (state, [id]) => {
-      return id
+      return state && id
         ? state[id]
         : {
             id: bugId,
@@ -67,13 +71,12 @@ const Bug = ({ reportId, bugId, isLoading }: BugProps) => {
     },
   });
 
-  const isNewBug = bug.id === null || bug.id === undefined;
+  const isNewBug = !bug.id;
+  const isNewReport = !reportId;
 
   const isBugChanged = isNewBug
     ? newBugData.receive !== "" && newBugData.expect !== ""
     : bug.isChanged;
-
-  const isNewReport = reportId == null;
 
   // 3. Обработчик выбора файла
   const handleFileChange = async (
@@ -104,31 +107,27 @@ const Bug = ({ reportId, bugId, isLoading }: BugProps) => {
   const expectedFiles = attachments?.filter((item) => item.attachType === 1);
 
   const handleSave = () => {
-    if (!bug.reportId) return;
-    if (isNewBug) {
-      // Вызываем событие для создания нового бага
+    if (typeof bug.id === "number") {
+      // todo убрать 'as', поправить типизацию
+      updateBugApi(bug as BugType);
+    } else if (bug.reportId) {
       createBugApi({ reportId: bug.reportId, bug: newBugData });
-      return;
     }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // todo fix types
-    updateBugApi(bug);
   };
 
   const handleResultUpdate = (
     event: ChangeEvent<HTMLTextAreaElement>,
-    key: "receive" | "expect"
+    key: string
   ) => {
-    if (isNewBug) {
+    if (bug.id) {
+      updateBugData({
+        id: bug.id,
+        [key]: event.target.value,
+        status: bug.status,
+      });
+    } else {
       updateNewBugData({ [key]: event.target.value });
-      return;
     }
-    updateBugData({
-      id: bug.id,
-      receive: event.target.value,
-      status: bug.status,
-    });
   };
 
   return (
@@ -139,14 +138,10 @@ const Bug = ({ reportId, bugId, isLoading }: BugProps) => {
     >
       <div className="bug-content-wrapper">
         <div className="flex items-center justify-between">
-          {isLoading ? (
+          {reportRequestState !== RequestStates.DONE ? (
             <div className="skeleton min-h-[2em] min-w-[30%] shrink-0" />
-          ) : isNewBug ? (
-            <span className="text-2xl"> Новый баг</span>
           ) : (
-            <span className="text-2xl">
-              Баг<span className="text-gray-300">#{bug.id}</span>
-            </span>
+            <Heading isNewBug={isNewBug} bugId={bug.id} />
           )}
 
           {/* Селект статуса (только для существующего бага) */}
@@ -154,7 +149,9 @@ const Bug = ({ reportId, bugId, isLoading }: BugProps) => {
             <Dropdown
               className="max-w-[150px]"
               onChange={(selected) => {
-                updateBugData({ id: bug.id!, status: Number(selected) });
+                if (bug.id) {
+                  updateBugData({ id: bug.id, status: Number(selected) });
+                }
               }}
               value={bug.status}
               options={[

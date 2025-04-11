@@ -6,6 +6,7 @@ import {
   resetReport,
   $isReportChanged,
   $isNewReport,
+  $reportRequestState,
   updateStatus,
   updateReportEvent,
 } from "@/store/report";
@@ -14,7 +15,7 @@ import CancelButton from "@/components/CancelButton/CancelButton";
 import SaveButton from "@/components/SaveButton/SaveButton";
 import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Avatar from "@/components/Avatar/Avatar";
-import { ReportStatuses } from "../../../../const";
+import { ReportStatuses, RequestStates } from "@/const";
 import Dropdown from "@/components/Dropdown/Dropdown";
 import { employeesAutocomplete } from "@/api/employees";
 import { User } from "@/types/user";
@@ -29,12 +30,13 @@ const autocompleteUsers = async (searchString: string) => {
   }));
 };
 
-const ReportHeader = ({ isLoading }: { isLoading: boolean }) => {
+const ReportHeader = () => {
   const [
     reportForm,
     setTitle,
     setResponsibleId,
     isReportChanged,
+    reportRequestState,
     reset,
     isNewReport,
     setUpdateStatus,
@@ -44,6 +46,7 @@ const ReportHeader = ({ isLoading }: { isLoading: boolean }) => {
     updateTitle,
     updateResponsible,
     $isReportChanged,
+    $reportRequestState,
     resetReport,
     $isNewReport,
     updateStatus,
@@ -62,17 +65,19 @@ const ReportHeader = ({ isLoading }: { isLoading: boolean }) => {
           : ""
       }`}
     >
-      {isLoading ? (
+      {reportRequestState !== RequestStates.DONE ? (
         <HeadingSkeleton />
       ) : (
-        <div className={`flex items-center justify-between items-start`}>
-          {isNewReport ? (
-            <span className="text-2xl">Новый репорт</span>
-          ) : (
-            <span className="text-2xl">
-              Репорт<span className="text-gray-300">#{reportForm.id}</span>
-            </span>
-          )}
+        <div className="flex justify-between items-start">
+          <span className="text-2xl">
+            {!isNewReport ? (
+              <>
+                Репорт <span className="text-gray-300">#{reportForm.id} </span>
+              </>
+            ) : (
+              <span>Новый репорт</span>
+            )}
+          </span>
 
           {!isNewReport && (
             <Dropdown
@@ -91,7 +96,7 @@ const ReportHeader = ({ isLoading }: { isLoading: boolean }) => {
       )}
       <div>
         <div className="text-xs font-semibold mt-1 mb-1">Заголовок</div>
-        {isLoading ? (
+        {reportRequestState === RequestStates.PENDING ? (
           <div className="skeleton input w-full" />
         ) : (
           <input
@@ -109,7 +114,7 @@ const ReportHeader = ({ isLoading }: { isLoading: boolean }) => {
         <div>
           <div className="text-xs font-semibold mb-1">Ответственный</div>
           <div className="flex gap-4 items-center">
-            {isLoading ? (
+            {reportRequestState === RequestStates.PENDING ? (
               <div className="skeleton input shrink-0 min-w-72" />
             ) : (
               <Autosuggest
@@ -123,16 +128,14 @@ const ReportHeader = ({ isLoading }: { isLoading: boolean }) => {
               />
             )}
             <div className="participants-wrapper">
-              {isLoading ? (
+              {reportRequestState === RequestStates.PENDING ? (
                 <ParticipantsSkeleton />
               ) : (
                 !!reportForm.participants?.length &&
                 reportForm.participants.map((p) => (
                   <div className="tooltip" key={p.id}>
                     <Avatar />
-                    <span key={p.id} className="tooltiptext rounded">
-                      {p.name}
-                    </span>
+                    <span className="tooltiptext rounded">{p.name}</span>
                   </div>
                 ))
               )}

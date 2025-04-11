@@ -26,7 +26,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content">
         <Header />
-        <Breadcrumbs breadcrumbs={breadcrumbs} className="py-4" />
+        <Breadcrumbs breadcrumbs={breadcrumbs} />
         <main>{children}</main>
       </div>
       <Sidebar isOpen={isSidebarOpen} />
