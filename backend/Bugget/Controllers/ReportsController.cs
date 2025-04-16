@@ -32,7 +32,7 @@ public sealed class ReportsController(
     public async Task<ReportView?> CreateReportAsync([FromBody] ReportCreateDto createDto)
     {
         var user = User.GetIdentity();
-        var createdReport = await reportsService.CreateReportAsync(createDto.ToReport(user.Id));
+        var createdReport = await reportsService.CreateReportAsync(createDto.ToReport(user.Id, user.TeamId, user.OrganizationId));
         return createdReport?.ToView();
     }
 
@@ -97,12 +97,14 @@ public sealed class ReportsController(
         [FromQuery] uint take = 10
         )
     {
+        var user = User.GetIdentity();
         var searchResult = await reportsService.SearchReportsAsync(
             ReportMapper.ToSearchReports(
                 query,
                 reportStatuses,
                 userId,
                 teamId,
+                user.OrganizationId,
                 sort,
                 skip,
                 take

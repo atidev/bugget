@@ -13,6 +13,8 @@ public class UserAuthHandler(
     : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
     private static readonly string? LdapUserIdKey = Environment.GetEnvironmentVariable(EnvironmentConstants.LdapUserIdKeyName);
+    private static readonly string? LdapTeamIdKey = Environment.GetEnvironmentVariable(EnvironmentConstants.LdapTeamIdKeyName);
+    private static readonly string? LdapOrganizationIdKey = Environment.GetEnvironmentVariable(EnvironmentConstants.LdapOrganizationIdKeyName);
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -27,10 +29,28 @@ public class UserAuthHandler(
             userId = "default-user";
         }
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(ClaimsIdentity.DefaultNameClaimType, userId)
         };
+
+        if (!string.IsNullOrEmpty(LdapTeamIdKey))
+        {
+            var teamId = headers[LdapTeamIdKey].ToString();
+            if (!string.IsNullOrEmpty(teamId))
+            {
+                claims.Add(new Claim("team_id", teamId));
+            }
+        }
+
+        if (!string.IsNullOrEmpty(LdapOrganizationIdKey))
+        {
+            var organizationId = headers[LdapOrganizationIdKey].ToString();
+            if (!string.IsNullOrEmpty(organizationId))
+            {
+                claims.Add(new Claim("organization_id", organizationId));
+            }
+        }
 
         return Task.FromResult(AuthenticateResult.Success(CreateTicket(claims)));
     }

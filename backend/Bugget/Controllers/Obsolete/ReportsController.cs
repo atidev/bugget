@@ -33,7 +33,7 @@ public sealed class ReportsController(
     public async Task<ReportViewObsolete?> CreateReportAsync([FromBody] ReportCreateDto createDto)
     {
         var user = User.GetIdentity();
-        var createdReport = await reportsService.CreateReportAsync(createDto.ToReport(user.Id));
+        var createdReport = await reportsService.CreateReportAsync(createDto.ToReport(user.Id, user.TeamId, user.OrganizationId));
 
         return createdReport?.ToViewObsolete(employeesDataAccess.DictEmployees());
     }

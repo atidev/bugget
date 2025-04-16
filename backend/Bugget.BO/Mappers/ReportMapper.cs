@@ -44,6 +44,8 @@ public static class ReportMapper
             Status = report.Status,
             ResponsibleUserId = report.ResponsibleUserId,
             CreatorUserId = report.CreatorUserId,
+            CreatorTeamId = report.CreatorTeamId,
+            CreatorOrganizationId = report.CreatorOrganizationId,
             CreatedAt = report.CreatedAt,
             UpdatedAt = report.UpdatedAt,
             ParticipantsUserIds = report.ParticipantsUserIds,
@@ -69,12 +71,14 @@ public static class ReportMapper
         };
     }
 
-    public static Report ToReport(this ReportCreateDto report, string userId)
+    public static Report ToReport(this ReportCreateDto report, string userId, string? teamId, string? organizationId)
     {
         return new Report
         {
             Title = report.Title,
             CreatorUserId = userId,
+            CreatorTeamId = teamId,
+            CreatorOrganizationId = organizationId,
             ResponsibleUserId = report.ResponsibleUserId,
             ParticipantsUserIds = report.ParticipantsUserIds,
             Status = report.Status
@@ -102,6 +106,8 @@ public static class ReportMapper
             Status = report.Status,
             ResponsibleUserId = report.ResponsibleUserId,
             CreatorUserId = report.CreatorUserId,
+            CreatorTeamId = report.CreatorTeamId,
+            CreatorOrganizationId = report.CreatorOrganizationId,
             ParticipantsUserIds = report.ParticipantsUserIds,
             Bugs = report.Bugs.Select(b => new BugCreateDbModel
             {
@@ -165,17 +171,18 @@ public static class ReportMapper
         int[]? reportStatuses,
         string? userId,
         string? teamId,
+        string? organizationId,
         string? sort,
         uint skip,
         uint take)
     {
-        
         return new SearchReports
         {
             Query = string.IsNullOrWhiteSpace(query) ? null : query,
             ReportStatuses = reportStatuses?.Length > 0 ? reportStatuses : null,
             UserId = userId,
             TeamId = teamId,
+            OrganizationId = organizationId,
             Skip = skip,
             Take = take,
             Sort = SortOption.Parse(sort)

@@ -47,13 +47,15 @@ public sealed class ReportsDbClient: PostgresClient
         var bugsJson = JsonSerializer.Serialize(reportDbModel.Bugs, JsonSerializerOptions);
 
         var jsonResult = await connection.ExecuteScalarAsync<string>(
-            "SELECT public.create_report(@title, @status, @responsible_user_id, @creator_user_id, @participants, @bugs_json);",
+            "SELECT public.create_report(@title, @status, @responsible_user_id, @creator_user_id, @creator_team_id, @creator_organization_id, @participants, @bugs_json);",
             new
             {
                 title = reportDbModel.Title,
                 status = reportDbModel.Status,
                 responsible_user_id = reportDbModel.ResponsibleUserId,
                 creator_user_id = reportDbModel.CreatorUserId,
+                creator_team_id = reportDbModel.CreatorTeamId,
+                creator_organization_id = reportDbModel.CreatorOrganizationId,
                 participants = reportDbModel.ParticipantsUserIds,
                 bugs_json = bugsJson
             }
@@ -111,7 +113,7 @@ public sealed class ReportsDbClient: PostgresClient
         await using var connection = await DataSource.OpenConnectionAsync();
 
         var jsonResult = await connection.ExecuteScalarAsync<string>(
-            "SELECT public.search_reports_v2(@sortField, @sortDesc, @skip, @take, @query, @statuses, @userId, @teamId);",
+            "SELECT public.search_reports_v2(@sortField, @sortDesc, @skip, @take, @query, @statuses, @userId, @teamId, @organizationId);",
             new
             {
                 sortField = search.Sort.Field,
@@ -122,6 +124,7 @@ public sealed class ReportsDbClient: PostgresClient
                 statuses = search.ReportStatuses,
                 userId = search.UserId,
                 teamId = search.TeamId,
+                organizationId = search.OrganizationId
             }
         );
 
