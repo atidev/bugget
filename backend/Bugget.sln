@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bugget.Entities", "Bugget.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bugget.Features", "Bugget.Features\Bugget.Features.csproj", "{76714590-ABDD-4BDE-95FC-B1B867BC36F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Result", "Result\Result.csproj", "{F3EF44BD-23C8-40D0-8FDE-A8C813AFCE7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{76714590-ABDD-4BDE-95FC-B1B867BC36F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76714590-ABDD-4BDE-95FC-B1B867BC36F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76714590-ABDD-4BDE-95FC-B1B867BC36F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3EF44BD-23C8-40D0-8FDE-A8C813AFCE7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3EF44BD-23C8-40D0-8FDE-A8C813AFCE7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3EF44BD-23C8-40D0-8FDE-A8C813AFCE7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3EF44BD-23C8-40D0-8FDE-A8C813AFCE7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

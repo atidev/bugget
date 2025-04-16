@@ -12,7 +12,7 @@ namespace Bugget.BO.Mappers;
 
 public static class ReportMapper
 {
-    public static ReportView ToView(this ReportDbModel report, IReadOnlyDictionary<string, Employee> employeesDict)
+    public static ReportView ToView(this ReportDbModel report, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
     {
         return new ReportView
         {
@@ -35,7 +35,7 @@ public static class ReportMapper
         };
     }
 
-    public static SearchReportsView ToView(this SearchReportsDbModel search, IReadOnlyDictionary<string, Employee> employeesDict)
+    public static SearchReportsView ToView(this SearchReportsDbModel search, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
     {
         return new SearchReportsView
         {
@@ -113,7 +113,7 @@ public static class ReportMapper
         string? sort,
         uint skip,
         uint take,
-        IReadOnlyDictionary<string, IReadOnlyCollection<Employee>> employeesByTeam)
+        IReadOnlyDictionary<string, IReadOnlyCollection<EmployeeObsolete>> employeesByTeam)
     {
         List<string> resultUserIds = [];
         if (!string.IsNullOrEmpty(teamId))

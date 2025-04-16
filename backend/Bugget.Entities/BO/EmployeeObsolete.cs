@@ -1,16 +1,14 @@
 namespace Bugget.Entities.BO;
 
-public class Employee
+public class EmployeeObsolete
 {
     /// <summary>
     /// Уникальный идентификатор соответствующий хэдеру авторизации LDAP_USER_ID_KEY
     /// </summary>
     public required string Id { get; init; }
-
-    /// <summary>
-    /// Имя пользователя
-    /// </summary>
-    public string? Name { get; init; }
+    public string? FirstName { get; init; }
+    public string? LastName { get; init; }
+    public string? Surname { get; init; }
     
     /// <summary>
     /// Идентификатор пользователя в системе уведомлений
@@ -23,9 +21,9 @@ public class Employee
     public string? TeamId { get; init; }
     
     /// <summary>
-    /// Идентификатор организации
+    /// Название команды/отдела
     /// </summary>
-    public string? OrganizationId { get; init; }
+    public string? TeamName { get; init; }
     
     /// <summary>
     /// Глубина пользователя в иерархии компании

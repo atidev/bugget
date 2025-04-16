@@ -53,7 +53,7 @@ public class EmployeesService(EmployeesDataAccess employeesDataAccess)
         return (foundedTeams.Skip(skip).Take(take), foundedTeams.Length);
     }
 
-    public IReadOnlyDictionary<string, Employee> DictEmployees()
+    public IReadOnlyDictionary<string, EmployeeObsolete> DictEmployees()
     {
         return employeesDataAccess.DictEmployees();
     }

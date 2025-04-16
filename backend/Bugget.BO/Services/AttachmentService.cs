@@ -40,7 +40,7 @@ public sealed class AttachmentService(
     }
     public async Task<IEnumerable<Attachment>> SaveAttachments(int bugId, string userId, IEnumerable<(Stream Stream, AttachType AttachType, string FileName)> streamsWithMetadata)
     {
-        var bug = await bugService.GetBug(bugId);
+        var bug = await bugService.GetBugAsync(bugId);
         var concurrencyLevel = 5;
         var saveContentTasks = new Task<Attachment>[concurrencyLevel];
         foreach (var streamsChunk in streamsWithMetadata.Chunk(concurrencyLevel))
@@ -57,7 +57,7 @@ public sealed class AttachmentService(
 
     public async Task<Attachment> SaveAttachment(int bugId, string userId, Stream fileStream, AttachType attachType, string fileName)
     {
-        var bug = await bugService.GetBug(bugId);
+        var bug = await bugService.GetBugAsync(bugId);
         return await SaveAttachment(bug, userId, fileStream, attachType, fileName);
     }
 

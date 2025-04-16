@@ -19,9 +19,9 @@ public sealed class BugsService(BugsDbClient bugsDbClient, IMapper mapper)
         return bugsDbClient.UpdateBugAsync(bug.ToBugUpdateDbModel());
     }
     
-    public async Task<Bug> GetBug(int bugId)
+    public async Task<Bug> GetBugAsync(int bugId)
     {
-        var bugDbModel = await bugsDbClient.GetBug(bugId);
+        var bugDbModel = await bugsDbClient.GetBugAsync(bugId);
         if (bugDbModel == null)
         {
             throw new Exception("Bug doesn't exist");

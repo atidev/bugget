@@ -31,7 +31,7 @@ public static class CommentMapper
         };
     }
 
-    public static CommentView ToCommentView(this CommentDbModel comment, IReadOnlyDictionary<string, Employee> employeesDict)
+    public static CommentView ToCommentView(this CommentDbModel comment, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
     {
         return new CommentView
         {

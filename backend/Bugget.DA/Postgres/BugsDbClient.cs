@@ -58,7 +58,7 @@ public sealed class BugsDbClient : PostgresClient
             : null;
     }
 
-    public async Task<BugDbModel?> GetBug(int bugId)
+    public async Task<BugDbModel?> GetBugAsync(int bugId)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
 

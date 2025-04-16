@@ -10,10 +10,15 @@ public class Team
     /// <summary>
     /// Название команды
     /// </summary>
-    public required string Name { get; init; }
+    public string? Name { get; init; }
     
     /// <summary>
     /// Глубина команды в иерархии компании
     /// </summary>
     public int? Depth { get; init; }
+
+     /// <summary>
+    /// Идентификатор организации
+    /// </summary>
+    public string? OrganizationId { get; init; }
 }
