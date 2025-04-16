@@ -85,7 +85,7 @@ public sealed class ReportsDbClient: PostgresClient
             : null;
     }
     
-    public async Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)
+    public async Task<SearchReportsDbModel> SearchReportsObsoleteAsync(SearchReportsObsolete search)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
 
@@ -100,6 +100,28 @@ public sealed class ReportsDbClient: PostgresClient
                 query = search.Query,
                 statuses = search.ReportStatuses,
                 userIds = search.UserIds,
+            }
+        );
+
+        return Deserialize<SearchReportsDbModel>(jsonResult);
+    }
+
+    public async Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+
+        var jsonResult = await connection.ExecuteScalarAsync<string>(
+            "SELECT public.search_reports_v2(@sortField, @sortDesc, @skip, @take, @query, @statuses, @userId, @teamId);",
+            new
+            {
+                sortField = search.Sort.Field,
+                sortDesc = search.Sort.IsDescending,
+                skip = (int)search.Skip,
+                take = (int)search.Take,
+                query = search.Query,
+                statuses = search.ReportStatuses,
+                userId = search.UserId,
+                teamId = search.TeamId,
             }
         );
 

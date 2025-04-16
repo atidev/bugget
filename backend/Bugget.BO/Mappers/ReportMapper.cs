@@ -12,9 +12,9 @@ namespace Bugget.BO.Mappers;
 
 public static class ReportMapper
 {
-    public static ReportView ToView(this ReportDbModel report, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
+    public static ReportViewObsolete ToViewObsolete(this ReportDbModel report, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
     {
-        return new ReportView
+        return new ReportViewObsolete
         {
             Id = report.Id,
             Title = report.Title,
@@ -31,15 +31,40 @@ public static class ReportMapper
                 employeesDict.TryGetValue(p, out var e)
                     ? EmployeeAdapter.ToUserView(e)
                     : EmployeeAdapter.ToUserView(p)).ToArray(),
-            Bugs = report.Bugs.Select(b => b.ToView(employeesDict)).ToArray()
+            Bugs = report.Bugs.Select(b => b.ToViewObsolete(employeesDict)).ToArray()
         };
     }
 
-    public static SearchReportsView ToView(this SearchReportsDbModel search, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
+    public static ReportView ToView(this ReportDbModel report)
     {
-        return new SearchReportsView
+        return new ReportView
         {
-            Reports = search.Reports.Select(r => ToView(r, employeesDict)).ToArray(),
+            Id = report.Id,
+            Title = report.Title,
+            Status = report.Status,
+            ResponsibleUserId = report.ResponsibleUserId,
+            CreatorUserId = report.CreatorUserId,
+            CreatedAt = report.CreatedAt,
+            UpdatedAt = report.UpdatedAt,
+            ParticipantsUserIds = report.ParticipantsUserIds,
+            Bugs = report.Bugs.Select(b => b.ToView()).ToArray()
+        };
+    }
+
+    public static SearchReportsView<ReportViewObsolete> ToViewObsolete(this SearchReportsDbModel search, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
+    {
+        return new SearchReportsView<ReportViewObsolete>
+        {
+            Reports = search.Reports.Select(r => ToViewObsolete(r, employeesDict)).ToArray(),
+            Total = search.Total
+        };
+    }
+
+    public static SearchReportsView<ReportView> ToView(this SearchReportsDbModel search)
+    {
+        return new SearchReportsView<ReportView>
+        {
+            Reports = search.Reports.Select(r => ToView(r)).ToArray(),
             Total = search.Total
         };
     }
@@ -49,16 +74,10 @@ public static class ReportMapper
         return new Report
         {
             Title = report.Title,
-            ResponsibleUserId = report.ResponsibleId,
             CreatorUserId = userId,
-            Bugs = report.Bugs.Select(b => new Bug
-                {
-                    Receive = b.Receive,
-                    Expect = b.Expect,
-                    CreatorUserId = userId,
-                })
-                .ToArray(),
-            ParticipantsUserIds = new string[] { userId, report.ResponsibleId }.Distinct().ToArray()
+            ResponsibleUserId = report.ResponsibleUserId,
+            ParticipantsUserIds = report.ParticipantsUserIds,
+            Status = report.Status
         };
     }
 
@@ -69,8 +88,9 @@ public static class ReportMapper
             Id = reportId,
             Title = report.Title,
             UpdaterUserId = userId,
-            Status = report.Status,
-            ResponsibleUserId = report.ResponsibleUserId
+            ResponsibleUserId = report.ResponsibleUserId,
+            ParticipantsUserIds = report.ParticipantsUserIds,
+            Status = report.Status
         };
     }
 
@@ -105,7 +125,7 @@ public static class ReportMapper
         };
     }
 
-    public static SearchReports ToSearchReports(
+    public static SearchReportsObsolete ToSearchReportsObsolete(
         string? query,
         int[]? reportStatuses,
         string? userId,
@@ -129,11 +149,33 @@ public static class ReportMapper
             resultUserIds.AddRange(userId);
         }
 
-        return new SearchReports
+        return new SearchReportsObsolete
         {
             Query = string.IsNullOrEmpty(query) ? null : query,
             ReportStatuses = reportStatuses?.Length > 0 ? reportStatuses : null,
             UserIds = resultUserIds.Count > 0 ? resultUserIds.ToArray() : null,
+            Skip = skip,
+            Take = take,
+            Sort = SortOption.Parse(sort)
+        };
+    }
+
+    public static SearchReports ToSearchReports(
+        string? query,
+        int[]? reportStatuses,
+        string? userId,
+        string? teamId,
+        string? sort,
+        uint skip,
+        uint take)
+    {
+        
+        return new SearchReports
+        {
+            Query = string.IsNullOrWhiteSpace(query) ? null : query,
+            ReportStatuses = reportStatuses?.Length > 0 ? reportStatuses : null,
+            UserId = userId,
+            TeamId = teamId,
             Skip = skip,
             Take = take,
             Sort = SortOption.Parse(sort)

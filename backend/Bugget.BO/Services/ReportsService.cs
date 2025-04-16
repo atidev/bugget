@@ -47,6 +47,11 @@ public sealed class ReportsService(
         return reportDbModel;
     }
     
+    public Task<SearchReportsDbModel> SearchReportsAsync(SearchReportsObsolete search)
+    {
+        return reportsDbClient.SearchReportsObsoleteAsync(search);
+    }
+
     public Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)
     {
         return reportsDbClient.SearchReportsAsync(search);

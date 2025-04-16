@@ -1,7 +1,7 @@
 namespace Bugget.Entities.Views;
 
-public sealed class SearchReportsView
+public sealed class SearchReportsView<TReportView>
 {
-    public ReportView[] Reports { get; init; }
+    public TReportView[] Reports { get; init; }
     public int Total { get; init; }
 }

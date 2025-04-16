@@ -11,16 +11,17 @@ using Bugget.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Bugget.Controllers;
+namespace Bugget.Controllers.Obsolete;
 
 /// <summary>
 /// Api для работы с репортами
 /// </summary>
 [LdapAuth]
-[Route("bugget/public/v2/reports")]
+[Route("bugget/public/v1/reports")]
 public sealed class ReportsController(
     ReportsService reportsService,
-    IHubContext<ReportPageHub> hubContext) : ApiController
+    IHubContext<ReportPageHub> hubContext,
+    EmployeesDataAccess employeesDataAccess) : ApiController
 {
     /// <summary>
     /// Создать репорт
@@ -28,12 +29,13 @@ public sealed class ReportsController(
     /// <param name="createDto"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(typeof(ReportView), 200)]
-    public async Task<ReportView?> CreateReportAsync([FromBody] ReportCreateDto createDto)
+    [ProducesResponseType(typeof(ReportViewObsolete), 200)]
+    public async Task<ReportViewObsolete?> CreateReportAsync([FromBody] ReportCreateDto createDto)
     {
         var user = User.GetIdentity();
         var createdReport = await reportsService.CreateReportAsync(createDto.ToReport(user.Id));
-        return createdReport?.ToView();
+
+        return createdReport?.ToViewObsolete(employeesDataAccess.DictEmployees());
     }
 
     /// <summary>
@@ -41,12 +43,13 @@ public sealed class ReportsController(
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [ProducesResponseType(typeof(ReportView[]), 200)]
-    public async Task<ReportView[]> ListReportsAsync()
+    [ProducesResponseType(typeof(ReportViewObsolete[]), 200)]
+    public async Task<ReportViewObsolete[]> ListReportsAsync()
     {
         var user = User.GetIdentity();
+
         var reports = await reportsService.ListReportsAsync(user.Id);
-        return reports.Select(r => r.ToView()).ToArray();
+        return reports.Select(r => r.ToViewObsolete(employeesDataAccess.DictEmployees())).ToArray();
     }
 
     /// <summary>
@@ -55,11 +58,11 @@ public sealed class ReportsController(
     /// <param name="reportId"></param>
     /// <returns></returns>
     [HttpGet("{reportId}")]
-    [ProducesResponseType(typeof(ReportDbModel), 200)]
-    public async Task<ReportView?> GetReportAsync([FromRoute] int reportId)
+    [ProducesResponseType(typeof(ReportViewObsolete), 200)]
+    public async Task<ReportViewObsolete?> GetReportAsync([FromRoute] int reportId)
     {
         var report = await reportsService.GetReportAsync(reportId);
-        return report?.ToView();
+        return report?.ToViewObsolete(employeesDataAccess.DictEmployees());
     }
 
     /// <summary>
@@ -69,8 +72,8 @@ public sealed class ReportsController(
     /// <param name="updateDto"></param>
     /// <returns></returns>
     [HttpPut("{reportId}")]
-    [ProducesResponseType(typeof(ReportView), 200)]
-    public async Task<ReportView?> UpdateReportAsync([FromRoute] int reportId, [FromBody] ReportUpdateDto updateDto)
+    [ProducesResponseType(typeof(ReportViewObsolete), 200)]
+    public async Task<ReportViewObsolete?> UpdateReportAsync([FromRoute] int reportId, [FromBody] ReportUpdateDto updateDto)
     {
         var user = User.GetIdentity();
         var report = await reportsService.UpdateReportAsync(updateDto.ToReportUpdate(reportId, user.Id));
@@ -78,7 +81,7 @@ public sealed class ReportsController(
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");
 
-        return report?.ToView();
+        return report?.ToViewObsolete(employeesDataAccess.DictEmployees());
     }
 
     /// <summary>
@@ -86,8 +89,8 @@ public sealed class ReportsController(
     /// </summary>
     /// <returns></returns>
     [HttpGet("search")]
-    [ProducesResponseType(typeof(SearchReportsView<ReportView>), 200)]
-    public async Task<SearchReportsView<ReportView>> SearchReportsAsync(
+    [ProducesResponseType(typeof(SearchReportsView<ReportViewObsolete>), 200)]
+    public async Task<SearchReportsView<ReportViewObsolete>> SearchReportsAsync(
         [FromQuery] string? query,
         [FromQuery] int[]? reportStatuses,
         [FromQuery] string? userId,
@@ -98,16 +101,17 @@ public sealed class ReportsController(
         )
     {
         var searchResult = await reportsService.SearchReportsAsync(
-            ReportMapper.ToSearchReports(
+            ReportMapper.ToSearchReportsObsolete(
                 query,
                 reportStatuses,
                 userId,
                 teamId,
                 sort,
                 skip,
-                take
+                take,
+                employeesDataAccess.DictByTeamEmployees()
                 ));
         
-        return searchResult.ToView();
+        return searchResult.ToViewObsolete(employeesDataAccess.DictEmployees());
     }
-} 
+}

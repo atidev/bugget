@@ -31,15 +31,27 @@ public static class CommentMapper
         };
     }
 
-    public static CommentView ToCommentView(this CommentDbModel comment, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
+    public static CommentViewObsolete ToCommentViewObsolete(this CommentDbModel comment, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
     {
-        return new CommentView
+        return new CommentViewObsolete
         {
             Id = comment.Id,
             Creator = employeesDict.TryGetValue(comment.CreatorUserId, out var e)
                 ? EmployeeAdapter.ToUserView(e)
                 : EmployeeAdapter.ToUserView(comment.CreatorUserId),
+            BugId = comment.BugId,
+            Text = comment.Text,
+            CreatedAt = comment.CreatedAt,
+            UpdatedAt = comment.UpdatedAt
+        };
+    }
 
+    public static CommentView ToCommentView(this CommentDbModel comment)
+    {
+        return new CommentView
+        {
+            Id = comment.Id,
+            CreatorUserId = comment.CreatorUserId,
             BugId = comment.BugId,
             Text = comment.Text,
             CreatedAt = comment.CreatedAt,
