@@ -1,13 +1,16 @@
 using Bugget.DA.Files;
+using Bugget.DA.Interfaces;
 using Bugget.Entities.Adapters;
 using Bugget.Entities.BO;
 using Bugget.Entities.Constants;
 using Bugget.Entities.Views;
+using Bugget.Entities.Views.Users;
 
 namespace Bugget.BO.Services;
 
-public class EmployeesService(EmployeesDataAccess employeesDataAccess)
-{ 
+public class EmployeesService(EmployeesDataAccess employeesDataAccess, IEmployeesClient employeesClient)
+{
+
     public (IEnumerable<EmployeeView>, int) AutocompleteEmployees(
         string userId,
         string searchString,
@@ -56,5 +59,11 @@ public class EmployeesService(EmployeesDataAccess employeesDataAccess)
     public IReadOnlyDictionary<string, EmployeeObsolete> DictEmployees()
     {
         return employeesDataAccess.DictEmployees();
+    }
+
+    public async Task<IEnumerable<UserView>> GetUserViewsAsync(IEnumerable<string> userIds)
+    {
+        var employees = await employeesClient.GetEmployeesAsync(userIds);
+        return employees.Select(e => new UserView { Id = e.Id, Name = e.Name ?? string.Empty });
     }
 }

@@ -23,6 +23,14 @@ public sealed class EmployeesFileClient(ILogger<EmployeesFileClient> logger) : B
         return Task.FromResult(employee);
     }
 
+    public Task<IEnumerable<Employee>> GetEmployeesAsync(IEnumerable<string> userIds)
+    {
+        var employees = userIds
+            .Select(id => EmployeesDict.Value.TryGetValue(id, out var employee) ? employee : null)
+            .Where(e => e != null);
+        return Task.FromResult(employees!);
+    }
+
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         return LoadEmployeesAsync();

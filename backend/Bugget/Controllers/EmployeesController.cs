@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 using Bugget.Authentication;
 using Bugget.BO.Services;
-using Bugget.Entities.Constants;
 using Bugget.Entities.Views;
+using Bugget.Entities.Views.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bugget.Controllers;
@@ -37,5 +36,19 @@ public sealed class EmployeesController(EmployeesService service) : ApiControlle
             depth);
         
         return Ok(new FoundedEmployeesView { Employees = employees, Total = total });
+    }
+
+    /// <summary>
+    /// Получить информацию о пользователях по их идентификаторам
+    /// </summary>
+    [HttpPost("users")]
+    [ProducesResponseType(typeof(IEnumerable<UserView>), 200)]
+    public async Task<IActionResult> GetUserViewsAsync([FromBody] string[] userIds)
+    {
+        if (userIds == null || userIds.Length == 0)
+            return BadRequest();
+
+        var employees = await service.GetUserViewsAsync(userIds);
+        return Ok(employees);
     }
 }
