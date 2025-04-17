@@ -19,7 +19,6 @@ import { ReportStatuses, RequestStates } from "@/const";
 import Dropdown from "@/components/Dropdown/Dropdown";
 import { employeesAutocomplete } from "@/api/employees";
 import { User } from "@/types/user";
-import HeadingSkeleton from "./components/HeadingSkeleton";
 import ParticipantsSkeleton from "./components/ParticipantsSkeleton";
 
 const autocompleteUsers = async (searchString: string) => {
@@ -59,44 +58,46 @@ const ReportHeader = () => {
 
   return (
     <div
-      className={`report-header p-4 mb-3 card card-border shadow-lg border-gray-300 ${
-        reportForm.status === Number(ReportStatuses.READY)
+      className={`report-header p-4 mb-3 card card-border shadow-lg border-gray-300 gap-2 ${
+        reportForm.status === Number(ReportStatuses.READY) &&
+        reportRequestState === RequestStates.DONE
           ? "border-success"
           : ""
       }`}
     >
-      {reportRequestState !== RequestStates.DONE ? (
-        <HeadingSkeleton />
-      ) : (
-        <div className="flex justify-between items-start">
+      <div className="flex justify-between items-center">
+        {reportRequestState !== RequestStates.DONE ? (
+          <div className="skeleton min-h-[40px]" />
+        ) : (
           <span className="text-2xl">
             {!isNewReport ? (
               <>
+                {" "}
                 Репорт <span className="text-gray-300">#{reportForm.id} </span>
               </>
             ) : (
               <span>Новый репорт</span>
             )}
           </span>
+        )}
 
-          {!isNewReport && (
-            <Dropdown
-              className="max-w-[150px]"
-              value={reportForm.status}
-              onChange={(selected) => {
-                setUpdateStatus(Number(selected));
-              }}
-              options={[
-                { label: "Решён", value: ReportStatuses.READY },
-                { label: "В работе", value: ReportStatuses.IN_PROGRESS },
-              ]}
-            />
-          )}
-        </div>
-      )}
+        {!isNewReport && (
+          <Dropdown
+            className="max-w-[150px]"
+            value={reportForm.status}
+            onChange={(selected) => {
+              setUpdateStatus(Number(selected));
+            }}
+            options={[
+              { label: "Решён", value: ReportStatuses.READY },
+              { label: "В работе", value: ReportStatuses.IN_PROGRESS },
+            ]}
+          />
+        )}
+      </div>
       <div>
         <div className="text-xs font-semibold mt-1 mb-1">Заголовок</div>
-        {reportRequestState === RequestStates.PENDING ? (
+        {reportRequestState !== RequestStates.DONE ? (
           <div className="skeleton input w-full" />
         ) : (
           <input
@@ -114,8 +115,8 @@ const ReportHeader = () => {
         <div>
           <div className="text-xs font-semibold mb-1">Ответственный</div>
           <div className="flex gap-4 items-center">
-            {reportRequestState === RequestStates.PENDING ? (
-              <div className="skeleton input shrink-0 min-w-72" />
+            {reportRequestState !== RequestStates.DONE ? (
+              <div className="skeleton input shrink-0 min-w-[288px]" />
             ) : (
               <Autosuggest
                 onSelect={(entity) =>
@@ -128,7 +129,7 @@ const ReportHeader = () => {
               />
             )}
             <div className="participants-wrapper">
-              {reportRequestState === RequestStates.PENDING ? (
+              {reportRequestState !== RequestStates.DONE ? (
                 <ParticipantsSkeleton />
               ) : (
                 !!reportForm.participants?.length &&
