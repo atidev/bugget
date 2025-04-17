@@ -7,6 +7,7 @@ using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
 using Bugget.Entities.Views;
+using Bugget.Entities.Views.Summary;
 
 namespace Bugget.BO.Mappers;
 
@@ -92,9 +93,8 @@ public static class ReportMapper
             Id = reportId,
             Title = report.Title,
             UpdaterUserId = userId,
-            ResponsibleUserId = report.ResponsibleUserId,
-            ParticipantsUserIds = report.ParticipantsUserIds,
-            Status = report.Status
+            Status = report.Status,
+            ResponsibleUserId = report.ResponsibleUserId
         };
     }
 
@@ -186,6 +186,20 @@ public static class ReportMapper
             Skip = skip,
             Take = take,
             Sort = SortOption.Parse(sort)
+        };
+    }
+
+    public static ReportSummaryView ToSummaryView(this ReportDbModel report)
+    {
+        return new ReportSummaryView
+        {
+            Id = report.Id,
+            Title = report.Title,
+            Status = report.Status,
+            ResponsibleUserId = report.ResponsibleUserId,
+            UpdatedAt = report.UpdatedAt,
+            CreatorUserId = report.CreatorUserId,
+            CreatedAt = report.CreatedAt
         };
     }
 }

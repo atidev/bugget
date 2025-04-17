@@ -48,6 +48,7 @@ builder.Services.AddControllers()
 builder.Services.AddAutoMapper(typeof(Bugget.Entities.MappingProfiles.BugMappingProfile).Assembly);
 
 builder.Services.AddFeatures();
+builder.Services.AddSingleton<ResultExceptionHandlerMiddleware>();
 
 builder.Services
     .AddSingleton<ReportsService>()
@@ -105,6 +106,8 @@ app.MapHealthChecks("/_ping");
 
 
 app.UseCors("CorsPolicy");
+
+app.UseMiddleware<ResultExceptionHandlerMiddleware>();
 
 
 app.MapHub<ReportPageHub>("/bugget/public/v1/report-page-hub"); // Подключаем хаб

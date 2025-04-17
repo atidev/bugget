@@ -76,7 +76,7 @@ public sealed class ReportsController(
     public async Task<ReportViewObsolete?> UpdateReportAsync([FromRoute] int reportId, [FromBody] ReportUpdateDto updateDto)
     {
         var user = User.GetIdentity();
-        var report = await reportsService.UpdateReportAsync(updateDto.ToReportUpdate(reportId, user.Id));
+        var report = await reportsService.UpdateReportObsoleteAsync(updateDto.ToReportUpdate(reportId, user.Id));
 
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");

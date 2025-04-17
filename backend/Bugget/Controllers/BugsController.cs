@@ -4,6 +4,7 @@ using Bugget.BO.Services;
 using Bugget.Entities.DTO;
 using Bugget.Entities.DTO.Bug;
 using Bugget.Entities.Views;
+using Bugget.Entities.Views.Bug;
 using Bugget.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -51,5 +52,20 @@ public sealed class BugsController(BugsService bugsService,
             .SendAsync("ReceiveReport");
 
         return updatedBug?.ToView();
+    }
+
+    /// <summary>
+    /// Получить краткую информацию о баге
+    /// </summary>
+    /// <param name="reportId"></param>
+    /// <param name="bugId"></param>
+    /// <returns></returns>
+    [HttpGet("{bugId}/summary")]
+    [ProducesResponseType(typeof(BugSummaryView), 200)]
+    public async Task<BugSummaryView?> GetBugSummaryAsync([FromRoute] int reportId, [FromRoute] int bugId)
+    {
+        var user = User.GetIdentity();
+        var bug = await bugsService.GetBugSummaryAsync(reportId, bugId, user.OrganizationId);
+        return bug?.ToSummaryView();
     }
 } 

@@ -28,4 +28,9 @@ public sealed class BugsService(BugsDbClient bugsDbClient, IMapper mapper)
         }
         return mapper.Map<Bug>(bugDbModel);
     }
+
+    public Task<BugDbModel?> GetBugSummaryAsync(int reportId, int bugId, string? organizationId)
+    {
+        return bugsDbClient.GetBugSummaryAsync(reportId, bugId, organizationId);
+    }
 }

@@ -35,9 +35,21 @@ public sealed class ReportsService(
         return reportsDbClient.GetReportAsync(reportId);
     }
 
-    public async Task<ReportDbModel?> UpdateReportAsync(ReportUpdate report)
+    public async Task<ReportDbModel?> UpdateReportObsoleteAsync(ReportUpdate report)
     {
         var reportDbModel =  await reportsDbClient.UpdateReportAsync(report.ToReportUpdateDbModel());
+
+        if (reportDbModel == null)
+            return null;
+        
+        await featuresService.ExecuteReportUpdatePostActions(new ReportUpdateContext(report, reportDbModel));
+
+        return reportDbModel;
+    }
+
+    public async Task<ReportDbModel?> UpdateReportSummaryAsync(ReportUpdate report, string? organizationId)
+    {
+        var reportDbModel =  await reportsDbClient.UpdateReportSummaryAsync(report.ToReportUpdateDbModel(), organizationId);
 
         if (reportDbModel == null)
             return null;
@@ -55,5 +67,10 @@ public sealed class ReportsService(
     public Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)
     {
         return reportsDbClient.SearchReportsAsync(search);
+    }
+
+    public Task<ReportDbModel?> GetReportSummaryAsync(int reportId, string? organizationId)
+    {
+        return reportsDbClient.GetReportSummaryAsync(reportId, organizationId);
     }
 }

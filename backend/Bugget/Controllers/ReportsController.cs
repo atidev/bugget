@@ -1,12 +1,10 @@
 using Bugget.Authentication;
 using Bugget.BO.Mappers;
 using Bugget.BO.Services;
-using Bugget.DA.Files;
-using Bugget.Entities.BO;
-using Bugget.Entities.BO.ReportBo;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
 using Bugget.Entities.Views;
+using Bugget.Entities.Views.Summary;
 using Bugget.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -68,17 +66,17 @@ public sealed class ReportsController(
     /// <param name="reportId"></param>
     /// <param name="updateDto"></param>
     /// <returns></returns>
-    [HttpPut("{reportId}")]
-    [ProducesResponseType(typeof(ReportView), 200)]
-    public async Task<ReportView?> UpdateReportAsync([FromRoute] int reportId, [FromBody] ReportUpdateDto updateDto)
+    [HttpPut("{reportId}/summary")]
+    [ProducesResponseType(typeof(ReportSummaryView), 200)]
+    public async Task<ReportSummaryView?> UpdateReportSummaryAsync([FromRoute] int reportId, [FromBody] ReportUpdateDto updateDto)
     {
         var user = User.GetIdentity();
-        var report = await reportsService.UpdateReportAsync(updateDto.ToReportUpdate(reportId, user.Id));
+        var report = await reportsService.UpdateReportSummaryAsync(updateDto.ToReportUpdate(reportId, user.Id), user.OrganizationId);
 
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");
 
-        return report?.ToView();
+        return report?.ToSummaryView();
     }
 
     /// <summary>
@@ -111,5 +109,19 @@ public sealed class ReportsController(
                 ));
         
         return searchResult.ToView();
+    }
+
+    /// <summary>
+    /// Получить краткую информацию о репорте
+    /// </summary>
+    /// <param name="reportId"></param>
+    /// <returns></returns>
+    [HttpGet("{reportId}/summary")]
+    [ProducesResponseType(typeof(ReportSummaryView), 200)]
+    public async Task<ReportSummaryView?> GetReportSummaryAsync([FromRoute] int reportId)
+    {
+        var user = User.GetIdentity();
+        var report = await reportsService.GetReportSummaryAsync(reportId, user.OrganizationId);
+        return report?.ToSummaryView();
     }
 } 

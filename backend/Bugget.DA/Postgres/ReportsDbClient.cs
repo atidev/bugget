@@ -86,6 +86,28 @@ public sealed class ReportsDbClient: PostgresClient
             ? Deserialize<ReportDbModel>(jsonResult)
             : null;
     }
+
+    public async Task<ReportDbModel?> UpdateReportSummaryAsync(ReportUpdateDbModel reportDbModel, string? organizationId)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+        
+        var jsonResult = await connection.ExecuteScalarAsync<string>(
+            "SELECT public.update_report_summary(@report_id, @participants,@title, @status, @responsible_user_id, @organization_id);",
+            new
+            {
+                report_id = reportDbModel.Id,
+                participants = reportDbModel.ParticipantsUserIds,
+                title = reportDbModel.Title,
+                status = reportDbModel.Status,
+                responsible_user_id = reportDbModel.ResponsibleUserId,
+                organization_id = organizationId
+            }
+        );
+
+        return jsonResult != null
+            ? Deserialize<ReportDbModel>(jsonResult)
+            : null;
+    }
     
     public async Task<SearchReportsDbModel> SearchReportsObsoleteAsync(SearchReportsObsolete search)
     {
@@ -129,6 +151,17 @@ public sealed class ReportsDbClient: PostgresClient
         );
 
         return Deserialize<SearchReportsDbModel>(jsonResult);
+    }
+    
+    public async Task<ReportDbModel?> GetReportSummaryAsync(int reportId, string? organizationId)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+        var jsonResult = await connection.ExecuteScalarAsync<string>(
+            "SELECT public.get_report_summary(@report_id, @organization_id);",
+            new { report_id = reportId, organization_id = organizationId }
+        );
+
+        return jsonResult != null ? Deserialize<ReportDbModel>(jsonResult) : null;
     }
     
     private T? Deserialize<T>(string json) => JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);

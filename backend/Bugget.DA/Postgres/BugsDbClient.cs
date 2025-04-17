@@ -74,6 +74,17 @@ public sealed class BugsDbClient : PostgresClient
             ? Deserialize<BugDbModel>(jsonResult)
             : null;
     }
+
+    public async Task<BugDbModel?> GetBugSummaryAsync(int reportId, int bugId, string? organizationId)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+        var jsonResult = await connection.ExecuteScalarAsync<string>(
+            "SELECT public.get_bug_summary(@report_id, @bug_id, @organization_id);",
+            new { report_id = reportId, bug_id = bugId, organization_id = organizationId }
+        );
+
+        return jsonResult != null ? Deserialize<BugDbModel>(jsonResult) : null;
+    }
     
     private T? Deserialize<T>(string json) => JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
 }

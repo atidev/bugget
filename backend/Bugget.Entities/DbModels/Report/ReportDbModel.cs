@@ -14,5 +14,5 @@ public sealed class ReportDbModel
     public required DateTimeOffset CreatedAt { get; init; }
     public required DateTimeOffset UpdatedAt { get; init; }
     public required string[] ParticipantsUserIds { get; init; } 
-    public required BugDbModel[] Bugs { get; init; }
+    public required BugDbModel[]? Bugs { get; init; }
 }
