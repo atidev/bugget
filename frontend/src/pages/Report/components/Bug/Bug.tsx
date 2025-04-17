@@ -136,7 +136,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
         bug.status === Number(BugStatuses.READY) ? "border-success" : ""
       }`}
     >
-      <div className="bug-content-wrapper">
+      <div className="gap-2 flex flex-col">
         <div className="flex items-center justify-between">
           {reportRequestState !== RequestStates.DONE ? (
             <div className="skeleton min-h-[2em] min-w-[30%] shrink-0" />
@@ -145,7 +145,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
           )}
 
           {/* Селект статуса (только для существующего бага) */}
-          {!isNewBug && (
+          {!isNewBug && reportRequestState !== RequestStates.PENDING && (
             <Dropdown
               className="max-w-[150px]"
               onChange={(selected) => {
@@ -160,8 +160,11 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               ]}
             />
           )}
+          {reportRequestState !== RequestStates.DONE && (
+            <div className="skeleton min-h-[40px] min-w-[30%] shrink-0" />
+          )}
         </div>
-        <div className="flex grow-1 gap-3">
+        <div className="flex grow-1 gap-2">
           <Result
             title="Фактический результат"
             value={isNewBug ? newBugData.receive : bug?.receive || ""}

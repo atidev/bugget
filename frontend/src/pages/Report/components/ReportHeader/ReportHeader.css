@@ -8,7 +8,6 @@ textarea.issue-description {
 }
 
 .report-header {
-  gap: 8px;
   display: flex;
   flex-direction: column;
 }

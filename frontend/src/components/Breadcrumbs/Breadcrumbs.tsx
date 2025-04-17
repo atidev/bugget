@@ -5,7 +5,7 @@ type Props = {
 };
 
 const Breadcrumbs = ({ breadcrumbs }: Props) => (
-  <div className={`breadcrumbs text-sm mx-4 min-h-[32px] py-4`}>
+  <div className={`breadcrumbs text-sm mx-4 min-h-[52px] py-4`}>
     <ul>
       {breadcrumbs.map((breadcrumb) => {
         return (
