@@ -8,7 +8,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Bugget.Features\Bugget.Features.csproj" />
-        <ProjectReference Include="..\Result\Result.csproj" />
+        <ProjectReference Include="..\Monade\Monade.csproj" />
     </ItemGroup>
     
 </Project>

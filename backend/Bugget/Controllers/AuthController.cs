@@ -1,8 +1,6 @@
 using Bugget.Authentication;
 using Bugget.DA.Files;
-using Bugget.Entities.Adapters;
-using Bugget.Entities.Constants;
-using Bugget.Entities.Views;
+using Bugget.Entities.Mappers;
 using Bugget.Entities.Views.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +26,7 @@ public sealed class AuthController(EmployeesDataAccess employeesDataAccess) : Ap
         return Ok(new UserAuthView
         {
             Id = employee.Id,
-            Name = EmployeeAdapter.Transform(employee).Name,
+            Name = EmployeesMapper.Transform(employee).Name,
             TeamId = employee.TeamId
         });
     }

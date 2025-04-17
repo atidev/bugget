@@ -1,16 +1,16 @@
-using Bugget.BO.Mappers;
 using Bugget.DA.Postgres;
 using Bugget.Entities.BO;
 using Bugget.Entities.BO.BugBo;
 using Bugget.Entities.DbModels.Comment;
+using Bugget.Entities.Mappers;
 
 namespace Bugget.BO.Services;
 
 public sealed class CommentsService(CommentsDbClient commentsDbClient)
 {
-    public Task<CommentDbModel?> CreateCommentAsync(Comment comment)
+    public Task<CommentDbModel?> CreateCommentAsync(CommentCreateDbModel comment)
     {
-        return commentsDbClient.CreateCommentAsync(comment.ToCommentCreateDbModel());
+        return commentsDbClient.CreateCommentAsync(comment);
     }
 
     public Task<CommentDbModel[]> ListCommentsAsync(int reportId, int bugId)

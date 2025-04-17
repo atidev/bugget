@@ -1,7 +1,7 @@
 using Bugget.Authentication;
-using Bugget.BO.Mappers;
 using Bugget.BO.Services;
 using Bugget.Entities.DTO;
+using Bugget.Entities.Mappers;
 using Bugget.Entities.Views;
 using Bugget.Hubs;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +31,7 @@ public sealed class CommentsController(
     public async Task<IActionResult> CreateCommentAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromBody] CommentDto createDto)
     {
         var user = User.GetIdentity();
-        var comment = await commentsService.CreateCommentAsync(createDto.ToComment(bugId, reportId, user.Id));
+        var comment = await commentsService.CreateCommentAsync(createDto.ToCommentCreateDbModel(user.Id, bugId, reportId));
         
         if (comment == null)
         {

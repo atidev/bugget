@@ -1,21 +1,19 @@
-using Bugget.Entities.Adapters;
 using Bugget.Entities.BO;
-using Bugget.Entities.Constants;
 using Bugget.Entities.DbModels.Comment;
 using Bugget.Entities.DTO;
 using Bugget.Entities.Views;
 
-namespace Bugget.BO.Mappers;
+namespace Bugget.Entities.Mappers;
 
 public static class CommentMapper
 {
-    public static CommentCreateDbModel ToCommentCreateDbModel(this Comment comment)
+    public static CommentCreateDbModel ToCommentCreateDbModel(this CommentDto comment, string userId, int bugId, int reportId)
     {
         return new CommentCreateDbModel
         {
-            CreatorUserId = comment.CreatorUserId,
-            BugId = comment.BugId,
-            ReportId = comment.ReportId,
+            ReportId = reportId,
+            CreatorUserId = userId,
+            BugId = bugId,
             Text = comment.Text
         };
     }
@@ -37,8 +35,8 @@ public static class CommentMapper
         {
             Id = comment.Id,
             Creator = employeesDict.TryGetValue(comment.CreatorUserId, out var e)
-                ? EmployeeAdapter.ToUserView(e)
-                : EmployeeAdapter.ToUserView(comment.CreatorUserId),
+                ? EmployeesMapper.ToUserView(e)
+                : EmployeesMapper.ToUserView(comment.CreatorUserId),
             BugId = comment.BugId,
             Text = comment.Text,
             CreatedAt = comment.CreatedAt,

@@ -8,6 +8,7 @@ using Bugget.Entities.Config;
 using Bugget.Features;
 using Bugget.Features.TaskQueue;
 using Bugget.Hubs;
+using Bugget.Middlewares;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,8 +45,6 @@ builder.Services.Configure<FileStorageConfiguration>(
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = SnakeCaseNamingPolicy.Instance; });
-
-builder.Services.AddAutoMapper(typeof(Bugget.Entities.MappingProfiles.BugMappingProfile).Assembly);
 
 builder.Services.AddFeatures();
 builder.Services.AddSingleton<ResultExceptionHandlerMiddleware>();

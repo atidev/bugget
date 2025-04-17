@@ -1,10 +1,11 @@
 using Bugget.Authentication;
-using Bugget.BO.Mappers;
 using Bugget.BO.Services;
 using Bugget.Entities.DTO;
 using Bugget.Entities.DTO.Bug;
+using Bugget.Entities.Mappers;
 using Bugget.Entities.Views;
 using Bugget.Entities.Views.Bug;
+using Bugget.Extensions;
 using Bugget.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -30,28 +31,28 @@ public sealed class BugsController(BugsService bugsService,
     public async Task<BugView?> CreateBugAsync([FromRoute] int reportId, [FromBody] BugDto createDto)
     {
         var user = User.GetIdentity();
-        var createdBug = await bugsService.CreateBugAsync(createDto.ToBug(reportId, user.Id));
-        return createdBug?.ToView();
+        var createdBug = await bugsService.CreateBugAsync(createDto.ToBug(reportId, user.Id), user.OrganizationId);
+        return createdBug.ToView();
     }
     
     /// <summary>
-    /// Изменить баг
+    /// Изменить краткую информацию о баге
     /// </summary>
     /// <param name="reportId"></param>
     /// <param name="bugId"></param>
     /// <param name="updateDto"></param>
     /// <returns></returns>
-    [HttpPut("{bugId}")]
-    [ProducesResponseType(typeof(BugView), 200)]
-    public async Task<BugView?> UpdateBugAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromBody] BugUpdateDto updateDto)
+    [HttpPut("{bugId}/summary")]
+    [ProducesResponseType(typeof(BugSummaryView), 200)]
+    public async Task<BugSummaryView?> UpdateBugSummaryAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromBody] BugUpdateSummaryDto updateDto)
     {
         var user = User.GetIdentity();
-        var updatedBug = await bugsService.UpdateBugAsync(updateDto.ToBugUpdate(reportId, bugId, user.Id));
+        var updatedBug = await bugsService.UpdateBugSummaryAsync(updateDto.ToBugUpdateSummary(reportId, bugId, user.Id), user.OrganizationId);
         
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");
 
-        return updatedBug?.ToView();
+        return updatedBug.ToSummaryView();
     }
 
     /// <summary>
@@ -62,10 +63,10 @@ public sealed class BugsController(BugsService bugsService,
     /// <returns></returns>
     [HttpGet("{bugId}/summary")]
     [ProducesResponseType(typeof(BugSummaryView), 200)]
-    public async Task<BugSummaryView?> GetBugSummaryAsync([FromRoute] int reportId, [FromRoute] int bugId)
+    public Task<IResult> GetBugSummaryAsync([FromRoute] int reportId, [FromRoute] int bugId)
     {
         var user = User.GetIdentity();
-        var bug = await bugsService.GetBugSummaryAsync(reportId, bugId, user.OrganizationId);
-        return bug?.ToSummaryView();
+        return bugsService.GetBugSummaryAsync(reportId, bugId, user.OrganizationId)
+        .AsResultAsync(BugMapper.ToSummaryView);
     }
 } 

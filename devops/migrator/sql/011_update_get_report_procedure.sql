@@ -2,7 +2,7 @@
 DROP FUNCTION IF EXISTS public.get_report(integer);
 
 -- Create updated get_report procedure with new fields
-CREATE OR REPLACE FUNCTION public.get_report(_report_id INT)
+CREATE OR REPLACE FUNCTION public.get_report(_report_id INT, _organization_id TEXT DEFAULT NULL)
     RETURNS JSONB
     LANGUAGE plpgsql
 AS
@@ -63,7 +63,8 @@ BEGIN
            )
     INTO result
     FROM public.reports r
-    WHERE r.id = _report_id;
+    WHERE r.id = _report_id
+    AND (_organization_id IS NULL OR r.creator_organization_id = _organization_id);
 
     RETURN result;
 END;

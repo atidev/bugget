@@ -1,13 +1,11 @@
 using Bugget.Authentication;
-using Bugget.BO.Mappers;
 using Bugget.BO.Services;
 using Bugget.DA.Files;
-using Bugget.Entities.BO;
-using Bugget.Entities.BO.ReportBo;
-using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
 using Bugget.Entities.Views;
 using Bugget.Hubs;
+using Bugget.Entities.Mappers;
+using Bugget.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -59,10 +57,10 @@ public sealed class ReportsController(
     /// <returns></returns>
     [HttpGet("{reportId}")]
     [ProducesResponseType(typeof(ReportViewObsolete), 200)]
-    public async Task<ReportViewObsolete?> GetReportAsync([FromRoute] int reportId)
+    public Task<IResult> GetReportAsync([FromRoute] int reportId)
     {
-        var report = await reportsService.GetReportAsync(reportId);
-        return report?.ToViewObsolete(employeesDataAccess.DictEmployees());
+        var user = User.GetIdentity();
+        return reportsService.GetReportAsync(reportId, user.OrganizationId).AsResultAsync(r => r.ToViewObsolete(employeesDataAccess.DictEmployees()));
     }
 
     /// <summary>
@@ -111,7 +109,7 @@ public sealed class ReportsController(
                 take,
                 employeesDataAccess.DictByTeamEmployees()
                 ));
-        
+
         return searchResult.ToViewObsolete(employeesDataAccess.DictEmployees());
     }
 }

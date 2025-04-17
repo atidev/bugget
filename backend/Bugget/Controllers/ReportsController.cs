@@ -1,13 +1,13 @@
 using Bugget.Authentication;
-using Bugget.BO.Mappers;
 using Bugget.BO.Services;
-using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
 using Bugget.Entities.Views;
 using Bugget.Entities.Views.Summary;
 using Bugget.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Bugget.Entities.Mappers;
+using Bugget.Extensions;
 
 namespace Bugget.Controllers;
 
@@ -53,15 +53,15 @@ public sealed class ReportsController(
     /// <param name="reportId"></param>
     /// <returns></returns>
     [HttpGet("{reportId}")]
-    [ProducesResponseType(typeof(ReportDbModel), 200)]
-    public async Task<ReportView?> GetReportAsync([FromRoute] int reportId)
+    [ProducesResponseType(typeof(ReportView), 200)]
+    public Task<IResult> GetReportAsync([FromRoute] int reportId)
     {
-        var report = await reportsService.GetReportAsync(reportId);
-        return report?.ToView();
+        var user = User.GetIdentity();
+        return reportsService.GetReportAsync(reportId, user.OrganizationId).AsResultAsync(ReportMapper.ToView);
     }
 
     /// <summary>
-    /// Изменить репорт
+    /// Изменить краткую информацию о репорте
     /// </summary>
     /// <param name="reportId"></param>
     /// <param name="updateDto"></param>
@@ -76,7 +76,7 @@ public sealed class ReportsController(
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");
 
-        return report?.ToSummaryView();
+        return report.ToSummaryView();
     }
 
     /// <summary>
@@ -107,7 +107,7 @@ public sealed class ReportsController(
                 skip,
                 take
                 ));
-        
+
         return searchResult.ToView();
     }
 
@@ -118,10 +118,10 @@ public sealed class ReportsController(
     /// <returns></returns>
     [HttpGet("{reportId}/summary")]
     [ProducesResponseType(typeof(ReportSummaryView), 200)]
-    public async Task<ReportSummaryView?> GetReportSummaryAsync([FromRoute] int reportId)
+    public Task<IResult> GetReportSummaryAsync([FromRoute] int reportId)
     {
         var user = User.GetIdentity();
-        var report = await reportsService.GetReportSummaryAsync(reportId, user.OrganizationId);
-        return report?.ToSummaryView();
+        return reportsService.GetReportSummaryAsync(reportId, user.OrganizationId)
+        .AsResultAsync(ReportMapper.ToSummaryView);
     }
-} 
+}

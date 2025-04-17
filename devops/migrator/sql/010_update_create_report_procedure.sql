@@ -7,8 +7,8 @@ CREATE OR REPLACE FUNCTION public.create_report(
     _status integer,
     _responsible_user_id text,
     _creator_user_id text,
-    _creator_team_id text,
-    _creator_organization_id text,
+    _creator_team_id text DEFAULT NULL,
+    _creator_organization_id text DEFAULT NULL,
     _participants text[],
     _bugs_json jsonb
 ) RETURNS jsonb
@@ -88,7 +88,7 @@ BEGIN
     END LOOP;
 
     -- Get full report with all relations
-    SELECT public.get_report(_report_id) INTO _result;
+    SELECT public.get_report(_report_id, _creator_organization_id) INTO _result;
 
     RETURN _result;
 END;

@@ -26,6 +26,11 @@ public class Employee
     /// Идентификатор организации
     /// </summary>
     public string? OrganizationId { get; init; }
+
+    /// <summary>
+    /// Идентификатор организации
+    /// </summary>
+    public string? PhotoUrl { get; init; }
     
     /// <summary>
     /// Глубина пользователя в иерархии компании

@@ -1,10 +1,12 @@
-using Bugget.BO.Mappers;
 using Bugget.DA.Postgres;
 using Bugget.Entities.BO.ReportBo;
 using Bugget.Entities.BO.Search;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Features;
 using Bugget.Features.Context;
+using Bugget.BO.Errors;
+using Bugget.Entities.Mappers;
+using Monade;
 
 namespace Bugget.BO.Services;
 
@@ -12,13 +14,9 @@ public sealed class ReportsService(
     ReportsDbClient reportsDbClient,
     FeaturesService featuresService)
 {
-    public async Task<ReportDbModel?> CreateReportAsync(Report report)
+    public async Task<ReportDbModel> CreateReportAsync(Report report)
     {
         var reportDbModel = await reportsDbClient.CreateReportAsync(report.ToReportDbModel());
-        if (reportDbModel == null)
-        {
-            return null;
-        }
 
         await featuresService.ExecuteReportCreatePostActions(new ReportCreateContext(report, reportDbModel));
 
@@ -30,9 +28,15 @@ public sealed class ReportsService(
         return reportsDbClient.ListReportsAsync(userId);
     }
 
-    public Task<ReportDbModel?> GetReportAsync(int reportId)
+    public async Task<MonadeStruct<ReportDbModel>> GetReportAsync(int reportId, string? organizationId)
     {
-        return reportsDbClient.GetReportAsync(reportId);
+        var report = await reportsDbClient.GetReportAsync(reportId, organizationId);
+        if (report == null)
+        {
+            return new MonadeStruct<ReportDbModel>(BoErrors.ReportNotFoundError);
+        }
+
+        return report;
     }
 
     public async Task<ReportDbModel?> UpdateReportObsoleteAsync(ReportUpdate report)
@@ -47,12 +51,9 @@ public sealed class ReportsService(
         return reportDbModel;
     }
 
-    public async Task<ReportDbModel?> UpdateReportSummaryAsync(ReportUpdate report, string? organizationId)
+    public async Task<ReportDbModel> UpdateReportSummaryAsync(ReportUpdate report, string? organizationId)
     {
         var reportDbModel =  await reportsDbClient.UpdateReportSummaryAsync(report.ToReportUpdateDbModel(), organizationId);
-
-        if (reportDbModel == null)
-            return null;
         
         await featuresService.ExecuteReportUpdatePostActions(new ReportUpdateContext(report, reportDbModel));
 
@@ -69,8 +70,14 @@ public sealed class ReportsService(
         return reportsDbClient.SearchReportsAsync(search);
     }
 
-    public Task<ReportDbModel?> GetReportSummaryAsync(int reportId, string? organizationId)
+    public async Task<MonadeStruct<ReportDbModel>> GetReportSummaryAsync(int reportId, string? organizationId)
     {
-        return reportsDbClient.GetReportSummaryAsync(reportId, organizationId);
+        var report = await reportsDbClient.GetReportSummaryAsync(reportId, organizationId);
+        if (report == null)
+        {
+            return new MonadeStruct<ReportDbModel>(BoErrors.ReportNotFoundError);
+        }
+
+        return report;
     }
 }

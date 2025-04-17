@@ -8,7 +8,7 @@ globs: backend/**/*.cs
 
 # Your rule content
 
-- Bugget.Entities — DTO, BO, DbModels, Views, MappingProfiles
+- Bugget.Entities — DTO, BO, DbModels, Views
 - Bugget.DA — доступ к данным (PostgreSQL, Files)
 - Bugget.BO — бизнес-логика
 - Bugget.Features — сквозные фичи (например, уведомления)

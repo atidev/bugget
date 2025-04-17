@@ -9,7 +9,7 @@
 ### Backend (`/backend`)
 
 На .NET (ASP.NET), структура слоями:
-- `Bugget.Entities` — DTO, BO, DbModels, Views, MappingProfiles
+- `Bugget.Entities` — DTO, BO, DbModels, Views
 - `Bugget.DA` — доступ к данным (PostgreSQL, Files)
 - `Bugget.BO` — бизнес-логика
 - `Bugget.Features` — сквозные фичи (например, уведомления)
@@ -67,11 +67,10 @@
 
 1. DTO: `ReportDto`, `ReportUpdateDto`
 2. DbModel: `ReportDbModel`, `ReportUpdateDbModel`
-3. MappingProfiles: `ReportMappingProfile`
-4. View: `ReportView`
-5. Сервис: `ReportsService.cs`
-6. Контроллер: `ReportsController.cs`
-7. Frontend: `src/types/report.ts`, `src/api/reports/index.ts`, `src/pages/Report/...`
+3. View: `ReportView`
+4. Сервис: `ReportsService.cs`
+5. Контроллер: `ReportsController.cs`
+6. Frontend: `src/types/report.ts`, `src/api/reports/index.ts`, `src/pages/Report/...`
 
 ---
 

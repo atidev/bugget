@@ -1,8 +1,8 @@
 using Bugget.Authentication;
-using Bugget.BO.Mappers;
 using Bugget.BO.Services;
 using Bugget.Entities.DTO;
 using Bugget.Entities.DTO.Bug;
+using Bugget.Entities.Mappers;
 using Bugget.Entities.Views;
 using Bugget.Hubs;
 using Microsoft.AspNetCore.Mvc;
@@ -30,8 +30,8 @@ public sealed class BugsController(BugsService bugsService,
     public async Task<BugViewObsolete?> CreateBugAsync([FromRoute] int reportId, [FromBody] BugDto createDto)
     {
         var user = User.GetIdentity();
-        var createdBug = await bugsService.CreateBugAsync(createDto.ToBug(reportId, user.Id));
-        return createdBug?.ToViewObsolete(employeesService.DictEmployees());
+        var createdBug = await bugsService.CreateBugAsync(createDto.ToBug(reportId, user.Id), user.OrganizationId);
+        return createdBug.ToViewObsolete(employeesService.DictEmployees());
     }
     
     /// <summary>
@@ -43,10 +43,10 @@ public sealed class BugsController(BugsService bugsService,
     /// <returns></returns>
     [HttpPut("{bugId}")]
     [ProducesResponseType(typeof(BugViewObsolete), 200)]
-    public async Task<BugViewObsolete?> UpdateBugAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromBody] BugUpdateDto updateDto)
+    public async Task<BugViewObsolete?> UpdateBugAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromBody] BugUpdateSummaryDto updateDto)
     {
         var user = User.GetIdentity();
-        var updatedBug = await bugsService.UpdateBugAsync(updateDto.ToBugUpdate(reportId, bugId, user.Id));
+        var updatedBug = await bugsService.UpdateBugAsync(updateDto.ToBugUpdateSummary(reportId, bugId, user.Id), user.OrganizationId);
         
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");

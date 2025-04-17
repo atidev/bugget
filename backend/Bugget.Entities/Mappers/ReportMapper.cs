@@ -1,4 +1,3 @@
-using Bugget.Entities.Adapters;
 using Bugget.Entities.BO;
 using Bugget.Entities.BO.ReportBo;
 using Bugget.Entities.BO.Search;
@@ -9,7 +8,7 @@ using Bugget.Entities.DTO.Report;
 using Bugget.Entities.Views;
 using Bugget.Entities.Views.Summary;
 
-namespace Bugget.BO.Mappers;
+namespace Bugget.Entities.Mappers;
 
 public static class ReportMapper
 {
@@ -21,17 +20,17 @@ public static class ReportMapper
             Title = report.Title,
             Status = report.Status,
             Responsible = employeesDict.TryGetValue(report.ResponsibleUserId, out var er)
-                ? EmployeeAdapter.ToUserView(er)
-                : EmployeeAdapter.ToUserView(report.ResponsibleUserId),
+                ? EmployeesMapper.ToUserView(er)
+                : EmployeesMapper.ToUserView(report.ResponsibleUserId),
             Creator = employeesDict.TryGetValue(report.CreatorUserId, out var ec)
-                ? EmployeeAdapter.ToUserView(ec)
-                : EmployeeAdapter.ToUserView(report.CreatorUserId),
+                ? EmployeesMapper.ToUserView(ec)
+                : EmployeesMapper.ToUserView(report.CreatorUserId),
             CreatedAt = report.CreatedAt,
             UpdatedAt = report.UpdatedAt,
             Participants = report.ParticipantsUserIds.Select(p =>
                 employeesDict.TryGetValue(p, out var e)
-                    ? EmployeeAdapter.ToUserView(e)
-                    : EmployeeAdapter.ToUserView(p)).ToArray(),
+                    ? EmployeesMapper.ToUserView(e)
+                    : EmployeesMapper.ToUserView(p)).ToArray(),
             Bugs = report.Bugs.Select(b => b.ToViewObsolete(employeesDict)).ToArray()
         };
     }
@@ -50,7 +49,7 @@ public static class ReportMapper
             CreatedAt = report.CreatedAt,
             UpdatedAt = report.UpdatedAt,
             ParticipantsUserIds = report.ParticipantsUserIds,
-            Bugs = report.Bugs.Select(b => b.ToView()).ToArray()
+            Bugs = report.Bugs!.Select(b => b.ToView()).ToArray()
         };
     }
 
@@ -72,17 +71,23 @@ public static class ReportMapper
         };
     }
 
-    public static Report ToReport(this ReportCreateDto report, string userId, string? teamId, string? organizationId)
+    public static Report ToReport(this ReportCreateDto report, string userId, string? organizationId, string? teamId)
     {
         return new Report
         {
             Title = report.Title,
+            ResponsibleUserId = report.ResponsibleId,
             CreatorUserId = userId,
-            CreatorTeamId = teamId,
             CreatorOrganizationId = organizationId,
-            ResponsibleUserId = report.ResponsibleUserId,
-            ParticipantsUserIds = report.ParticipantsUserIds,
-            Status = report.Status
+            CreatorTeamId = teamId,
+            Bugs = report.Bugs.Select(b => new Bug
+                {
+                    Receive = b.Receive,
+                    Expect = b.Expect,
+                    CreatorUserId = userId,
+                })
+                .ToArray(),
+            ParticipantsUserIds = new string[] { userId, report.ResponsibleId }.Distinct().ToArray()
         };
     }
 
@@ -106,7 +111,6 @@ public static class ReportMapper
             Status = report.Status,
             ResponsibleUserId = report.ResponsibleUserId,
             CreatorUserId = report.CreatorUserId,
-            CreatorTeamId = report.CreatorTeamId,
             CreatorOrganizationId = report.CreatorOrganizationId,
             ParticipantsUserIds = report.ParticipantsUserIds,
             Bugs = report.Bugs.Select(b => new BugCreateDbModel

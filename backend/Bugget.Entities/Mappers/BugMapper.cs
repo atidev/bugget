@@ -1,4 +1,3 @@
-using Bugget.Entities.Adapters;
 using Bugget.Entities.BO;
 using Bugget.Entities.BO.BugBo;
 using Bugget.Entities.DbModels.Bug;
@@ -7,7 +6,7 @@ using Bugget.Entities.DTO.Bug;
 using Bugget.Entities.Views;
 using Bugget.Entities.Views.Bug;
 
-namespace Bugget.BO.Mappers;
+namespace Bugget.Entities.Mappers;
 
 public static class BugMapper
 {
@@ -57,8 +56,8 @@ public static class BugMapper
             Receive = bug.Receive,
             Expect = bug.Expect,
             Creator = employeesDict.TryGetValue(bug.CreatorUserId, out var e)
-                ? EmployeeAdapter.ToUserView(e)
-                : EmployeeAdapter.ToUserView(bug.CreatorUserId),
+                ? EmployeesMapper.ToUserView(e)
+                : EmployeesMapper.ToUserView(bug.CreatorUserId),
             CreatedAt = bug.CreatedAt,
             UpdatedAt = bug.UpdatedAt,
             Status = bug.Status,
@@ -102,7 +101,7 @@ public static class BugMapper
         };
     }
 
-    public static BugUpdate ToBugUpdate(this BugUpdateDto bugUpdateDto, int reportId, int bugId, string userId)
+    public static BugUpdate ToBugUpdateSummary(this BugUpdateSummaryDto bugUpdateDto, int reportId, int bugId, string userId)
     {
         return new BugUpdate
         {

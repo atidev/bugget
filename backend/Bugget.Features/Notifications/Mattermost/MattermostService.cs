@@ -1,5 +1,5 @@
 using Bugget.DA.Files;
-using Bugget.Entities.Adapters;
+using Bugget.Entities.Mappers;
 using Bugget.Features.Context;
 using Bugget.Features.Interfaces;
 
@@ -20,7 +20,7 @@ public sealed class MattermostService(
             return Task.CompletedTask;
 
         var message = ReportMessageBuilder.GetYourResponsibleInNewReportMessage(
-            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, EmployeeAdapter.Transform(creatorEmployee).Name
+            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, EmployeesMapper.Transform(creatorEmployee).Name
         );
 
         return mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
@@ -41,7 +41,7 @@ public sealed class MattermostService(
             return Task.CompletedTask;
 
         var message = ReportMessageBuilder.GetYourResponsibleInExistReportMessage(
-            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, EmployeeAdapter.Transform(updaterEmployee).Name
+            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, EmployeesMapper.Transform(updaterEmployee).Name
         );
 
         return mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);

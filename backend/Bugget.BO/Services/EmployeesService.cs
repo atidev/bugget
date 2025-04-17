@@ -1,8 +1,7 @@
 using Bugget.DA.Files;
 using Bugget.DA.Interfaces;
-using Bugget.Entities.Adapters;
 using Bugget.Entities.BO;
-using Bugget.Entities.Constants;
+using Bugget.Entities.Mappers;
 using Bugget.Entities.Views;
 using Bugget.Entities.Views.Users;
 
@@ -25,7 +24,7 @@ public class EmployeesService(EmployeesDataAccess employeesDataAccess, IEmployee
         var foundedUsers = employeesDataAccess.ListEmployees()
             // текущая глубина + 1
             .Where(e => user.Depth == null || e.Depth >= user.Depth - depth)
-            .Select(EmployeeAdapter.Transform)
+            .Select(EmployeesMapper.Transform)
             .Where(v => v.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             .OrderBy(v => v.Name.IndexOf(searchString, StringComparison.OrdinalIgnoreCase))
             .ThenBy(v => v.Name)
@@ -61,9 +60,9 @@ public class EmployeesService(EmployeesDataAccess employeesDataAccess, IEmployee
         return employeesDataAccess.DictEmployees();
     }
 
-    public async Task<IEnumerable<UserView>> GetUserViewsAsync(IEnumerable<string> userIds)
+    public async Task<IEnumerable<UserView>> GetUserViewsAsync(IEnumerable<string> userIds, string? organizationId)
     {
-        var employees = await employeesClient.GetEmployeesAsync(userIds);
-        return employees.Select(e => new UserView { Id = e.Id, Name = e.Name ?? string.Empty });
+        var employees = await employeesClient.GetEmployeesAsync(userIds, organizationId);
+        return employees.Select(e => new UserView { Id = e.Id, Name = e.Name, PhotoUrl = e.PhotoUrl });
     }
 }

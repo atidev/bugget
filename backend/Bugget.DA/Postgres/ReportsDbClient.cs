@@ -11,12 +11,12 @@ public sealed class ReportsDbClient: PostgresClient
     /// <summary>
     /// Получает отчет по ID.
     /// </summary>
-    public async Task<ReportDbModel?> GetReportAsync(int reportId)
+    public async Task<ReportDbModel?> GetReportAsync(int reportId, string? organizationId)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
         var jsonResult = await connection.ExecuteScalarAsync<string>(
-            "SELECT public.get_report(@report_id);",
-            new { report_id = reportId }
+            "SELECT public.get_report(@report_id, @organization_id);",
+            new { report_id = reportId, organization_id = organizationId }
         );
 
         return jsonResult != null ? Deserialize<ReportDbModel>(jsonResult) : null;
@@ -39,7 +39,7 @@ public sealed class ReportsDbClient: PostgresClient
     /// <summary>
     /// Создает новый отчет и возвращает его полную структуру.
     /// </summary>
-    public async Task<ReportDbModel?> CreateReportAsync(ReportCreateDbModel reportDbModel)
+    public async Task<ReportDbModel> CreateReportAsync(ReportCreateDbModel reportDbModel)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
 
@@ -54,16 +54,13 @@ public sealed class ReportsDbClient: PostgresClient
                 status = reportDbModel.Status,
                 responsible_user_id = reportDbModel.ResponsibleUserId,
                 creator_user_id = reportDbModel.CreatorUserId,
-                creator_team_id = reportDbModel.CreatorTeamId,
                 creator_organization_id = reportDbModel.CreatorOrganizationId,
                 participants = reportDbModel.ParticipantsUserIds,
                 bugs_json = bugsJson
             }
         );
 
-        return jsonResult != null
-            ? Deserialize<ReportDbModel>(jsonResult)
-            : null;
+        return Deserialize<ReportDbModel>(jsonResult!)!;
     }
     
     public async Task<ReportDbModel?> UpdateReportAsync(ReportUpdateDbModel reportDbModel)
@@ -87,7 +84,7 @@ public sealed class ReportsDbClient: PostgresClient
             : null;
     }
 
-    public async Task<ReportDbModel?> UpdateReportSummaryAsync(ReportUpdateDbModel reportDbModel, string? organizationId)
+    public async Task<ReportDbModel> UpdateReportSummaryAsync(ReportUpdateDbModel reportDbModel, string? organizationId)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
         
@@ -104,9 +101,7 @@ public sealed class ReportsDbClient: PostgresClient
             }
         );
 
-        return jsonResult != null
-            ? Deserialize<ReportDbModel>(jsonResult)
-            : null;
+        return Deserialize<ReportDbModel>(jsonResult!)!;
     }
     
     public async Task<SearchReportsDbModel> SearchReportsObsoleteAsync(SearchReportsObsolete search)

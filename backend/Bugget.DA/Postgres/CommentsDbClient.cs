@@ -1,12 +1,6 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Bugget.Entities.Config;
-using Bugget.Entities.DbModels;
-using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DbModels.Comment;
 using Dapper;
-using Microsoft.Extensions.Options;
-using Npgsql;
 
 namespace Bugget.DA.Postgres;
 

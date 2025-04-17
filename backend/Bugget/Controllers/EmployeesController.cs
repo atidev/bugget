@@ -48,7 +48,8 @@ public sealed class EmployeesController(EmployeesService service) : ApiControlle
         if (userIds == null || userIds.Length == 0)
             return BadRequest();
 
-        var employees = await service.GetUserViewsAsync(userIds);
+        var user = User.GetIdentity();
+        var employees = await service.GetUserViewsAsync(userIds, user.OrganizationId);
         return Ok(employees);
     }
 }

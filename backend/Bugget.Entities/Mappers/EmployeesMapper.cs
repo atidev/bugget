@@ -3,9 +3,9 @@ using Bugget.Entities.BO;
 using Bugget.Entities.Views;
 using Bugget.Entities.Views.Users;
 
-namespace Bugget.Entities.Adapters;
+namespace Bugget.Entities.Mappers;
 
-public static class EmployeeAdapter
+public static class EmployeesMapper
 {
     public static EmployeeView Transform(EmployeeObsolete e)
     {

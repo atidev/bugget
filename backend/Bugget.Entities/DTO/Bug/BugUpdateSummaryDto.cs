@@ -1,6 +1,6 @@
 namespace Bugget.Entities.DTO.Bug;
 
-public sealed class BugUpdateDto
+public sealed class BugUpdateSummaryDto
 {
     public string? Receive { get; init; }
     public string? Expect { get; init; }

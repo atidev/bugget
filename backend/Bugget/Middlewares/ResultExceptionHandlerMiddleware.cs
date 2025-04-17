@@ -1,7 +1,9 @@
 using System.Net;
+using Monade;
+using Monade.Errors;
 using Npgsql;
-using Result;
-using Result.Errors;
+
+namespace Bugget.Middlewares;
 
 public class ResultExceptionHandlerMiddleware : IMiddleware
 {

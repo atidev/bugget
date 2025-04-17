@@ -1,3 +1,3 @@
-namespace Result;
+namespace Monade;
 
 public abstract record Error;

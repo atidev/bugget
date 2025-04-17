@@ -1,36 +1,33 @@
-using AutoMapper;
-using Bugget.BO.Mappers;
+using Bugget.BO.Errors;
 using Bugget.DA.Postgres;
 using Bugget.Entities.BO;
 using Bugget.Entities.BO.BugBo;
 using Bugget.Entities.DbModels.Bug;
+using Bugget.Entities.Mappers;
+using Monade;
 
 namespace Bugget.BO.Services;
 
-public sealed class BugsService(BugsDbClient bugsDbClient, IMapper mapper)
+public sealed class BugsService(BugsDbClient bugsDbClient)
 {
-    public Task<BugDbModel?> CreateBugAsync(Bug bug)
+    public Task<BugDbModel> CreateBugAsync(Bug bug, string? organizationId)
     {
-        return bugsDbClient.CreateBugAsync(bug.ToBugCreateDbModel());
+        return bugsDbClient.CreateBugAsync(bug.ToBugCreateDbModel(), organizationId);
     }
 
-    public Task<BugDbModel?> UpdateBugAsync(BugUpdate bug)
+    public Task<BugDbModel> UpdateBugAsync(BugUpdate bug, string? organizationId)
     {
-        return bugsDbClient.UpdateBugAsync(bug.ToBugUpdateDbModel());
-    }
-    
-    public async Task<Bug> GetBugAsync(int bugId)
-    {
-        var bugDbModel = await bugsDbClient.GetBugAsync(bugId);
-        if (bugDbModel == null)
-        {
-            throw new Exception("Bug doesn't exist");
-        }
-        return mapper.Map<Bug>(bugDbModel);
+        return bugsDbClient.UpdateBugObsoleteAsync(bug.ToBugUpdateDbModel(), organizationId);
     }
 
-    public Task<BugDbModel?> GetBugSummaryAsync(int reportId, int bugId, string? organizationId)
+    public Task<BugDbModel> UpdateBugSummaryAsync(BugUpdate bug, string? organizationId)
     {
-        return bugsDbClient.GetBugSummaryAsync(reportId, bugId, organizationId);
+        return bugsDbClient.UpdateBugSummaryAsync(bug.ToBugUpdateDbModel(), organizationId);
+    }
+
+    public async Task<MonadeStruct<BugDbModel>> GetBugSummaryAsync(int reportId, int bugId, string? organizationId)
+    {
+        var bug = await bugsDbClient.GetBugSummaryAsync(reportId, bugId, organizationId);
+        return bug is null ? BoErrors.BugNotFoundError : bug;
     }
 }

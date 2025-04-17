@@ -1,17 +1,17 @@
-using AutoMapper;
 using Bugget.DA.Postgres;
 using Bugget.Entities.BO;
 using Bugget.Entities.Config;
 using Bugget.Entities.DbModels;
+using Bugget.Entities.Mappers;
 using Microsoft.Extensions.Options;
+using Monade;
 
 namespace Bugget.BO.Services;
 
 public sealed class AttachmentService(
-    BugsService bugService, 
+    BugsService bugService,
     AttachmentDbClient attachmentDbClient,
-    IOptions<FileStorageConfiguration> fileStorageConfigurationOptions,
-    IMapper mapper)
+    IOptions<FileStorageConfiguration> fileStorageConfigurationOptions)
 {
     private readonly string _baseDir = fileStorageConfigurationOptions.Value.BaseDirectory.TrimEnd('/');
 
@@ -38,32 +38,41 @@ public sealed class AttachmentService(
 
         await attachmentDbClient.DeleteAttachment(attachmentId);
     }
-    public async Task<IEnumerable<Attachment>> SaveAttachments(int bugId, string userId, IEnumerable<(Stream Stream, AttachType AttachType, string FileName)> streamsWithMetadata)
+    public async Task<MonadeStruct<Attachment[]>> SaveAttachments(int reportId, int bugId, string? organizationId, IEnumerable<(Stream Stream, AttachType AttachType, string FileName)> streamsWithMetadata)
     {
-        var bug = await bugService.GetBugAsync(bugId);
+        var bugDbModel = await bugService.GetBugSummaryAsync(reportId, bugId, organizationId);
+        if (bugDbModel.HasError)
+        {
+            return bugDbModel.Error!;
+        }
+
         var concurrencyLevel = 5;
-        var saveContentTasks = new Task<Attachment>[concurrencyLevel];
+        var saveContentTasks = new Task<MonadeStruct<Attachment>>[concurrencyLevel];
         foreach (var streamsChunk in streamsWithMetadata.Chunk(concurrencyLevel))
         {
             for (int i = 0; i < concurrencyLevel; i++)
                 saveContentTasks[i] = SaveAttachment(
-                    bug, userId, streamsChunk[i].Stream, streamsChunk[i].AttachType, streamsChunk[i].FileName);
-            
+                    reportId, bugDbModel.Value!.Id, organizationId, streamsChunk[i].Stream, streamsChunk[i].AttachType, streamsChunk[i].FileName);
+
             await Task.WhenAll(saveContentTasks);
         }
 
-        return saveContentTasks.Select(t => t.Result).ToList();
+        return saveContentTasks.Where(t => t.Result.IsSuccess).Select(t => t.Result.Value!).ToArray();
     }
 
-    public async Task<Attachment> SaveAttachment(int bugId, string userId, Stream fileStream, AttachType attachType, string fileName)
+    public async Task<MonadeStruct<Attachment>> SaveAttachment(int reportId, int bugId, string? organizationId, Stream fileStream, AttachType attachType, string fileName)
     {
-        var bug = await bugService.GetBugAsync(bugId);
-        return await SaveAttachment(bug, userId, fileStream, attachType, fileName);
+        var bugDbModel = await bugService.GetBugSummaryAsync(reportId, bugId, organizationId);
+        if (bugDbModel.HasError)
+        {
+            return bugDbModel.Error!;
+        }
+        return await SaveAttachment(reportId, bugDbModel.Value!.Id, fileStream, attachType, fileName);
     }
 
-    private async Task<Attachment> SaveAttachment(Bug bug, string userId, Stream fileStream, AttachType attachType, string fileName)
+    private async Task<Attachment> SaveAttachment(int reportId, int bugId, Stream fileStream, AttachType attachType, string fileName)
     {
-        var relativePath = GetAttachmentFilePath(bug, fileName);
+        var relativePath = GetAttachmentFilePath(reportId, bugId, fileName);
         var fullPath = GetAttachmentContentAbsolutePath(relativePath);
 
         if (await attachmentDbClient.FilePathExist(relativePath))
@@ -75,16 +84,16 @@ public sealed class AttachmentService(
         var dirPath = Path.GetDirectoryName(fullPath);
         if (!Directory.Exists(dirPath))
             Directory.CreateDirectory(dirPath!);
-        
+
         await using (var writeFs = new FileStream(fullPath, FileMode.Create))
         {
             await fileStream.CopyToAsync(writeFs);
         }
-        
+
         var dbModel = new AttachmentDbModel()
         {
             AttachType = (int)attachType,
-            BugId = bug.Id!.Value,
+            BugId = bugId,
             CreatedAt = DateTimeOffset.UtcNow,
             Path = relativePath
         };
@@ -94,15 +103,15 @@ public sealed class AttachmentService(
             throw new Exception("Attachment save failed");
         }
 
-        return mapper.Map<Attachment>(attachment);
+        return attachment.ToAttachment();
     }
 
-    private string GetAttachmentFilePath(Bug bug, string fileName) =>
-        $"{bug.ReportId}/{bug.Id}/{fileName.Trim('.')}";
+    private string GetAttachmentFilePath(int reportId, int bugId, string fileName) =>
+        $"{reportId}/{bugId}/{fileName.Trim('.')}";
 
-    private string GetAttachmentContentAbsolutePath(string attachmentRelativePath) 
+    private string GetAttachmentContentAbsolutePath(string attachmentRelativePath)
         => Path.Combine(_baseDir, attachmentRelativePath);
-    
+
     private async Task<AttachmentDbModel> GetAttachment(int attachmentId)
     {
         var attachment = await attachmentDbClient.GetAttachment(attachmentId);

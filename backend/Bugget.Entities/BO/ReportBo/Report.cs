@@ -4,11 +4,15 @@ public sealed class Report
 {
     public int? Id { get; set; }
     public required string Title { get; set; }
-    public required string CreatorUserId { get; set; }
-    public string? CreatorTeamId { get; set; }
-    public string? CreatorOrganizationId { get; set; }
+    public int Status { get; set; } = (int)ReportStatus.Active;
     public required string ResponsibleUserId { get; set; }
+    public required string CreatorUserId { get; set; }
+    public required string? CreatorOrganizationId { get; set; }
+    public required string? CreatorTeamId { get; set; }
+    public DateTimeOffset? CreatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
+
     public required string[] ParticipantsUserIds { get; set; }
-    public required int Status { get; set; }
-    public Bug[] Bugs { get; set; } = Array.Empty<Bug>();
+    
+    public required Bug[] Bugs { get; set; }
 }

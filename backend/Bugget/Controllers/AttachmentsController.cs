@@ -1,8 +1,8 @@
-using AutoMapper;
 using Bugget.Authentication;
 using Bugget.BO.Services;
 using Bugget.Entities.BO;
 using Bugget.Entities.Views;
+using Bugget.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 
@@ -13,7 +13,7 @@ namespace Bugget.Controllers;
 public sealed class AttachmentsController(AttachmentService attachmentService) : ApiController
 {
     [HttpPost]
-    public async Task<IActionResult> CreateAttachment(
+    public async Task<IResult> CreateAttachment(
         [FromRoute] int reportId,
         int bugId,
         [FromQuery(Name = "attachType")] int attachType,
@@ -21,17 +21,18 @@ public sealed class AttachmentsController(AttachmentService attachmentService) :
         )
     {
         await using var stream = file.OpenReadStream();
-        var attachment = await attachmentService.SaveAttachment(
-            bugId, User.GetIdentity().Id, stream, (AttachType)attachType, file.FileName);
-        return Ok(new AttachmentView
-        {
-            Id = attachment.Id!.Value,
-            BugId = attachment.BugId,
-            ReportId = reportId,
-            Path = attachment.Path,
-            CreatedAt = attachment.CreatedAt!.Value,
-            AttachType = attachment.AttachType
-        });
+        var user = User.GetIdentity();
+        return await attachmentService.SaveAttachment(
+            reportId, bugId, user.OrganizationId, stream, (AttachType)attachType, file.FileName)
+            .AsResultAsync((a) => new AttachmentView
+            {
+                Id = a.Id!.Value,
+                BugId = a.BugId,
+                ReportId = reportId,
+                Path = a.Path,
+                CreatedAt = a.CreatedAt!.Value,
+                AttachType = a.AttachType
+            });
     }
 
     [HttpGet("{id}/content")]
@@ -40,7 +41,7 @@ public sealed class AttachmentsController(AttachmentService attachmentService) :
         var (content, fileName) = await attachmentService.GetAttachmentContent(id);
         return new FileContentResult(content, GetMimeTypeForFileExtension(fileName));
     }
-    
+
     [HttpDelete("{id}")]
     public Task DeleteAttachmentContent(int id)
     {
