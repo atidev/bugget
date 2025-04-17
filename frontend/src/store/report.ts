@@ -94,11 +94,9 @@ export const $isNewReport = createStore(true)
 export const $reportRequestState = createStore(RequestStates.IDLE);
 $reportRequestState
   .on(fetchReportFx.pending, (_, state) => {
-    console.log("pending", state);
     return state ? RequestStates.PENDING : RequestStates.DONE;
   })
   .on(fetchReportFx.doneData, () => {
-    console.log("done data");
     return RequestStates.DONE;
   });
 
