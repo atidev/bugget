@@ -91,13 +91,13 @@ const ReportPage = () => {
 
   return (
     <div className="reports-wrapper">
-      <ReportHeader />
+      <ReportHeader isNewReport={isNewReport} />
       {bugsIds.length ? (
         bugsIds.map((id) => (
-          <Bug key={id} reportId={reportForm.id} bugId={id} />
+          <Bug key={id} bugId={id} reportId={reportForm.id} />
         ))
       ) : (
-        <Bug />
+        <Bug isNewReport />
       )}
 
       {!isNewReport && bugsIds.length > 0 && !isExists && (

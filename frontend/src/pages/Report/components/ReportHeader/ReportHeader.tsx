@@ -5,7 +5,6 @@ import {
   updateResponsible,
   resetReport,
   $isReportChanged,
-  $isNewReport,
   $reportRequestState,
   updateStatus,
   updateReportEvent,
@@ -29,7 +28,7 @@ const autocompleteUsers = async (searchString: string) => {
   }));
 };
 
-const ReportHeader = () => {
+const ReportHeader = ({ isNewReport }: { isNewReport: boolean }) => {
   const [
     reportForm,
     setTitle,
@@ -37,7 +36,6 @@ const ReportHeader = () => {
     isReportChanged,
     reportRequestState,
     reset,
-    isNewReport,
     setUpdateStatus,
     updateReport,
   ] = useUnit([
@@ -47,7 +45,6 @@ const ReportHeader = () => {
     $isReportChanged,
     $reportRequestState,
     resetReport,
-    $isNewReport,
     updateStatus,
     updateReportEvent,
   ]);
@@ -66,7 +63,7 @@ const ReportHeader = () => {
       }`}
     >
       <div className="flex justify-between items-center">
-        {reportRequestState !== RequestStates.DONE ? (
+        {reportRequestState !== RequestStates.DONE && !isNewReport ? (
           <div className="skeleton min-h-[40px]" />
         ) : (
           <span className="text-2xl">
@@ -97,7 +94,7 @@ const ReportHeader = () => {
       </div>
       <div>
         <div className="text-xs font-semibold mt-1 mb-1">Заголовок</div>
-        {reportRequestState !== RequestStates.DONE ? (
+        {reportRequestState !== RequestStates.DONE && !isNewReport ? (
           <div className="skeleton input w-full" />
         ) : (
           <input
@@ -115,7 +112,7 @@ const ReportHeader = () => {
         <div>
           <div className="text-xs font-semibold mb-1">Ответственный</div>
           <div className="flex gap-4 items-center">
-            {reportRequestState !== RequestStates.DONE ? (
+            {reportRequestState !== RequestStates.DONE && !isNewReport ? (
               <div className="skeleton input shrink-0 min-w-[288px]" />
             ) : (
               <Autosuggest
@@ -129,7 +126,7 @@ const ReportHeader = () => {
               />
             )}
             <div className="participants-wrapper">
-              {reportRequestState !== RequestStates.DONE ? (
+              {reportRequestState !== RequestStates.DONE && !isNewReport ? (
                 <ParticipantsSkeleton />
               ) : (
                 !!reportForm.participants?.length &&
@@ -146,7 +143,11 @@ const ReportHeader = () => {
         {!isNewReport && isReportChanged && reportForm.responsible?.id && (
           <div className="flex gap-2 justify-end">
             <CancelButton isChanged={isReportChanged} onReset={reset} />
-            <SaveButton isChanged={isReportChanged} onSave={updateReport} />
+            <SaveButton
+              isLoading={reportRequestState === RequestStates.PENDING}
+              isChanged={isReportChanged}
+              onSave={updateReport}
+            />
           </div>
         )}
       </div>

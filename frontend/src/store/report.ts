@@ -85,12 +85,6 @@ export const updateTitle = createEvent<string>();
 export const updateStatus = createEvent<number>();
 export const updateResponsible = createEvent<User | null>();
 
-export const setIsNewReport = createEvent();
-
-export const $isNewReport = createStore(true)
-  .on(setIsNewReport, (_, isNew) => isNew)
-  .reset(clearReport);
-
 export const $reportRequestState = createStore(RequestStates.IDLE);
 $reportRequestState
   .on(fetchReportFx.pending, (_, state) => {
@@ -148,20 +142,6 @@ sample({
   source: $initialReportForm, // Берём данные из исходного стейта (загруженного с сервера)
   clock: resetReport, // Ждём, когда сработает resetReport
   target: $reportForm, // Копируем данные в редактируемый стор
-});
-
-// При загрузке отчёта устанавливаем `isNewReport`
-sample({
-  source: fetchReportFx.doneData,
-  fn: () => false, // Если отчёт загружен, это НЕ новый отчёт
-  target: setIsNewReport,
-});
-
-// При создании отчёта обновляем `isNewReport`
-sample({
-  source: createReportFx.doneData,
-  fn: () => false, // После успешного создания отчёта считаем его существующим
-  target: setIsNewReport,
 });
 
 sample({
