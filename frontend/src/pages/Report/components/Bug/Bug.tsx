@@ -9,6 +9,7 @@ import {
   updateBugEvent,
   resetBug,
   updateBugApiEvent,
+  $bugRequestState,
 } from "@/store/bugs";
 import { $reportRequestState } from "@/store/report";
 import { $attachmentsByBugId } from "@/store/attachments";
@@ -16,29 +17,36 @@ import "./Bug.css";
 import CancelButton from "@/components/CancelButton/CancelButton";
 import SaveButton from "@/components/SaveButton/SaveButton";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import { BugStatuses } from "@/const";
+import { BugStatuses, RequestStates } from "@/const";
 import Chat from "./components/Chat/Chat";
 import { uploadAttachmentFx } from "@/store/attachments";
 import { Bug as BugType } from "@/types/bug";
 import Result from "./components/Result/Result";
 import { ChangeEvent } from "react";
 import Heading from "./components/Heading/Heading";
-import { RequestStates } from "../../../../const/index";
 
 type BugProps = {
   reportId?: number | null;
+  isNewReport?: boolean;
   bugId?: number;
 };
 
-const Bug = ({ reportId, bugId }: BugProps) => {
-  const [updateBugData, reset, updateBugApi, createBugApi, uploadAttachment] =
-    useUnit([
-      updateBugEvent,
-      resetBug,
-      updateBugApiEvent,
-      createBugEventByApi,
-      uploadAttachmentFx,
-    ]);
+const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
+  const [
+    updateBugData,
+    reset,
+    updateBugApi,
+    createBugApi,
+    uploadAttachment,
+    bugRequestState,
+  ] = useUnit([
+    updateBugEvent,
+    resetBug,
+    updateBugApiEvent,
+    createBugEventByApi,
+    uploadAttachmentFx,
+    $bugRequestState,
+  ]);
 
   const [newBugData, updateNewBugData] = useUnit([$newBugStore, updateNewBug]);
 
@@ -72,7 +80,6 @@ const Bug = ({ reportId, bugId }: BugProps) => {
   });
 
   const isNewBug = !bug.id;
-  const isNewReport = !reportId;
 
   const isBugChanged = isNewBug
     ? newBugData.receive !== "" && newBugData.expect !== ""
@@ -145,7 +152,7 @@ const Bug = ({ reportId, bugId }: BugProps) => {
           )}
 
           {/* Селект статуса (только для существующего бага) */}
-          {!isNewBug && reportRequestState !== RequestStates.PENDING && (
+          {!isNewBug && reportRequestState === RequestStates.DONE && (
             <Dropdown
               className="max-w-[150px]"
               onChange={(selected) => {
@@ -197,7 +204,11 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               }
             }}
           />
-          <SaveButton isChanged={isBugChanged} onSave={handleSave} />
+          <SaveButton
+            isChanged={isBugChanged}
+            onSave={handleSave}
+            isLoading={bugRequestState === RequestStates.PENDING}
+          />
         </div>
       )}
       {!isNewBug && (

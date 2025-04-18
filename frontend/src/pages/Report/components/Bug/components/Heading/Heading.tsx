@@ -4,11 +4,15 @@ type Props = {
 };
 
 const Heading = ({ isNewBug, bugId }: Props) => {
-  return isNewBug ? (
-    <span className="text-2xl">Новый баг</span>
-  ) : (
+  return (
     <span className="text-2xl">
-      Баг<span className="text-gray-300">#{bugId}</span>
+      {!isNewBug ? (
+        <>
+          Баг <span className="text-gray-300">#{bugId}</span>
+        </>
+      ) : (
+        "Новый баг"
+      )}
     </span>
   );
 };

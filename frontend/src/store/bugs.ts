@@ -3,6 +3,7 @@ import { createBugFx } from "./newBug";
 import { $initialReportForm, clearReport } from "./report";
 import { updateBugApi } from "@/api/reports/bug";
 import { Bug, UpdateBugParameters } from "@/types/bug";
+import { RequestStates } from "@/const";
 
 type UpdateBugParams = {
   reportId: number;
@@ -100,6 +101,15 @@ export const $bugsIds = createStore<number[]>([])
     bugs ? Object.keys(bugs).map(Number) : []
   )
   .reset(clearReport);
+
+export const $bugRequestState = createStore(RequestStates.IDLE);
+$bugRequestState
+  .on(updateBugFx.pending, (_, state) => {
+    return state ? RequestStates.PENDING : RequestStates.DONE;
+  })
+  .on(updateBugFx.doneData, () => {
+    return RequestStates.DONE;
+  });
 
 sample({
   source: updateBugApiEvent,
