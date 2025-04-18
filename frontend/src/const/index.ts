@@ -1,3 +1,5 @@
+import { StatusMeta } from "@/types/status";
+
 export enum BugStatuses {
   IN_PROGRESS = 0,
   READY = 1,
@@ -14,3 +16,29 @@ export enum RequestStates {
   DONE = 2,
   ERROR = 3,
 }
+
+export const reportStatusMap: Record<number, StatusMeta> = {
+  0: {
+    title: "В работе",
+    color: "badge-error",
+    border: "border-error",
+  },
+  1: {
+    title: "Решён",
+    color: "badge-success",
+    border: "border-success",
+  },
+};
+
+export const bugStatusMap: Record<number, StatusMeta> = {
+  0: {
+    title: "Открыт",
+    color: "badge-error",
+    border: "border-error",
+  },
+  1: {
+    title: "Исправлен",
+    color: "badge-success",
+    border: "border-success",
+  },
+};
