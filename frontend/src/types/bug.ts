@@ -22,3 +22,11 @@ export type NewBug = {
   expect: string;
   isReady?: boolean;
 };
+
+// параметры обновления существующего бага
+export type UpdateBugParameters = {
+  id: number;
+  receive?: string;
+  expect?: string;
+  status?: BugStatuses;
+};

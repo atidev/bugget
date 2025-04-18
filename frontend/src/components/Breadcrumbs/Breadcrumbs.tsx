@@ -2,11 +2,10 @@ import { Breadcrumb } from "@/types/ui";
 
 type Props = {
   breadcrumbs: Breadcrumb[];
-  className?: string;
 };
 
-const Breadcrumbs = ({ breadcrumbs, className }: Props) => (
-  <div className={`breadcrumbs text-sm mx-4 ${className}`}>
+const Breadcrumbs = ({ breadcrumbs }: Props) => (
+  <div className={`breadcrumbs text-sm mx-4 min-h-[52px] py-4`}>
     <ul>
       {breadcrumbs.map((breadcrumb) => {
         return (

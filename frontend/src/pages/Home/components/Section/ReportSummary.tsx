@@ -1,6 +1,4 @@
 import { useNavigate } from "react-router-dom";
-
-import "./ReportSummary.css";
 import { Report } from "@/types/report";
 
 type ReportProps = {

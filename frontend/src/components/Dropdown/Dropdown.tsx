@@ -1,4 +1,5 @@
 import { ChevronDown, X } from "lucide-react";
+import { useRef } from "react";
 
 function getSingleSelectedLabel<T>(
   options: DropdownOption<T>[],
@@ -39,7 +40,7 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
     className = "",
     onResetValue,
   } = props;
-
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const hasCustomResetValue = "onResetValue" in props;
 
   const isSelected = (val: T) =>
@@ -53,8 +54,31 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
     ? Array.isArray(value) && value.length > 0
     : value !== null && value !== undefined;
 
+  const handleDropdownClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    onChange(onResetValue ?? (multiple ? [] : null));
+    dropdownRef.current?.blur();
+  };
+
+  const handleOptionClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    option: DropdownOption<T>
+  ) => {
+    if (multiple) {
+      const current = Array.isArray(value) ? value : [];
+      const exists = current.includes(option.value);
+      const updated = exists
+        ? current.filter((v) => v !== option.value)
+        : [...current, option.value];
+      onChange(updated);
+    } else {
+      onChange(option.value);
+      dropdownRef.current?.blur();
+    }
+  };
+
   return (
-    <div className={`dropdown ${className}`} tabIndex={0}>
+    <div className={`dropdown ${className}`} tabIndex={0} ref={dropdownRef}>
       {label && <div className="mb-1 text-xs font-semibold">{label}</div>}
       <div className="btn bg-base-100 w-full justify-between">
         <span className="flex gap-1 flex-wrap items-center font-normal">
@@ -82,11 +106,7 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
             <button
               type="button"
               className="inline-flex p-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                onChange(onResetValue ?? (multiple ? [] : null));
-                (e.currentTarget.closest(".dropdown") as HTMLElement)?.blur();
-              }}
+              onClick={handleDropdownClick}
             >
               <X className="w-4 h-4 text-gray-400 hover:text-neutral cursor-pointer" />
             </button>
@@ -99,9 +119,9 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
         {!multiple && hasCustomResetValue && (
           <li key="none">
             <button
-              onClick={(e) => {
+              onClick={() => {
                 onChange(null);
-                (e.currentTarget.closest(".dropdown") as HTMLElement)?.blur();
+                dropdownRef.current?.blur();
               }}
               className={value === null || value === undefined ? "active" : ""}
             >
@@ -111,29 +131,19 @@ const Dropdown = <T,>(props: DropdownProps<T>) => {
             </button>
           </li>
         )}
-        {options.map((opt) => (
-          <li key={String(opt.value)}>
+        {options.map((option) => (
+          <li key={String(option.value)}>
             <button
-              onClick={(e) => {
-                if (multiple) {
-                  const current = Array.isArray(value) ? value : [];
-                  const exists = current.includes(opt.value);
-                  const updated = exists
-                    ? current.filter((v) => v !== opt.value)
-                    : [...current, opt.value];
-                  onChange(updated);
-                } else {
-                  onChange(opt.value);
-                  (e.currentTarget.closest(".dropdown") as HTMLElement)?.blur();
-                }
-              }}
+              onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
+                handleOptionClick(event, option)
+              }
               className={`hover:bg-base-200 ${
-                isSelected(opt.value) ? "active bg-base-300" : ""
+                isSelected(option.value) ? "active bg-base-300" : ""
               }`}
             >
               <div className="flex justify-between items-center">
-                {opt.label}
-                {isSelected(opt.value) && (
+                {option.label}
+                {isSelected(option.value) && (
                   <span className="text-success text-xs ml-2">✔</span>
                 )}
               </div>

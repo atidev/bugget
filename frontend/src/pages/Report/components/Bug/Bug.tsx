@@ -1,52 +1,62 @@
-import React, { useEffect, useRef } from "react";
 import { useStoreMap, useUnit } from "effector-react";
 import {
   $newBugStore,
   updateNewBug,
   createBugEventByApi,
 } from "@/store/newBug";
-
 import {
   $bugsByBugId,
   updateBugEvent,
   resetBug,
   updateBugApiEvent,
+  $bugRequestState,
 } from "@/store/bugs";
+import { $reportRequestState } from "@/store/report";
 import { $attachmentsByBugId } from "@/store/attachments";
 import "./Bug.css";
 import CancelButton from "@/components/CancelButton/CancelButton";
 import SaveButton from "@/components/SaveButton/SaveButton";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import { BugStatuses } from "@/const";
-import { Chat } from "./components/Chat/Chat";
+import { BugStatuses, RequestStates } from "@/const";
+import Chat from "./components/Chat/Chat";
 import { uploadAttachmentFx } from "@/store/attachments";
-import ImageCarousel from "./components/ImageCarousel/ImageCarousel";
+import { Bug as BugType } from "@/types/bug";
+import Result from "./components/Result/Result";
+import { ChangeEvent } from "react";
+import Heading from "./components/Heading/Heading";
 
 type BugProps = {
   reportId?: number | null;
+  isNewReport?: boolean;
   bugId?: number;
 };
 
-const Bug = ({ reportId, bugId }: BugProps) => {
-  const textareaRefReceive = useRef<HTMLTextAreaElement>(null);
-  const textareaRefExpect = useRef<HTMLTextAreaElement>(null);
-
-  const [updateBugData, reset, updateBugApi, createBugApi, uploadAttachment] =
-    useUnit([
-      updateBugEvent,
-      resetBug,
-      updateBugApiEvent,
-      createBugEventByApi,
-      uploadAttachmentFx,
-    ]);
+const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
+  const [
+    updateBugData,
+    reset,
+    updateBugApi,
+    createBugApi,
+    uploadAttachment,
+    bugRequestState,
+  ] = useUnit([
+    updateBugEvent,
+    resetBug,
+    updateBugApiEvent,
+    createBugEventByApi,
+    uploadAttachmentFx,
+    $bugRequestState,
+  ]);
 
   const [newBugData, updateNewBugData] = useUnit([$newBugStore, updateNewBug]);
+
+  const [reportRequestState] = useUnit([$reportRequestState]);
 
   const bug = useStoreMap({
     store: $bugsByBugId,
     keys: [bugId],
     fn: (state, [id]) => {
-      return id
+      return state && id
         ? state[id]
         : {
             id: bugId,
@@ -69,16 +79,11 @@ const Bug = ({ reportId, bugId }: BugProps) => {
     },
   });
 
-  const isNewBug = bug.id === null || bug.id === undefined;
+  const isNewBug = !bug.id;
 
   const isBugChanged = isNewBug
     ? newBugData.receive !== "" && newBugData.expect !== ""
     : bug.isChanged;
-
-  const isNewReport = reportId == null;
-  // 2. Реф на file input, чтобы кликать по нему программно
-  const fileInputRefRecieve = useRef<HTMLInputElement>(null);
-  const fileInputRefExpected = useRef<HTMLInputElement>(null);
 
   // 3. Обработчик выбора файла
   const handleFileChange = async (
@@ -104,31 +109,32 @@ const Bug = ({ reportId, bugId }: BugProps) => {
     }
   };
 
+  // todo: move to derived stores
   const receivedFiles = attachments?.filter((item) => item.attachType === 0);
   const expectedFiles = attachments?.filter((item) => item.attachType === 1);
 
-  useEffect(() => {
-    if (textareaRefReceive.current) {
-      textareaRefReceive.current.style.height = "auto";
-      textareaRefReceive.current.style.height = `${textareaRefReceive.current.scrollHeight}px`;
-    }
-    if (textareaRefExpect.current) {
-      textareaRefExpect.current.style.height = "auto";
-      textareaRefExpect.current.style.height = `${textareaRefExpect.current.scrollHeight}px`;
-    }
-  }, [bug.receive, bug.expect]);
-
   const handleSave = () => {
-    if (!bug.reportId) return;
-    if (isNewBug) {
-      // Вызываем событие для создания нового бага
+    if (typeof bug.id === "number") {
+      // todo убрать 'as', поправить типизацию
+      updateBugApi(bug as BugType);
+    } else if (bug.reportId) {
       createBugApi({ reportId: bug.reportId, bug: newBugData });
-      return;
     }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // todo fix types
-    updateBugApi(bug);
+  };
+
+  const handleResultUpdate = (
+    event: ChangeEvent<HTMLTextAreaElement>,
+    key: string
+  ) => {
+    if (bug.id) {
+      updateBugData({
+        id: bug.id,
+        [key]: event.target.value,
+        status: bug.status,
+      });
+    } else {
+      updateNewBugData({ [key]: event.target.value });
+    }
   };
 
   return (
@@ -137,22 +143,22 @@ const Bug = ({ reportId, bugId }: BugProps) => {
         bug.status === Number(BugStatuses.READY) ? "border-success" : ""
       }`}
     >
-      <div className="bug-content-wrapper">
+      <div className="gap-2 flex flex-col">
         <div className="flex items-center justify-between">
-          {isNewBug ? (
-            <span className="text-2xl">Новый баг</span>
+          {reportRequestState !== RequestStates.DONE ? (
+            <div className="skeleton min-h-[2em] min-w-[30%] shrink-0" />
           ) : (
-            <span className="text-2xl">
-              Баг<span className="text-gray-300">#{bug.id}</span>
-            </span>
+            <Heading isNewBug={isNewBug} bugId={bug.id} />
           )}
 
           {/* Селект статуса (только для существующего бага) */}
-          {!isNewBug && (
+          {!isNewBug && reportRequestState === RequestStates.DONE && (
             <Dropdown
               className="max-w-[150px]"
               onChange={(selected) => {
-                updateBugData({ id: bug.id!, status: Number(selected) });
+                if (bug.id) {
+                  updateBugData({ id: bug.id, status: Number(selected) });
+                }
               }}
               value={bug.status}
               options={[
@@ -161,116 +167,55 @@ const Bug = ({ reportId, bugId }: BugProps) => {
               ]}
             />
           )}
+          {reportRequestState !== RequestStates.DONE && (
+            <div className="skeleton min-h-[40px] min-w-[30%] shrink-0" />
+          )}
         </div>
-        <div className="flex gap-3 text-xs font-semibold mb-1 mt-3">
-          <span className="w-1/2">Фактический результат</span>
-          <span className="w-1/2">Ожидаемый результат</span>
-        </div>
-        <div className="bug-content">
-          <textarea
-            ref={textareaRefReceive}
+        <div className="flex grow-1 gap-2">
+          <Result
+            title="Фактический результат"
             value={isNewBug ? newBugData.receive : bug?.receive || ""}
-            onChange={(e) =>
-              isNewBug
-                ? updateNewBugData({ receive: e.target.value })
-                : updateBugData({
-                    id: bug.id!,
-                    receive: e.target.value,
-                    status: bug.status,
-                  })
-            }
-            className="textarea bug-section p-4 bg-base-100 focus:outline-none"
+            onChange={(event) => handleResultUpdate(event, "receive")}
+            files={receivedFiles}
+            onFileChange={(e) => handleFileChange(e, 0)}
+            withAttachments={!isNewBug}
           />
-          <textarea
-            ref={textareaRefExpect}
+          <Result
+            title="Ожидаемый результат"
             value={isNewBug ? newBugData.expect : bug?.expect || ""}
-            onChange={(e) =>
-              isNewBug
-                ? updateNewBugData({ expect: e.target.value })
-                : updateBugData({
-                    id: bug.id!,
-                    expect: e.target.value,
-                    status: bug.status,
-                  })
-            }
-            className="textarea bug-section p-4 bg-base-100 focus:outline-none"
+            onChange={(event) => handleResultUpdate(event, "expect")}
+            files={expectedFiles}
+            onFileChange={(e) => handleFileChange(e, 0)}
+            withAttachments={!isNewBug}
           />
         </div>
-        <div className="flex gap-3">
-          {/* Блок вложений */}
-          {!isNewBug && (
-            <div className="attachments w-1/2">
-              {/* Скрытый input для выбора файла */}
-              <input
-                ref={fileInputRefRecieve}
-                type="file"
-                style={{ display: "none" }}
-                onChange={(e) => handleFileChange(e, 0)}
-              />
-
-              {/* Кнопка "плюс" — открывает окно выбора файла */}
-              {!isNewBug && (
-                <button
-                  className="btn btn-info btn-outline mt-2"
-                  onClick={() => fileInputRefRecieve.current?.click()}
-                >
-                  + Добавить файл
-                </button>
-              )}
-              {receivedFiles && !!receivedFiles.length && (
-                <ImageCarousel attachments={receivedFiles} />
-              )}
-            </div>
-          )}
-
-          {!isNewBug && (
-            <div className="attachments w-1/2">
-              {/* Скрытый input для выбора файла */}
-              <input
-                ref={fileInputRefExpected}
-                type="file"
-                style={{ display: "none" }}
-                onChange={(e) => handleFileChange(e, 1)}
-              />
-
-              {/* Кнопка "плюс" — открывает окно выбора файла */}
-              {!isNewBug && (
-                <button
-                  className="btn btn-info btn-outline mt-2"
-                  onClick={() => fileInputRefExpected.current?.click()}
-                >
-                  + Добавить файл
-                </button>
-              )}
-              {expectedFiles && !!expectedFiles.length && (
-                <ImageCarousel attachments={expectedFiles} />
-              )}
-            </div>
-          )}
-        </div>
-        {/* Кнопки "Сохранить" / "Отмена" */}
-        {!isNewReport && isBugChanged && (
-          <div className="flex gap-2 justify-end mt-2">
-            <CancelButton
-              isChanged={isBugChanged}
-              onReset={() => {
-                if (isNewBug) {
-                  // Сброс нового бага
-                  updateNewBugData({ receive: "", expect: "" });
-                } else {
-                  reset(bug.id!);
-                }
-              }}
-            />
-            <SaveButton isChanged={isBugChanged} onSave={handleSave} />
-          </div>
-        )}
-        {!isNewBug && (
-          <div className="mt-2">
-            <Chat reportId={bug.reportId!} bugId={bug.id!} />
-          </div>
-        )}
       </div>
+      {/* Кнопки "Сохранить" / "Отмена" */}
+      {!isNewReport && isBugChanged && (
+        <div className="flex gap-2 justify-end mt-2">
+          <CancelButton
+            isChanged={isBugChanged}
+            onReset={() => {
+              if (isNewBug) {
+                // Сброс нового бага
+                updateNewBugData({ receive: "", expect: "" });
+              } else {
+                reset(bug.id!);
+              }
+            }}
+          />
+          <SaveButton
+            isChanged={isBugChanged}
+            onSave={handleSave}
+            isLoading={bugRequestState === RequestStates.PENDING}
+          />
+        </div>
+      )}
+      {!isNewBug && (
+        <div className="mt-2">
+          <Chat reportId={bug.reportId!} bugId={bug.id!} />
+        </div>
+      )}
     </div>
   );
 };

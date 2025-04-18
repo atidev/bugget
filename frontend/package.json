@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "prepare": "npx simple-git-hooks",
+    "start": "npm run start-backend && npm run dev",
+    "start-backend": "docker compose -f ../devops/components/postgres/docker-compose.yml -f ../devops/components/backend/docker-compose.yml up -d",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint .",
@@ -42,7 +44,7 @@
     "tailwindcss": "^4.0.16",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0",
-    "vite": "^6.2.5"
+    "vite": "^6.2.6"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
