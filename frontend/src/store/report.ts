@@ -71,7 +71,7 @@ export const updateReportFx = createEffect(
     const payload = {
       title: report.title,
       status: report.status,
-      responsible: report.responsibleId,
+      responsibleUserId: report.responsibleId,
     };
     return await updateReport(payload, report.id);
   }

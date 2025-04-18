@@ -77,6 +77,7 @@ export type CreateReportRequest = {
 export type UpdateReportRequest = {
   title: string | null;
   status: ReportStatuses | null;
+  responsibleUserId: string | null;
 };
 
 export type SearchResponse = {
