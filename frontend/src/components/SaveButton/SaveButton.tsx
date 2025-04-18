@@ -1,16 +1,10 @@
-import React from "react";
-
-interface SaveButtonProps {
+type Props = {
   isChanged: boolean;
   onSave: () => void;
   isLoading: boolean;
-}
+};
 
-const SaveButton: React.FC<SaveButtonProps> = ({
-  isChanged,
-  onSave,
-  isLoading,
-}) => {
+const SaveButton = ({ isChanged, onSave, isLoading }: Props) => {
   return (
     <button
       onClick={onSave}

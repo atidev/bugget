@@ -3,7 +3,7 @@
 ## Стэк
 
 - vite + ts + effector
-- lucide – иконки (выбирал еще heroicons, но он менее строгий)
+- lucide – иконки
 - tailwind – css-framework
 - [daisyui](https://daisyui.com/) – plugin для tailwind готовыми компонентами
 
