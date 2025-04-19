@@ -7,6 +7,7 @@ namespace Bugget.Features;
 public sealed class FeaturesService(
     IEnumerable<IReportCreatePostAction> reportCreatePostActions,
     IEnumerable<IReportUpdatePostAction> reportUpdatePostActions,
+    IEnumerable<IReportPatchPostAction> reportPatchPostActions,
     ITaskQueue taskQueue)
 {
     public async Task ExecuteReportCreatePostActions(ReportCreateContext reportCreateContext)
@@ -24,6 +25,15 @@ public sealed class FeaturesService(
         {
             await taskQueue.Enqueue(() =>
                 reportUpdatePostAction.ExecuteAsync(reportUpdateContext));
+        }
+    }
+
+    public async Task ExecuteReportPatchPostActions(ReportPatchContext reportPatchContext)
+    {
+        foreach (var reportPatchPostAction in reportPatchPostActions)
+        {
+            await taskQueue.Enqueue(() =>
+                reportPatchPostAction.ExecuteAsync(reportPatchContext));
         }
     }
 }

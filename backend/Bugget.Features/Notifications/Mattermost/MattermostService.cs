@@ -7,7 +7,7 @@ namespace Bugget.Features.Notifications.Mattermost;
 
 public sealed class MattermostService(
     EmployeesDataAccess employeesDataAccess,
-    MattermostClient mattermostClient) : IReportCreatePostAction, IReportUpdatePostAction
+    MattermostClient mattermostClient) : IReportCreatePostAction, IReportUpdatePostAction, IReportPatchPostAction
 {
     public Task ExecuteAsync(ReportCreateContext createContext)
     {
@@ -42,6 +42,27 @@ public sealed class MattermostService(
 
         var message = ReportMessageBuilder.GetYourResponsibleInExistReportMessage(
             createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, EmployeeAdapter.Transform(updaterEmployee).Name
+        );
+
+        return mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
+    }
+
+    public Task ExecuteAsync(ReportPatchContext reportPatchContext)
+    {
+        // не меняли ответственного
+        if (reportPatchContext.PatchDto.ResponsibleUserId == null)
+            return Task.CompletedTask;
+
+        if (reportPatchContext.UserId == reportPatchContext.ReportPatchDbModel.ResponsibleUserId)
+            return Task.CompletedTask;
+
+        var responsibleEmployee = employeesDataAccess.GetEmployee(reportPatchContext.ReportPatchDbModel.ResponsibleUserId);
+        var updaterEmployee = employeesDataAccess.GetEmployee(reportPatchContext.UserId);
+        if (responsibleEmployee == null || updaterEmployee == null)
+            return Task.CompletedTask;
+
+        var message = ReportMessageBuilder.GetYourResponsibleAfterPatchReportMessage(
+            reportPatchContext.ReportPatchDbModel.Id, reportPatchContext.ReportPatchDbModel.Title, EmployeeAdapter.Transform(updaterEmployee).Name
         );
 
         return mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);

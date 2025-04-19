@@ -2,6 +2,7 @@ using System.Text.Json;
 using Bugget.Entities.BO.Search;
 using Bugget.Entities.DbModels;
 using Bugget.Entities.DbModels.Report;
+using Bugget.Entities.DTO.Report;
 using Dapper;
 
 namespace Bugget.DA.Postgres;
@@ -11,7 +12,7 @@ public sealed class ReportsDbClient: PostgresClient
     /// <summary>
     /// Получает отчет по ID.
     /// </summary>
-    public async Task<ReportDbModel?> GetReportAsync(int reportId)
+    public async Task<ReportObsoleteDbModel?> GetReportAsync(int reportId)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
         var jsonResult = await connection.ExecuteScalarAsync<string>(
@@ -19,10 +20,24 @@ public sealed class ReportsDbClient: PostgresClient
             new { report_id = reportId }
         );
 
+        return jsonResult != null ? Deserialize<ReportObsoleteDbModel>(jsonResult) : null;
+    }
+
+    /// <summary>
+    /// Получает отчет по ID.
+    /// </summary>
+    public async Task<ReportDbModel?> GetReportAsync(int reportId, string? organizationId)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+        var jsonResult = await connection.ExecuteScalarAsync<string>(
+            "SELECT public.get_report_v2(@report_id, @organization_id);",
+            new { report_id = reportId, organization_id = organizationId }
+        );
+
         return jsonResult != null ? Deserialize<ReportDbModel>(jsonResult) : null;
     }
     
-    public async Task<ReportDbModel[]> ListReportsAsync(string userId)
+    public async Task<ReportObsoleteDbModel[]> ListReportsAsync(string userId)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
         var jsonResults = await connection.QueryAsync<string>(
@@ -32,14 +47,59 @@ public sealed class ReportsDbClient: PostgresClient
 
         return jsonResults
             .Where(json => json != null)
-            .Select(json => Deserialize<ReportDbModel>(json)!)
+            .Select(json => Deserialize<ReportObsoleteDbModel>(json)!)
             .ToArray();
     }
 
     /// <summary>
+    /// Создает новый отчет и возвращает его краткую структуру.
+    /// </summary>
+    public async Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto dto)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+
+        var jsonResult = await connection.ExecuteScalarAsync<string>(
+            "SELECT public.create_report(@user_id, @title, @team_id, @organization_id);",
+            new
+            {
+                user_id = userId,
+                title = dto.Title,
+                team_id = teamId,
+                organization_id = organizationId,
+            }
+        );
+
+        return Deserialize<ReportSummaryDbModel>(jsonResult!)!;
+    }
+
+    /// <summary>
+    /// Обновляет краткую информацию об отчете и возвращает его краткую структуру.
+    /// </summary>
+    public async Task<ReportPatchDbModel> PatchReportAsync(int reportId, string userId, string? organizationId, ReportPatchDto dto)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+
+        var jsonResult = await connection.ExecuteScalarAsync<string>(
+            "SELECT public.patch_report(@report_id, @user_id, @organization_id, @title, @status, @responsible_user_id);",
+            new
+            {
+                report_id = reportId,
+                user_id = userId,
+                organization_id = organizationId,
+                title = dto.Title,
+                status = dto.Status,
+                responsible_user_id = dto.ResponsibleUserId,
+            }
+        );
+
+        return Deserialize<ReportPatchDbModel>(jsonResult!)!;
+    }
+
+
+    /// <summary>
     /// Создает новый отчет и возвращает его полную структуру.
     /// </summary>
-    public async Task<ReportDbModel?> CreateReportAsync(ReportCreateDbModel reportDbModel)
+    public async Task<ReportObsoleteDbModel?> CreateReportAsync(ReportCreateDbModel reportDbModel)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
 
@@ -60,11 +120,11 @@ public sealed class ReportsDbClient: PostgresClient
         );
 
         return jsonResult != null
-            ? Deserialize<ReportDbModel>(jsonResult)
+            ? Deserialize<ReportObsoleteDbModel>(jsonResult)
             : null;
     }
     
-    public async Task<ReportDbModel?> UpdateReportAsync(ReportUpdateDbModel reportDbModel)
+    public async Task<ReportObsoleteDbModel?> UpdateReportAsync(ReportUpdateDbModel reportDbModel)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
         
@@ -81,7 +141,7 @@ public sealed class ReportsDbClient: PostgresClient
         );
 
         return jsonResult != null
-            ? Deserialize<ReportDbModel>(jsonResult)
+            ? Deserialize<ReportObsoleteDbModel>(jsonResult)
             : null;
     }
     

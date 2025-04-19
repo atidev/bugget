@@ -2,13 +2,11 @@
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Bugget.Features\Bugget.Features.csproj" />
-        <ProjectReference Include="..\Monade\Monade.csproj" />
+        <PackageReference Include="JetBrains.Annotations" Version="*"/>
     </ItemGroup>
     
 </Project>

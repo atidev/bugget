@@ -7,19 +7,19 @@ namespace Bugget.DA.Files;
 
 public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : BackgroundService
 {
-    public Employee? GetEmployee(string userId)
+    public EmployeeObsolete? GetEmployee(string userId)
     {
         EmployeesDict.Value.TryGetValue(userId, out var employee);
 
         return employee;
     }
 
-    public IReadOnlyDictionary<string, Employee> DictEmployees()
+    public IReadOnlyDictionary<string, EmployeeObsolete> DictEmployees()
     {
         return EmployeesDict.Value;
     }
 
-    public IReadOnlyCollection<Employee> ListEmployees()
+    public IReadOnlyCollection<EmployeeObsolete> ListEmployees()
     {
         return EmployeesCollection.Value;
     }
@@ -29,7 +29,7 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
         return TeamsCollection.Value;
     }
 
-    public IReadOnlyDictionary<string, IReadOnlyCollection<Employee>> DictByTeamEmployees()
+    public IReadOnlyDictionary<string, IReadOnlyCollection<EmployeeObsolete>> DictByTeamEmployees()
     {
         return EmployeesByTeam.Value;
     }
@@ -50,7 +50,7 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
 
         if (File.Exists(employeesFilePath))
         {
-            Employees = JsonSerializer.Deserialize<Employee[]>(await File.ReadAllTextAsync(employeesFilePath), JsonSerializerOptions)
+            Employees = JsonSerializer.Deserialize<EmployeeObsolete[]>(await File.ReadAllTextAsync(employeesFilePath), JsonSerializerOptions)
                         ?? throw new InvalidOperationException("Ошибка загрузки данных из employees.json");
             return;
         }
@@ -58,9 +58,9 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
         logger.LogWarning("Файл employees.json не найден, используются данные по умолчанию");
     }
 
-    private static Employee[] Employees =
+    private static EmployeeObsolete[] Employees =
     [
-        new Employee
+        new EmployeeObsolete
         {
             Id = "1",
             FirstName = "Иван",
@@ -71,7 +71,7 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
             TeamName = "test4",
             Depth = -1
         },
-        new Employee
+        new EmployeeObsolete
         {
             Id = "any-ldap-id",
             FirstName = "Петр",
@@ -82,7 +82,7 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
             TeamName = "test4",
             Depth = 0
         },
-        new Employee
+        new EmployeeObsolete
         {
             Id = "int",
             FirstName = "Сергей",
@@ -93,7 +93,7 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
             TeamName = "test3",
             Depth = 2
         },
-        new Employee
+        new EmployeeObsolete
         {
             Id = "guid",
             FirstName = "Алексей",
@@ -104,7 +104,7 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
             TeamName = "test2",
             Depth = 1
         },
-        new Employee
+        new EmployeeObsolete
         {
             Id = "default-user",
             FirstName = "Дефолт",
@@ -117,7 +117,7 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
         }
     ];
 
-    private static readonly Lazy<IReadOnlyCollection<Employee>> EmployeesCollection = new(() => Employees);
+    private static readonly Lazy<IReadOnlyCollection<EmployeeObsolete>> EmployeesCollection = new(() => Employees);
 
     private static readonly Lazy<IReadOnlyCollection<Team>> TeamsCollection = new(() =>
     {
@@ -136,12 +136,12 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
         }).ToArray();
     });
 
-    private static readonly Lazy<IReadOnlyDictionary<string, Employee>> EmployeesDict = new(() => Employees.ToDictionary(k => k.Id));
+    private static readonly Lazy<IReadOnlyDictionary<string, EmployeeObsolete>> EmployeesDict = new(() => Employees.ToDictionary(k => k.Id));
 
-    private static readonly Lazy<IReadOnlyDictionary<string, IReadOnlyCollection<Employee>>> EmployeesByTeam = new(() =>
+    private static readonly Lazy<IReadOnlyDictionary<string, IReadOnlyCollection<EmployeeObsolete>>> EmployeesByTeam = new(() =>
         Employees
             .GroupBy(e => e.TeamId ?? string.Empty)
             .ToDictionary(
-                g => g.Key, IReadOnlyCollection<Employee> (g) => g.ToArray()
+                g => g.Key, IReadOnlyCollection<EmployeeObsolete> (g) => g.ToArray()
             ));
 }
