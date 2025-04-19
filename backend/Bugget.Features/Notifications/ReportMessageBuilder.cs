@@ -17,4 +17,11 @@ public static class ReportMessageBuilder
                $"Название: **{reportTitle}**\n" +
                $"Инициатор: {creatorUserFullName}";
     }
+
+    public static string GetYourResponsibleAfterPatchReportMessage(int reportId, string reportTitle, string creatorUserFullName)
+    {
+        return $":arrow_forward: Вы назначены ответственным **[в баг-репорте]({BuggetBaseUrl}/reports/{reportId})**\n" +
+               $"Название: **{reportTitle}**\n" +
+               $"Инициатор: {creatorUserFullName}";
+    }
 }

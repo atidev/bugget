@@ -23,7 +23,7 @@ public static class MattermostExtensions
         
         services.AddSingleton<IReportCreatePostAction, MattermostService>(sp => sp.GetRequiredService<MattermostService>());
         services.AddSingleton<IReportUpdatePostAction, MattermostService>(sp => sp.GetRequiredService<MattermostService>());
-
+        services.AddSingleton<IReportPatchPostAction, MattermostService>(sp => sp.GetRequiredService<MattermostService>());
         return services;
     }
 }

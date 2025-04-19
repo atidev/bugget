@@ -8,7 +8,12 @@ using Bugget.Entities.Config;
 using Bugget.Features;
 using Bugget.Features.TaskQueue;
 using Bugget.Hubs;
+using Bugget.Middlewares;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Bugget.DA.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,9 +66,12 @@ builder.Services
     .AddSingleton<CommentsDbClient>()
     .AddSingleton<BugsDbClient>()
     .AddSingleton<AttachmentDbClient>()
-    .AddSingleton<EmployeesDataAccess>();
+    .AddSingleton<EmployeesDataAccess>()
+    .AddSingleton<EmployeesFileClient>()
+    .AddSingleton<IEmployeesClient>((sp) => sp.GetRequiredService<EmployeesFileClient>());
 
 builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesDataAccess>());
+builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesFileClient>());
 
 builder.Services.AddHealthChecks();
 builder.Services.AddLdapAuth();
@@ -83,7 +91,11 @@ builder.Services.AddSwaggerGen(c =>
 
 #endregion
 
+builder.Services.AddSingleton<ResultExceptionHandlerMiddleware>();
 
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(o =>
+        o.InvalidModelStateResponseFactory = _ => new ModelStateInvalidHandler());
 
 var app = builder.Build();
 
@@ -103,9 +115,9 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/_ping");
 
-
 app.UseCors("CorsPolicy");
 
+app.UseMiddleware<ResultExceptionHandlerMiddleware>();
 
 app.MapHub<ReportPageHub>("/bugget/public/v1/report-page-hub"); // Подключаем хаб
 

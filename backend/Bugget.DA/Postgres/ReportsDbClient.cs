@@ -2,6 +2,7 @@ using System.Text.Json;
 using Bugget.Entities.BO.Search;
 using Bugget.Entities.DbModels;
 using Bugget.Entities.DbModels.Report;
+using Bugget.Entities.DTO.Report;
 using Dapper;
 
 namespace Bugget.DA.Postgres;
@@ -21,6 +22,20 @@ public sealed class ReportsDbClient: PostgresClient
 
         return jsonResult != null ? Deserialize<ReportDbModel>(jsonResult) : null;
     }
+
+    /// <summary>
+    /// Получает отчет по ID.
+    /// </summary>
+    public async Task<ReportV2DbModel?> GetReportAsync(int reportId, string? organizationId)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+        var jsonResult = await connection.ExecuteScalarAsync<string>(
+            "SELECT public.get_report_v2(@report_id, @organization_id);",
+            new { report_id = reportId, organization_id = organizationId }
+        );
+
+        return jsonResult != null ? Deserialize<ReportV2DbModel>(jsonResult) : null;
+    }
     
     public async Task<ReportDbModel[]> ListReportsAsync(string userId)
     {
@@ -35,6 +50,51 @@ public sealed class ReportsDbClient: PostgresClient
             .Select(json => Deserialize<ReportDbModel>(json)!)
             .ToArray();
     }
+
+    /// <summary>
+    /// Создает новый отчет и возвращает его краткую структуру.
+    /// </summary>
+    public async Task<ReportV2DbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto dto)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+
+        var jsonResult = await connection.ExecuteScalarAsync<string>(
+            "SELECT public.create_report(@user_id, @title, @team_id, @organization_id);",
+            new
+            {
+                user_id = userId,
+                title = dto.Title,
+                team_id = teamId,
+                organization_id = organizationId,
+            }
+        );
+
+        return Deserialize<ReportV2DbModel>(jsonResult!)!;
+    }
+
+    /// <summary>
+    /// Обновляет краткую информацию об отчете и возвращает его краткую структуру.
+    /// </summary>
+    public async Task<ReportPatchDbModel> PatchReportAsync(int reportId, string userId, string? organizationId, ReportPatchDto dto)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+
+        var jsonResult = await connection.ExecuteScalarAsync<string>(
+            "SELECT public.patch_report(@report_id, @user_id, @organization_id, @title, @status, @responsible_user_id);",
+            new
+            {
+                report_id = reportId,
+                user_id = userId,
+                organization_id = organizationId,
+                title = dto.Title,
+                status = dto.Status,
+                responsible_user_id = dto.ResponsibleUserId,
+            }
+        );
+
+        return Deserialize<ReportPatchDbModel>(jsonResult!)!;
+    }
+
 
     /// <summary>
     /// Создает новый отчет и возвращает его полную структуру.

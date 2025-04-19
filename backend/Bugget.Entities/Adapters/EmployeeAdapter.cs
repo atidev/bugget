@@ -7,7 +7,7 @@ namespace Bugget.Entities.Adapters;
 
 public static class EmployeeAdapter
 {
-    public static EmployeeView Transform(Employee e)
+    public static EmployeeView Transform(EmployeeObsolete e)
     {
         var sb = new StringBuilder()
             .AppendWithSeparator(e.Surname)
@@ -22,7 +22,7 @@ public static class EmployeeAdapter
         return new EmployeeView { Id = e.Id, Name = fullName };
     }
     
-    public static UserView ToUserView(Employee e)
+    public static UserView ToUserView(EmployeeObsolete e)
     {
         var sb = new StringBuilder()
             .AppendWithSeparator(e.Surname)

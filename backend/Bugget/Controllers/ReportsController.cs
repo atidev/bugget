@@ -73,7 +73,7 @@ public sealed class ReportsController(
     /// <returns></returns>
     [HttpPut("{reportId}")]
     [ProducesResponseType(typeof(ReportView), 200)]
-    public async Task<ReportView?> UpdateReportAsync([FromRoute] int reportId, [FromBody] ReportUpdateDto updateDto)
+    public async Task<ReportView?> UpdateReportAsync([FromRoute] int reportId, [FromBody] ReportPatchDto updateDto)
     {
         var user = User.GetIdentity();
         var report = await reportsService.UpdateReportAsync(updateDto.ToReportUpdate(reportId, user.Id));
