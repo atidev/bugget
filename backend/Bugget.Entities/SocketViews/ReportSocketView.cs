@@ -1,4 +1,4 @@
-namespace Bugget.Entities.SocketView;
+namespace Bugget.Entities.SocketViews;
 
 public class ReportSocketView
 {

@@ -3,4 +3,4 @@ using Bugget.Entities.DbModels.Report;
 
 namespace Bugget.Features.Context;
 
-public record ReportUpdateContext(ReportUpdate Report, ReportDbModel ReportDbModel);
+public record ReportUpdateContext(ReportUpdate Report, ReportObsoleteDbModel ReportDbModel);

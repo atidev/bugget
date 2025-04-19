@@ -15,7 +15,7 @@ public sealed class ReportsService(
     ReportsDbClient reportsDbClient,
     FeaturesService featuresService)
 {
-    public async Task<ReportDbModel?> CreateReportAsync(Report report)
+    public async Task<ReportObsoleteDbModel?> CreateReportAsync(Report report)
     {
         var reportDbModel = await reportsDbClient.CreateReportAsync(report.ToReportDbModel());
         if (reportDbModel == null)
@@ -28,7 +28,7 @@ public sealed class ReportsService(
         return reportDbModel;
     }
 
-    public  Task<ReportV2DbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto createDto)
+    public  Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto createDto)
     {
         return reportsDbClient.CreateReportAsync(userId, teamId, organizationId, createDto);
     }
@@ -38,17 +38,17 @@ public sealed class ReportsService(
         return reportsDbClient.PatchReportAsync(reportId, userId, organizationId, patchDto);
     }
 
-    public Task<ReportDbModel[]> ListReportsAsync(string userId)
+    public Task<ReportObsoleteDbModel[]> ListReportsAsync(string userId)
     {
         return reportsDbClient.ListReportsAsync(userId);
     }
 
-    public Task<ReportDbModel?> GetReportAsync(int reportId)
+    public Task<ReportObsoleteDbModel?> GetReportAsync(int reportId)
     {
         return reportsDbClient.GetReportAsync(reportId);
     }
 
-    public async Task<MonadeStruct<ReportV2DbModel>> GetReportAsync(int reportId, string? organizationId)
+    public async Task<MonadeStruct<ReportDbModel>> GetReportAsync(int reportId, string? organizationId)
     {
         var report = await reportsDbClient.GetReportAsync(reportId, organizationId);
         if (report == null)
@@ -59,7 +59,7 @@ public sealed class ReportsService(
         return report;
     }
 
-    public async Task<ReportDbModel?> UpdateReportAsync(ReportUpdate report)
+    public async Task<ReportObsoleteDbModel?> UpdateReportAsync(ReportUpdate report)
     {
         var reportDbModel =  await reportsDbClient.UpdateReportAsync(report.ToReportUpdateDbModel());
 

@@ -19,8 +19,8 @@ public sealed class ReportsV2Controller(
     /// Создать репорт
     /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(ReportV2DbModel), 200)]
-    public Task<ReportV2DbModel> CreateReportAsync([FromBody] ReportV2CreateDto createDto)
+    [ProducesResponseType(typeof(ReportDbModel), 200)]
+    public Task<ReportSummaryDbModel> CreateReportAsync([FromBody] ReportV2CreateDto createDto)
     {
         var user = User.GetIdentity();
         return reportsService.CreateReportAsync(user.Id, user.TeamId, user.OrganizationId, createDto);
@@ -32,7 +32,7 @@ public sealed class ReportsV2Controller(
     /// <param name="reportId"></param>
     /// <returns></returns>
     [HttpGet("{reportId}")]
-    [ProducesResponseType(typeof(ReportV2DbModel), 200)]
+    [ProducesResponseType(typeof(ReportDbModel), 200)]
     public Task<IActionResult> GetReportAsync([FromRoute] int reportId)
     {
         var user = User.GetIdentity();
@@ -43,7 +43,7 @@ public sealed class ReportsV2Controller(
     /// Частично обновить репорт ТОЛЬКО ДЛЯ ТЕСТА (должно идти через веб-сокет)
     /// </summary>
     [HttpPatch("{reportId}")]
-    [ProducesResponseType(typeof(ReportV2DbModel), 200)]
+    [ProducesResponseType(typeof(ReportDbModel), 200)]
     public Task<ReportPatchDbModel> PatchReportAsync([FromRoute] int reportId, [FromBody] ReportPatchDto patchDto)
     {
         var user = User.GetIdentity();

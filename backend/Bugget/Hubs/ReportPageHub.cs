@@ -1,7 +1,7 @@
 using Bugget.Authentication;
 using Bugget.BO.Services;
 using Bugget.Entities.DTO.Report;
-using Bugget.Entities.SocketView;
+using Bugget.Entities.SocketViews;
 using Bugget.Features;
 using Bugget.Features.Context;
 using Microsoft.AspNetCore.SignalR;

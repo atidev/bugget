@@ -12,7 +12,7 @@ public sealed class ReportsDbClient: PostgresClient
     /// <summary>
     /// Получает отчет по ID.
     /// </summary>
-    public async Task<ReportDbModel?> GetReportAsync(int reportId)
+    public async Task<ReportObsoleteDbModel?> GetReportAsync(int reportId)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
         var jsonResult = await connection.ExecuteScalarAsync<string>(
@@ -20,13 +20,13 @@ public sealed class ReportsDbClient: PostgresClient
             new { report_id = reportId }
         );
 
-        return jsonResult != null ? Deserialize<ReportDbModel>(jsonResult) : null;
+        return jsonResult != null ? Deserialize<ReportObsoleteDbModel>(jsonResult) : null;
     }
 
     /// <summary>
     /// Получает отчет по ID.
     /// </summary>
-    public async Task<ReportV2DbModel?> GetReportAsync(int reportId, string? organizationId)
+    public async Task<ReportDbModel?> GetReportAsync(int reportId, string? organizationId)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
         var jsonResult = await connection.ExecuteScalarAsync<string>(
@@ -34,10 +34,10 @@ public sealed class ReportsDbClient: PostgresClient
             new { report_id = reportId, organization_id = organizationId }
         );
 
-        return jsonResult != null ? Deserialize<ReportV2DbModel>(jsonResult) : null;
+        return jsonResult != null ? Deserialize<ReportDbModel>(jsonResult) : null;
     }
     
-    public async Task<ReportDbModel[]> ListReportsAsync(string userId)
+    public async Task<ReportObsoleteDbModel[]> ListReportsAsync(string userId)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
         var jsonResults = await connection.QueryAsync<string>(
@@ -47,14 +47,14 @@ public sealed class ReportsDbClient: PostgresClient
 
         return jsonResults
             .Where(json => json != null)
-            .Select(json => Deserialize<ReportDbModel>(json)!)
+            .Select(json => Deserialize<ReportObsoleteDbModel>(json)!)
             .ToArray();
     }
 
     /// <summary>
     /// Создает новый отчет и возвращает его краткую структуру.
     /// </summary>
-    public async Task<ReportV2DbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto dto)
+    public async Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto dto)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
 
@@ -69,7 +69,7 @@ public sealed class ReportsDbClient: PostgresClient
             }
         );
 
-        return Deserialize<ReportV2DbModel>(jsonResult!)!;
+        return Deserialize<ReportSummaryDbModel>(jsonResult!)!;
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public sealed class ReportsDbClient: PostgresClient
     /// <summary>
     /// Создает новый отчет и возвращает его полную структуру.
     /// </summary>
-    public async Task<ReportDbModel?> CreateReportAsync(ReportCreateDbModel reportDbModel)
+    public async Task<ReportObsoleteDbModel?> CreateReportAsync(ReportCreateDbModel reportDbModel)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
 
@@ -120,11 +120,11 @@ public sealed class ReportsDbClient: PostgresClient
         );
 
         return jsonResult != null
-            ? Deserialize<ReportDbModel>(jsonResult)
+            ? Deserialize<ReportObsoleteDbModel>(jsonResult)
             : null;
     }
     
-    public async Task<ReportDbModel?> UpdateReportAsync(ReportUpdateDbModel reportDbModel)
+    public async Task<ReportObsoleteDbModel?> UpdateReportAsync(ReportUpdateDbModel reportDbModel)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
         
@@ -141,7 +141,7 @@ public sealed class ReportsDbClient: PostgresClient
         );
 
         return jsonResult != null
-            ? Deserialize<ReportDbModel>(jsonResult)
+            ? Deserialize<ReportObsoleteDbModel>(jsonResult)
             : null;
     }
     

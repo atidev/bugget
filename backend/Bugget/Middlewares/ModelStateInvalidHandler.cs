@@ -8,7 +8,7 @@ public sealed class ModelStateInvalidHandler : IActionResult
 {
     private const string Error = "model_state_validation_error";
     private const string Reason = "Ошибка валидации модели запроса";
-    private const string LogKey = "errorList";
+    private const string LogKey = "error_list";
 
     private readonly LogLevel _logLevel;
 

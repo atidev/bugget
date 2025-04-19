@@ -12,7 +12,7 @@ namespace Bugget.BO.Mappers;
 
 public static class ReportMapper
 {
-    public static ReportView ToView(this ReportDbModel report, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
+    public static ReportView ToView(this ReportObsoleteDbModel report, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
     {
         return new ReportView
         {

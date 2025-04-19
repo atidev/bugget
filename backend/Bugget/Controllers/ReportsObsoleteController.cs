@@ -18,7 +18,8 @@ namespace Bugget.Controllers;
 /// </summary>
 [LdapAuth]
 [Route("bugget/public/v1/reports")]
-public sealed class ReportsController(
+[Obsolete("Используйте ReportsV2Controller")]
+public sealed class ReportsObsoleteController(
     ReportsService reportsService,
     IHubContext<ReportPageHub> hubContext,
     EmployeesDataAccess employeesDataAccess) : ApiController
@@ -58,7 +59,7 @@ public sealed class ReportsController(
     /// <param name="reportId"></param>
     /// <returns></returns>
     [HttpGet("{reportId}")]
-    [ProducesResponseType(typeof(ReportDbModel), 200)]
+    [ProducesResponseType(typeof(ReportObsoleteDbModel), 200)]
     public async Task<ReportView?> GetReportAsync([FromRoute] int reportId)
     {
         var report = await reportsService.GetReportAsync(reportId);
