@@ -15,9 +15,9 @@ public sealed class BugsService(BugsDbClient bugsDbClient)
         return bugsDbClient.CreateBugAsync(bug.ToBugCreateDbModel(), organizationId);
     }
 
-    public Task<BugDbModel> UpdateBugAsync(BugUpdate bug, string? organizationId)
+    public Task<BugDbModel> UpdateBugAsync(BugUpdate bug)
     {
-        return bugsDbClient.UpdateBugObsoleteAsync(bug.ToBugUpdateDbModel(), organizationId);
+        return bugsDbClient.UpdateBugObsoleteAsync(bug.ToBugUpdateDbModel());
     }
 
     public Task<BugDbModel> UpdateBugSummaryAsync(BugUpdate bug, string? organizationId)

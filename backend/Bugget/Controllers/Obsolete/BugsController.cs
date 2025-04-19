@@ -46,7 +46,7 @@ public sealed class BugsController(BugsService bugsService,
     public async Task<BugViewObsolete?> UpdateBugAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromBody] BugUpdateSummaryDto updateDto)
     {
         var user = User.GetIdentity();
-        var updatedBug = await bugsService.UpdateBugAsync(updateDto.ToBugUpdateSummary(reportId, bugId, user.Id), user.OrganizationId);
+        var updatedBug = await bugsService.UpdateBugAsync(updateDto.ToBugUpdateSummary(reportId, bugId, user.Id));
         
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");

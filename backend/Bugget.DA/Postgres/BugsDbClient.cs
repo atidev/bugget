@@ -42,17 +42,16 @@ public sealed class BugsDbClient : PostgresClient
     /// <param name="updateBugDbModel"></param>
     /// <param name="organizationId"></param>
     /// <returns></returns>
-    public async Task<BugDbModel> UpdateBugObsoleteAsync(BugUpdateDbModel updateBugDbModel, string? organizationId)
+    public async Task<BugDbModel> UpdateBugObsoleteAsync(BugUpdateDbModel updateBugDbModel)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
         
         var jsonResult = await connection.ExecuteScalarAsync<string>(
-            "SELECT public.update_bug(@bug_id, @report_id, @organization_id, @updater_user_id, @receive, @expect, @status);",
+            "SELECT public.update_bug(@bug_id, @report_id, @updater_user_id, @receive, @expect, @status);",
             new
             {
                 bug_id = updateBugDbModel.Id,
                 report_id = updateBugDbModel.ReportId,
-                organization_id = organizationId,
                 updater_user_id = updateBugDbModel.UpdaterUserId,
                 receive = updateBugDbModel.Receive,
                 expect = updateBugDbModel.Expect,
@@ -64,7 +63,7 @@ public sealed class BugsDbClient : PostgresClient
     }
 
     /// <summary>
-    /// Обновляет баг и возвращает его полную структуру.
+    /// Обновляет баг и возвращает его краткую структуру.
     /// </summary>
     /// <param name="updateBugDbModel"></param>
     /// <param name="organizationId"></param>

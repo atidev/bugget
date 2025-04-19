@@ -54,6 +54,7 @@ public sealed class ReportsDbClient: PostgresClient
                 status = reportDbModel.Status,
                 responsible_user_id = reportDbModel.ResponsibleUserId,
                 creator_user_id = reportDbModel.CreatorUserId,
+                creator_team_id = reportDbModel.CreatorTeamId,
                 creator_organization_id = reportDbModel.CreatorOrganizationId,
                 participants = reportDbModel.ParticipantsUserIds,
                 bugs_json = bugsJson

@@ -111,6 +111,7 @@ public static class ReportMapper
             Status = report.Status,
             ResponsibleUserId = report.ResponsibleUserId,
             CreatorUserId = report.CreatorUserId,
+            CreatorTeamId = report.CreatorTeamId,
             CreatorOrganizationId = report.CreatorOrganizationId,
             ParticipantsUserIds = report.ParticipantsUserIds,
             Bugs = report.Bugs.Select(b => new BugCreateDbModel
