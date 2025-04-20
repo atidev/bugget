@@ -1,19 +1,14 @@
 using Bugget.Authentication;
 using Bugget.BO.Services;
 using Bugget.Entities.DTO.Report;
-using Bugget.Entities.SocketViews;
-using Bugget.Features;
-using Bugget.Features.Context;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Bugget.Hubs;
 
 public sealed class ReportPageHub(
     ILogger<ReportPageHub> logger,
-    ReportsService reportsService,
-    FeaturesService featuresService) : Hub
+    ReportsService reportsService) : Hub
 {
-
     // Подключение к группе комментариев по reportId
     public async Task JoinReportGroupAsync(int reportId)
     {
@@ -35,37 +30,23 @@ public sealed class ReportPageHub(
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async Task PatchReportAsync(int reportId, ReportPatchDto patchDto)
+    public Task PatchReportAsync(int reportId, ReportPatchDto patchDto)
     {
         if (Context.User == null)
         {
             logger.LogError("Пользователь не авторизован");
-            return;
+            return Task.CompletedTask;
         }
 
         var user = new UserIdentity(Context.User);
 
         logger.LogInformation("Пользователь {@UserId} патчит отчёт {@ReportId}, {@PatchDto}", user.Id, reportId, patchDto);
 
-        var result = await reportsService.PatchReportAsync(
+        return reportsService.PatchReportAsync(
             reportId,
             user.Id,
             user.OrganizationId,
             patchDto
         );
-
-        var socketView = new ReportSocketView
-        {
-            Title = patchDto.Title,
-            Status = patchDto.Status,
-            ResponsibleUserId = patchDto.ResponsibleUserId,
-            PastResponsibleUserId = patchDto.ResponsibleUserId != null ? result.PastResponsibleUserId : null,
-            ParticipantsUserIds = result.IsParticipantsChanged ? result.ParticipantsUserIds : null,
-        };
-
-        await Clients.Group($"{reportId}")
-            .SendAsync("ReceiveReportPatch", socketView);
-
-        await featuresService.ExecuteReportPatchPostActions(new ReportPatchContext(user.Id, patchDto, result));
     }
 }

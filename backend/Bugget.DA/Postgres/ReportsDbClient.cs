@@ -75,7 +75,7 @@ public sealed class ReportsDbClient: PostgresClient
     /// <summary>
     /// Обновляет краткую информацию об отчете и возвращает его краткую структуру.
     /// </summary>
-    public async Task<ReportPatchDbModel> PatchReportAsync(int reportId, string userId, string? organizationId, ReportPatchDto dto)
+    public async Task<ReportPatchResultDbModel> PatchReportAsync(int reportId, string userId, string? organizationId, ReportPatchDto dto)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
 
@@ -92,7 +92,7 @@ public sealed class ReportsDbClient: PostgresClient
             }
         );
 
-        return Deserialize<ReportPatchDbModel>(jsonResult!)!;
+        return Deserialize<ReportPatchResultDbModel>(jsonResult!)!;
     }
 
 

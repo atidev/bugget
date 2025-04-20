@@ -44,7 +44,7 @@ public sealed class ReportsV2Controller(
     /// </summary>
     [HttpPatch("{reportId}")]
     [ProducesResponseType(typeof(ReportDbModel), 200)]
-    public Task<ReportPatchDbModel> PatchReportAsync([FromRoute] int reportId, [FromBody] ReportPatchDto patchDto)
+    public Task<ReportPatchResultDbModel> PatchReportAsync([FromRoute] int reportId, [FromBody] ReportPatchDto patchDto)
     {
         var user = User.GetIdentity();
         return reportsService.PatchReportAsync(reportId, user.Id, user.OrganizationId, patchDto);
