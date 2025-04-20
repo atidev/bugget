@@ -19,6 +19,7 @@ namespace Bugget.BO.Services
                 reportPageHubClient.SendReportPatchAsync(reportId, patchDto.ToSocketView(result)),
                 externalClientsActionService.ExecuteReportPatchPostActions(new ReportPatchContext(userId, patchDto, result)),
                 participantsService.AddParticipantIfNotExistAsync(reportId, userId),
+                patchDto.ResponsibleUserId != null ? participantsService.AddParticipantIfNotExistAsync(reportId, patchDto.ResponsibleUserId) : Task.CompletedTask,
                 autoStatusService.CalculateStatusAsync(reportId, patchDto, result)
             );
         }
