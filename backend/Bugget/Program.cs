@@ -29,7 +29,8 @@ builder.Services.AddSignalR(options =>
     options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // Клиент ждёт 60 сек перед разрывом
 }).AddHubOptions<ReportPageHub>(options =>
 {
-    options.AddFilter<HubErrorFilter>();
+    options.AddFilter<HubExceptionHandlerFilter>();
+    options.AddFilter<HubModelStateInvalidFilter>();
 });
 
 // разрешаем cors для локального тестирования

@@ -5,7 +5,7 @@ using Npgsql;
 
 namespace Bugget.Middlewares;
 
-public class HubErrorFilter(ILogger<HubErrorFilter> logger) : IHubFilter
+public class HubExceptionHandlerFilter(ILogger<HubExceptionHandlerFilter> logger) : IHubFilter
 {
     protected readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
