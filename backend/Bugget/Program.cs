@@ -66,6 +66,9 @@ builder.Services
     .AddSingleton<ReportAutoStatusService>()
     .AddSingleton<ParticipantsService>();
 
+// для маппинга snake_case в c# типы средствами dapper
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
 builder.Services
     .AddSingleton<ReportsDbClient>()
     .AddSingleton<CommentsDbClient>()

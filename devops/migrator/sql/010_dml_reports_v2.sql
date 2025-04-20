@@ -87,44 +87,131 @@ BEGIN
 END;
 $$;
 
+-- 1) Общая информация по отчёту
 CREATE OR REPLACE FUNCTION public.get_report_v2(_report_id int, _organization_id text DEFAULT NULL)
-    RETURNS jsonb
-    LANGUAGE plpgsql
+    RETURNS TABLE(
+        id int,
+        title text,
+        status text,
+        created_at timestamp,
+        updated_at timestamp,
+        creator_user_id text,
+        creator_team_id text,
+        responsible_user_id text,
+        past_responsible_user_id text)
+    LANGUAGE sql
+    STABLE
     AS $$
-DECLARE
-    result jsonb;
-BEGIN
-    -- Формируем JSON с Report и его связями
     SELECT
-        jsonb_build_object('id', r.id, 'title', r.title, 'status', r.status, 'created_at', r.created_at, 'updated_at', r.updated_at, 'creator_user_id', r.creator_user_id, 'creator_team_id', r.creator_team_id, 'responsible_user_id', r.responsible_user_id, 'past_responsible_user_id', r.past_responsible_user_id, 'bugs', COALESCE((
-                SELECT
-                    jsonb_agg(jsonb_build_object('id', b.id, 'report_id', b.report_id, 'receive', b.receive, 'expect', b.expect, 'status', b.status, 'creator_user_id', b.creator_user_id, 'created_at', b.created_at, 'updated_at', b.updated_at, 'attachments', COALESCE((
-                                SELECT
-                                    jsonb_agg(jsonb_build_object('id', a.id, 'path', a.path, 'attach_type', a.attach_type, 'created_at', a.created_at))
-                            FROM public.attachments a
-                            WHERE
-                                a.bug_id = b.id), '[]'::jsonb), 'comments', COALESCE((
-                            SELECT
-                                jsonb_agg(jsonb_build_object('id', c.id, 'text', c.text, 'creator_user_id', c.creator_user_id, 'bug_id', c.bug_id, 'created_at', c.created_at, 'updated_at', c.updated_at))
-                            FROM public.comments c
-                        WHERE
-                            c.bug_id = b.id), '[]'::jsonb)))
-            FROM public.bugs b
-        WHERE
-            b.report_id = r.id), '[]'::jsonb), 'participants_user_ids', COALESCE((
-        SELECT
-            jsonb_agg(user_id)
-        FROM public.report_participants AS rp
-    WHERE
-        rp.report_id = r.id), '[]'::jsonb)) INTO result
+        r.id,
+        r.title,
+        r.status,
+        r.created_at,
+        r.updated_at,
+        r.creator_user_id,
+        r.creator_team_id,
+        r.responsible_user_id,
+        r.past_responsible_user_id
     FROM
         public.reports r
     WHERE
         r.id = _report_id
-        AND (_organization_id IS NULL
+        AND(_organization_id IS NULL
             OR r.creator_organization_id = _organization_id);
-    RETURN result;
-END;
+$$;
+
+-- 2) Все баги из отчёта
+CREATE OR REPLACE FUNCTION public.list_bugs(_report_id int)
+    RETURNS TABLE(
+        id int,
+        report_id int,
+        receive text,
+        expect text,
+        status text,
+        creator_user_id text,
+        created_at timestamp,
+        updated_at timestamp)
+    LANGUAGE sql
+    STABLE
+    AS $$
+    SELECT
+        b.id,
+        b.report_id,
+        b.receive,
+        b.expect,
+        b.status,
+        b.creator_user_id,
+        b.created_at,
+        b.updated_at
+    FROM
+        public.bugs b
+    WHERE
+        b.report_id = _report_id;
+$$;
+
+-- 3) Участники отчёта
+CREATE OR REPLACE FUNCTION public.list_participants(_report_id int)
+    RETURNS TABLE(
+        user_id text)
+    LANGUAGE sql
+    STABLE
+    AS $$
+    SELECT
+        p.user_id
+    FROM
+        public.report_participants p
+    WHERE
+        p.report_id = _report_id;
+$$;
+
+-- 4) Комментарии ко всем багам отчёта
+CREATE OR REPLACE FUNCTION public.list_comments(_report_id int)
+    RETURNS TABLE(
+        id int,
+        bug_id int,
+        text text,
+        creator_user_id text,
+        created_at timestamp,
+        updated_at timestamp)
+    LANGUAGE sql
+    STABLE
+    AS $$
+    SELECT
+        c.id,
+        c.bug_id,
+        c.text,
+        c.creator_user_id,
+        c.created_at,
+        c.updated_at
+    FROM
+        public.comments c
+        JOIN public.bugs b ON c.bug_id = b.id
+    WHERE
+        b.report_id = _report_id;
+$$;
+
+-- 5) Вложения ко всем багам отчёта
+CREATE OR REPLACE FUNCTION public.list_attachments(_report_id int)
+    RETURNS TABLE(
+        id int,
+        bug_id int,
+        path text,
+        attach_type text,
+        created_at timestamp)
+    LANGUAGE sql
+    STABLE
+    AS $$
+    SELECT
+        a.id,
+        a.bug_id,
+        a.path,
+        a.attach_type,
+        a.created_at
+    FROM
+        public.attachments a
+        JOIN public.bugs b ON a.bug_id = b.id
+    WHERE
+        b.report_id = _report_id;
 $$;
 
 CREATE OR REPLACE FUNCTION public.add_participant_if_not_exist(_report_id integer, _user_id text)
@@ -140,7 +227,6 @@ BEGIN
         VALUES (_report_id, _user_id)
     ON CONFLICT (report_id, user_id)
         DO NOTHING;
-        
     GET DIAGNOSTICS inserted_count = ROW_COUNT;
     -- если ничего не вставилось — возвращаем NULL
     IF inserted_count = 0 THEN

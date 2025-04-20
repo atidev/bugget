@@ -1,6 +1,8 @@
 using System.Text.Json;
 using Bugget.Entities.BO.Search;
 using Bugget.Entities.DbModels;
+using Bugget.Entities.DbModels.Bug;
+using Bugget.Entities.DbModels.Comment;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
 using Dapper;
@@ -28,13 +30,37 @@ public sealed class ReportsDbClient : PostgresClient
     /// </summary>
     public async Task<ReportDbModel?> GetReportAsync(int reportId, string? organizationId)
     {
-        await using var connection = await DataSource.OpenConnectionAsync();
-        var jsonResult = await connection.ExecuteScalarAsync<string>(
-            "SELECT public.get_report_v2(@report_id, @organization_id);",
-            new { report_id = reportId, organization_id = organizationId }
-        );
+        await using var conn = await DataSource.OpenConnectionAsync();
+        // Открываем транзакцию для курсоров
+        await using var multi = await conn.QueryMultipleAsync(@"
+  SELECT * FROM public.get_report_v2(@reportId, @organizationId);
+  SELECT * FROM public.list_bugs(@reportId);
+  SELECT * FROM public.list_participants(@reportId);
+  SELECT * FROM public.list_comments(@reportId);
+  SELECT * FROM public.list_attachments(@reportId);
+", new { reportId, organizationId });
 
-        return jsonResult != null ? Deserialize<ReportDbModel>(jsonResult) : null;
+        // проверка доступа к репорту
+        var report = await multi.ReadSingleOrDefaultAsync<ReportDbModel>();
+        if (report == null) return null;
+
+        // 2. Дочерние сущности
+        report.Bugs = (await multi.ReadAsync<BugDbModel>()).ToArray();
+        report.ParticipantsUserIds = (await multi.ReadAsync<string>()).ToArray();
+        var comments = (await multi.ReadAsync<CommentDbModel>()).ToArray();
+        var attachments = (await multi.ReadAsync<AttachmentDbModel>()).ToArray();
+
+        // 3. Группируем по багам
+        var commentsByBug = comments.GroupBy(c => c.BugId).ToDictionary(g => g.Key, g => g.ToArray());
+        var attachmentsByBug = attachments.GroupBy(a => a.BugId).ToDictionary(g => g.Key, g => g.ToArray());
+
+        foreach (var bug in report.Bugs)
+        {
+            bug.Comments = commentsByBug.TryGetValue(bug.Id, out var c) ? c : [];
+            bug.Attachments = attachmentsByBug.TryGetValue(bug.Id, out var a) ? a : [];
+        }
+
+        return report;
     }
 
     public async Task<ReportObsoleteDbModel[]> ListReportsAsync(string userId)
