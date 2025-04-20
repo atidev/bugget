@@ -7,7 +7,7 @@ using Dapper;
 
 namespace Bugget.DA.Postgres;
 
-public sealed class ReportsDbClient: PostgresClient
+public sealed class ReportsDbClient : PostgresClient
 {
     /// <summary>
     /// Получает отчет по ID.
@@ -36,7 +36,7 @@ public sealed class ReportsDbClient: PostgresClient
 
         return jsonResult != null ? Deserialize<ReportDbModel>(jsonResult) : null;
     }
-    
+
     public async Task<ReportObsoleteDbModel[]> ListReportsAsync(string userId)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
@@ -123,11 +123,11 @@ public sealed class ReportsDbClient: PostgresClient
             ? Deserialize<ReportObsoleteDbModel>(jsonResult)
             : null;
     }
-    
+
     public async Task<ReportObsoleteDbModel?> UpdateReportAsync(ReportUpdateDbModel reportDbModel)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
-        
+
         var jsonResult = await connection.ExecuteScalarAsync<string>(
             "SELECT public.update_report(@report_id, @participants,@title, @status, @responsible_user_id);",
             new
@@ -144,7 +144,7 @@ public sealed class ReportsDbClient: PostgresClient
             ? Deserialize<ReportObsoleteDbModel>(jsonResult)
             : null;
     }
-    
+
     public async Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
@@ -165,6 +165,16 @@ public sealed class ReportsDbClient: PostgresClient
 
         return Deserialize<SearchReportsDbModel>(jsonResult);
     }
-    
+
+    public async Task ChangeStatusAsync(int reportId, int newStatus)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+
+        await connection.ExecuteAsync(
+            "SELECT public.change_status(@report_id, @new_status);",
+            new { report_id = reportId, new_status = newStatus }
+        );
+    }
+
     private T? Deserialize<T>(string json) => JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
 }

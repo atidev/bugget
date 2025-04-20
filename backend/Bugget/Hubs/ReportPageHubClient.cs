@@ -4,18 +4,19 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Bugget.Hubs;
 
-public class ReportPageHubClient : IReportPageHubClient
+public class ReportPageHubClient(IHubContext<ReportPageHub> hubContext) : IReportPageHubClient
 {
-    private readonly IHubContext<ReportPageHub> _hubContext;
-
-    public ReportPageHubClient(IHubContext<ReportPageHub> hubContext)
-    {
-        _hubContext = hubContext;
-    }
+    private readonly IHubContext<ReportPageHub> _hubContext = hubContext;
 
     public Task SendReportPatchAsync(int reportId, PatchReportSocketView view)
     {
         return _hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReportPatch", view);
+    }
+
+    public Task SendReportParticipantsAsync(int reportId, string[] participants)
+    {
+        return _hubContext.Clients.Group($"{reportId}")
+            .SendAsync("ReceiveReportParticipants", participants);
     }
 } 

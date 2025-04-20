@@ -12,6 +12,7 @@ using Microsoft.OpenApi.Models;
 using Bugget.DA.Interfaces;
 using Bugget.ExternalClients;
 using TaskQueue;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,9 @@ builder.Services.AddSignalR(options =>
     options.EnableDetailedErrors = true; // Показывать ошибки в логе
     options.KeepAliveInterval = TimeSpan.FromSeconds(15); // Пинг каждые 15 сек
     options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // Клиент ждёт 60 сек перед разрывом
+}).AddHubOptions<ReportPageHub>(options =>
+{
+    options.AddFilter<HubErrorFilter>();
 });
 
 // разрешаем cors для локального тестирования
@@ -57,7 +61,10 @@ builder.Services
     .AddSingleton<BugsService>()
     .AddSingleton<CommentsService>()
     .AddSingleton<EmployeesService>()
-    .AddSingleton<AttachmentService>();
+    .AddSingleton<AttachmentService>()
+    .AddSingleton<ReportEventsService>()
+    .AddSingleton<ReportAutoStatusService>()
+    .AddSingleton<ParticipantsService>();
 
 builder.Services
     .AddSingleton<ReportsDbClient>()
@@ -66,6 +73,7 @@ builder.Services
     .AddSingleton<AttachmentDbClient>()
     .AddSingleton<EmployeesDataAccess>()
     .AddSingleton<EmployeesFileClient>()
+    .AddSingleton<ParticipantsDbClient>()
     .AddSingleton<IEmployeesClient>((sp) => sp.GetRequiredService<EmployeesFileClient>());
 
 builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesDataAccess>());

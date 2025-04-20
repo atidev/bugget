@@ -1,14 +1,13 @@
 using Bugget.BO.Errors;
 using Bugget.BO.Mappers;
-using Bugget.BO.WebSockets;
 using Bugget.DA.Postgres;
 using Bugget.Entities.BO.ReportBo;
 using Bugget.Entities.BO.Search;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
-using Bugget.Entities.SocketViews;
 using Bugget.ExternalClients;
 using Bugget.ExternalClients.Context;
+using Microsoft.Extensions.Logging;
 using Monade;
 using TaskQueue;
 
@@ -18,7 +17,8 @@ public sealed class ReportsService(
     ReportsDbClient reportsDbClient,
     ExternalClientsActionService externalClientsActionService,
     ITaskQueue taskQueue,
-    IReportPageHubClient reportPageHubClient)
+    ReportEventsService reportEventsService,
+    ILogger<ReportsService> logger)
 {
     public async Task<ReportObsoleteDbModel?> CreateReportAsync(Report report)
     {
@@ -40,23 +40,12 @@ public sealed class ReportsService(
 
     public async Task<ReportPatchResultDbModel> PatchReportAsync(int reportId, string userId, string? organizationId, ReportPatchDto patchDto)
     {
+        logger.LogInformation("Пользователь {@UserId} патчит отчёт {@ReportId}, {@PatchDto}", userId, reportId, patchDto);
+
         var result = await reportsDbClient.PatchReportAsync(reportId, userId, organizationId, patchDto);
-        var socketView = new PatchReportSocketView
-        {
-            Title = patchDto.Title,
-            Status = patchDto.Status,
-            ResponsibleUserId = patchDto.ResponsibleUserId,
-            PastResponsibleUserId = patchDto.ResponsibleUserId == null ? null : result.PastResponsibleUserId
-        };
 
-        await reportPageHubClient.SendReportPatchAsync(reportId, socketView);
+        await taskQueue.Enqueue(() => reportEventsService.HandlePatchReportEventAsync(reportId, userId, patchDto, result));
 
-        await taskQueue.Enqueue(() => externalClientsActionService.ExecuteReportPatchPostActions(new ReportPatchContext(userId, patchDto, result)));
-
-        // todo проставление участников и уведомление
-        
-        // todo вычисление статуса
-        
         return result;
     }
 

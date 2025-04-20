@@ -39,9 +39,6 @@ public sealed class ReportPageHub(
         }
 
         var user = new UserIdentity(Context.User);
-
-        logger.LogInformation("Пользователь {@UserId} патчит отчёт {@ReportId}, {@PatchDto}", user.Id, reportId, patchDto);
-
         return reportsService.PatchReportAsync(
             reportId,
             user.Id,
