@@ -84,6 +84,7 @@ export const resetReport = createEvent();
 export const updateTitle = createEvent<string>();
 export const updateStatus = createEvent<number>();
 export const updateResponsible = createEvent<User | null>();
+export const setRequestState = createEvent<RequestStates>();
 
 export const $reportRequestState = createStore(RequestStates.IDLE);
 $reportRequestState
@@ -92,7 +93,8 @@ $reportRequestState
   })
   .on(fetchReportFx.doneData, () => {
     return RequestStates.DONE;
-  });
+  })
+  .on(setRequestState, (state, status) => status);
 
 export const $isReportChanged = createStore(false).reset(clearReport);
 

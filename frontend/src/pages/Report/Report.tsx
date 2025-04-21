@@ -7,6 +7,7 @@ import {
   clearReport,
   createReportFx,
   $reportForm,
+  setRequestState,
 } from "@/store/report";
 import { $newBugStore, $isExists, setExists } from "@/store/newBug";
 import { $bugsIds } from "@/store/bugs";
@@ -15,7 +16,7 @@ import Bug from "./components/Bug/Bug";
 import ReportHeader from "./components/ReportHeader/ReportHeader";
 import "./Report.css";
 import useWebSocketReportPage from "@/hooks/useWebSocketReportPage";
-import { ReportStatuses } from "@/const";
+import { ReportStatuses, RequestStates } from "@/const";
 
 const reportsPageBreadcrumb = { label: "Репорты", path: "/" };
 
@@ -47,6 +48,8 @@ const ReportPage = () => {
   useEffect(() => {
     if (reportId) {
       fetchReportFx(Number(reportId));
+    } else {
+      setRequestState(RequestStates.DONE);
     }
 
     return () => {
