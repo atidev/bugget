@@ -3,7 +3,7 @@ namespace Bugget.Entities.DTO.Report;
 
 public sealed class ReportPatchDto
 {
-    [StringLength(120, MinimumLength = 1)]
+    [StringLength(128, MinimumLength = 1)]
     public string? Title { get; init; }
     [Range(0, 3)]
     public int? Status { get; init; }

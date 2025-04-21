@@ -5,15 +5,20 @@ using Bugget.Entities.BO.ReportBo;
 using Bugget.Entities.BO.Search;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
-using Bugget.Features;
-using Bugget.Features.Context;
+using Bugget.ExternalClients;
+using Bugget.ExternalClients.Context;
+using Microsoft.Extensions.Logging;
 using Monade;
+using TaskQueue;
 
 namespace Bugget.BO.Services;
 
 public sealed class ReportsService(
     ReportsDbClient reportsDbClient,
-    FeaturesService featuresService)
+    ExternalClientsActionService externalClientsActionService,
+    ITaskQueue taskQueue,
+    ReportEventsService reportEventsService,
+    ILogger<ReportsService> logger)
 {
     public async Task<ReportObsoleteDbModel?> CreateReportAsync(Report report)
     {
@@ -23,19 +28,25 @@ public sealed class ReportsService(
             return null;
         }
 
-        await featuresService.ExecuteReportCreatePostActions(new ReportCreateContext(report, reportDbModel));
+        await taskQueue.Enqueue(() => externalClientsActionService.ExecuteReportCreatePostActions(new ReportCreateContext(report, reportDbModel)));
 
         return reportDbModel;
     }
 
-    public  Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto createDto)
+    public Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto createDto)
     {
         return reportsDbClient.CreateReportAsync(userId, teamId, organizationId, createDto);
     }
 
-    public  Task<ReportPatchDbModel> PatchReportAsync(int reportId, string userId, string? organizationId, ReportPatchDto patchDto)
+    public async Task<ReportPatchResultDbModel> PatchReportAsync(int reportId, string userId, string? organizationId, ReportPatchDto patchDto)
     {
-        return reportsDbClient.PatchReportAsync(reportId, userId, organizationId, patchDto);
+        logger.LogInformation("Пользователь {@UserId} патчит отчёт {@ReportId}, {@PatchDto}", userId, reportId, patchDto);
+
+        var result = await reportsDbClient.PatchReportAsync(reportId, userId, organizationId, patchDto);
+
+        await taskQueue.Enqueue(() => reportEventsService.HandlePatchReportEventAsync(reportId, userId, patchDto, result));
+
+        return result;
     }
 
     public Task<ReportObsoleteDbModel[]> ListReportsAsync(string userId)
@@ -61,16 +72,16 @@ public sealed class ReportsService(
 
     public async Task<ReportObsoleteDbModel?> UpdateReportAsync(ReportUpdate report)
     {
-        var reportDbModel =  await reportsDbClient.UpdateReportAsync(report.ToReportUpdateDbModel());
+        var reportDbModel = await reportsDbClient.UpdateReportAsync(report.ToReportUpdateDbModel());
 
         if (reportDbModel == null)
             return null;
-        
-        await featuresService.ExecuteReportUpdatePostActions(new ReportUpdateContext(report, reportDbModel));
+
+        await taskQueue.Enqueue(() => externalClientsActionService.ExecuteReportUpdatePostActions(new ReportUpdateContext(report, reportDbModel)));
 
         return reportDbModel;
     }
-    
+
     public Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)
     {
         return reportsDbClient.SearchReportsAsync(search);

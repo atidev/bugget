@@ -2,18 +2,17 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using Bugget.Authentication;
 using Bugget.BO.Services;
+using Bugget.BO.WebSockets;
 using Bugget.DA.Files;
 using Bugget.DA.Postgres;
 using Bugget.Entities.Config;
-using Bugget.Features;
-using Bugget.Features.TaskQueue;
 using Bugget.Hubs;
 using Bugget.Middlewares;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Bugget.DA.Interfaces;
+using Bugget.ExternalClients;
+using TaskQueue;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +27,10 @@ builder.Services.AddSignalR(options =>
     options.EnableDetailedErrors = true; // Показывать ошибки в логе
     options.KeepAliveInterval = TimeSpan.FromSeconds(15); // Пинг каждые 15 сек
     options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // Клиент ждёт 60 сек перед разрывом
+}).AddHubOptions<ReportPageHub>(options =>
+{
+    options.AddFilter<HubExceptionHandlerFilter>();
+    options.AddFilter<HubModelStateInvalidFilter>();
 });
 
 // разрешаем cors для локального тестирования
@@ -52,14 +55,20 @@ builder.Services.AddControllers()
 
 builder.Services.AddAutoMapper(typeof(Bugget.Entities.MappingProfiles.BugMappingProfile).Assembly);
 
-builder.Services.AddFeatures();
+builder.Services.AddExternalClients();
 
 builder.Services
     .AddSingleton<ReportsService>()
     .AddSingleton<BugsService>()
     .AddSingleton<CommentsService>()
     .AddSingleton<EmployeesService>()
-    .AddSingleton<AttachmentService>();
+    .AddSingleton<AttachmentService>()
+    .AddSingleton<ReportEventsService>()
+    .AddSingleton<ReportAutoStatusService>()
+    .AddSingleton<ParticipantsService>();
+
+// для маппинга snake_case в c# типы средствами dapper
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 builder.Services
     .AddSingleton<ReportsDbClient>()
@@ -68,6 +77,7 @@ builder.Services
     .AddSingleton<AttachmentDbClient>()
     .AddSingleton<EmployeesDataAccess>()
     .AddSingleton<EmployeesFileClient>()
+    .AddSingleton<ParticipantsDbClient>()
     .AddSingleton<IEmployeesClient>((sp) => sp.GetRequiredService<EmployeesFileClient>());
 
 builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesDataAccess>());
@@ -75,7 +85,8 @@ builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesFileCli
 
 builder.Services.AddHealthChecks();
 builder.Services.AddLdapAuth();
-builder.Services.AddTaskQueueHostedService();
+builder.Services.AddSingleton<ITaskQueue, TaskQueue.TaskQueue>()
+    .AddHostedService(provider => (TaskQueue.TaskQueue)provider.GetRequiredService<ITaskQueue>());
 
 #region Swagger
 
@@ -96,6 +107,8 @@ builder.Services.AddSingleton<ResultExceptionHandlerMiddleware>();
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(o =>
         o.InvalidModelStateResponseFactory = _ => new ModelStateInvalidHandler());
+
+builder.Services.AddSingleton<IReportPageHubClient, ReportPageHubClient>();
 
 var app = builder.Build();
 

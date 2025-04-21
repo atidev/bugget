@@ -8,7 +8,6 @@ namespace Bugget.Middlewares;
 
 public class ResultExceptionHandlerMiddleware(ILogger<ResultExceptionHandlerMiddleware> logger) : IMiddleware
 {
-    private const string CatchedOnMiddlewareError = "Обработана ошибка на мидлваре";
     private readonly ILogger _logger = logger;
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -17,14 +16,14 @@ public class ResultExceptionHandlerMiddleware(ILogger<ResultExceptionHandlerMidd
         {
             await next(context);
         }
-        catch (PostgresException ex) when (ex.SqlState == "P404")
+        catch (PostgresException ex) when (ex.SqlState == "P0404")
         {
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             await context.Response.WriteAsJsonAsync(BoErrors.NotFoundError);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, CatchedOnMiddlewareError);
+            _logger.LogError(e, "Обработана ошибка на мидлваре");
 
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             await context.Response.WriteAsJsonAsync(BoErrors.InternalServerError);

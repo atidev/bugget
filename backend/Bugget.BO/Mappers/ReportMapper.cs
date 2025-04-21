@@ -6,6 +6,7 @@ using Bugget.Entities.DbModels;
 using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
+using Bugget.Entities.SocketViews;
 using Bugget.Entities.Views;
 
 namespace Bugget.BO.Mappers;
@@ -52,11 +53,11 @@ public static class ReportMapper
             ResponsibleUserId = report.ResponsibleId,
             CreatorUserId = userId,
             Bugs = report.Bugs.Select(b => new Bug
-                {
-                    Receive = b.Receive,
-                    Expect = b.Expect,
-                    CreatorUserId = userId,
-                })
+            {
+                Receive = b.Receive,
+                Expect = b.Expect,
+                CreatorUserId = userId,
+            })
                 .ToArray(),
             ParticipantsUserIds = new string[] { userId, report.ResponsibleId }.Distinct().ToArray()
         };
@@ -137,6 +138,17 @@ public static class ReportMapper
             Skip = skip,
             Take = take,
             Sort = SortOption.Parse(sort)
+        };
+    }
+
+    public static PatchReportSocketView ToSocketView(this ReportPatchDto patchDto, ReportPatchResultDbModel? result)
+    {
+        return new PatchReportSocketView
+        {
+            Title = patchDto.Title,
+            Status = patchDto.Status,
+            ResponsibleUserId = patchDto.ResponsibleUserId,
+            PastResponsibleUserId = patchDto.ResponsibleUserId == null ? null : result?.PastResponsibleUserId
         };
     }
 }
