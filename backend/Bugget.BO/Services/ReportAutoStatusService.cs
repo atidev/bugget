@@ -1,5 +1,5 @@
-using Bugget.BO.WebSockets;
 using Bugget.DA.Postgres;
+using Bugget.DA.WebSockets;
 using Bugget.Entities.BO.ReportBo;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
@@ -18,7 +18,7 @@ namespace Bugget.BO.Services
                 await reportPageHubClient.SendReportPatchAsync(reportId, new PatchReportSocketView
                 {
                     Status = (int)ReportStatus.InProgress,
-                });
+                }, null);
             }
         }
     }

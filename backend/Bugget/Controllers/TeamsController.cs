@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
-using Bugget.Authentication;
+using Authentication;
 using Bugget.BO.Services;
 using Bugget.Entities.Constants;
 using Bugget.Entities.Views;

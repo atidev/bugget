@@ -1,4 +1,6 @@
-using Bugget.BO.WebSockets;
+using Bugget.DA.WebSockets;
+using Bugget.Entities.DbModels.Bug;
+using Bugget.Entities.DTO.Bug;
 using Bugget.Entities.SocketViews;
 using Microsoft.AspNetCore.SignalR;
 
@@ -8,9 +10,15 @@ public class ReportPageHubClient(IHubContext<ReportPageHub> hubContext) : IRepor
 {
     private readonly IHubContext<ReportPageHub> _hubContext = hubContext;
 
-    public Task SendReportPatchAsync(int reportId, PatchReportSocketView view)
+    public Task SendReportPatchAsync(int reportId, PatchReportSocketView view, string? signalRConnectionId)
     {
-        return _hubContext.Clients.Group($"{reportId}")
+        if (signalRConnectionId == null)
+        {
+            return _hubContext.Clients.Group($"{reportId}")
+                .SendAsync("ReceiveReportPatch", view);
+        }
+
+        return _hubContext.Clients.GroupExcept($"{reportId}", signalRConnectionId)
             .SendAsync("ReceiveReportPatch", view);
     }
 
@@ -18,5 +26,29 @@ public class ReportPageHubClient(IHubContext<ReportPageHub> hubContext) : IRepor
     {
         return _hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReportParticipants", participants);
+    }
+
+    public Task SendBugPatchAsync(int reportId, int bugId, BugPatchDto patchDto, string? signalRConnectionId)
+    {
+        if (signalRConnectionId == null)
+        {
+            return _hubContext.Clients.Group($"{reportId}")
+                .SendAsync("ReceiveBugPatch", bugId, patchDto);
+        }
+
+        return _hubContext.Clients.GroupExcept($"{reportId}", signalRConnectionId)
+            .SendAsync("ReceiveBugPatch", bugId, patchDto);
+    }
+
+    public Task SendBugCreateAsync(int reportId, BugSummaryDbModel summaryDbModel, string? signalRConnectionId)
+    {
+        if (signalRConnectionId == null)
+        {
+            return _hubContext.Clients.Group($"{reportId}")
+                .SendAsync("ReceiveBugCreate", summaryDbModel);
+        }
+
+        return _hubContext.Clients.GroupExcept($"{reportId}", signalRConnectionId)
+            .SendAsync("ReceiveBugCreate", summaryDbModel);
     }
 } 

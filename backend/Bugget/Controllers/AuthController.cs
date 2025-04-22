@@ -1,4 +1,4 @@
-using Bugget.Authentication;
+using Authentication;
 using Bugget.DA.Files;
 using Bugget.Entities.Adapters;
 using Bugget.Entities.Constants;
