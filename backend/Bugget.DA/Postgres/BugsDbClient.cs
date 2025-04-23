@@ -13,12 +13,12 @@ public sealed class BugsDbClient : PostgresClient
         await using var connection = await DataSource.OpenConnectionAsync();
 
         return await connection.QuerySingleAsync<BugSummaryDbModel>(
-            "SELECT public.create_bug_v2(@userId, @organizationId, @reportId, @receive, @expect);",
+            "SELECT * FROM public.create_bug_v2(@user_id, @organization_id, @report_id, @receive, @expect);",
             new
             {
-                userId,
-                organizationId,
-                reportId,
+                user_id = userId,
+                organization_id = organizationId,
+                report_id = reportId,
                 receive = bugDto.Receive,
                 expect = bugDto.Expect,
             }
@@ -30,7 +30,7 @@ public sealed class BugsDbClient : PostgresClient
         await using var connection = await DataSource.OpenConnectionAsync();
 
         return await connection.QuerySingleAsync<BugPatchResultDbModel>(
-            "SELECT public.patch_bug(@bug_id, @report_id,  @organization_id, @receive, @expect, @status);",
+            "SELECT * FROM public.patch_bug(@bug_id, @report_id,  @organization_id, @receive, @expect, @status);",
             new
             {
                 bug_id = bugId,

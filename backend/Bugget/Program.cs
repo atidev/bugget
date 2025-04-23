@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Authentication;
 using Bugget.BO.Services;
@@ -24,14 +25,16 @@ builder.Configuration
 
 builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
 builder.Services.AddSignalR(options =>
-{
-    options.EnableDetailedErrors = true; // Показывать ошибки в логе
-    options.KeepAliveInterval = TimeSpan.FromSeconds(15); // Пинг каждые 15 сек
-    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // Клиент ждёт 60 сек перед разрывом
-}).AddHubOptions<ReportPageHub>(options =>
-{
-    options.AddFilter<HubExceptionHandlerFilter>();
-});
+    {
+        options.EnableDetailedErrors = true; // Показывать ошибки в логе
+        options.KeepAliveInterval = TimeSpan.FromSeconds(15); // Пинг каждые 15 сек
+        options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // Клиент ждёт 60 сек перед разрывом
+    })
+    .AddJsonProtocol(options =>
+    {
+        options.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    })
+    .AddHubOptions<ReportPageHub>(options => { options.AddFilter<HubExceptionHandlerFilter>(); });
 
 // разрешаем cors для локального тестирования
 builder.Services.AddCors(options =>

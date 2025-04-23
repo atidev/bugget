@@ -2,6 +2,7 @@ using Authentication;
 using Bugget.BO.Services;
 using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DTO.Bug;
+using Bugget.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bugget.Controllers;
@@ -19,10 +20,10 @@ public sealed class BugsV2Controller(BugsService bugsService) : ApiController
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(BugSummaryDbModel), 200)]
-    public Task<BugSummaryDbModel> CreateBugAsync([FromRoute] int reportId, [FromBody] BugDto createDto)
+    public Task<IActionResult> CreateBugAsync([FromRoute] int reportId, [FromBody] BugDto createDto)
     {
         var user = User.GetIdentity();
-        return bugsService.CreateBugAsync(user, reportId, createDto);
+        return bugsService.CreateBugAsync(user, reportId, createDto).AsActionResultAsync();
     }
 
     /// <summary>

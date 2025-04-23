@@ -11,7 +11,7 @@ namespace Bugget.BO.Services
 
             if (participants != null)
             {
-                await reportPageHubClient.SendReportParticipantsAsync(reportId, participants);
+                await reportPageHubClient.SendNewReportParticipantAsync(reportId, userId);
             }
         }
     }

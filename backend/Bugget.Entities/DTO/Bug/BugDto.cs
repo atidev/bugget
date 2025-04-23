@@ -5,7 +5,7 @@ namespace Bugget.Entities.DTO.Bug;
 public sealed class BugDto
 {
     [StringLength(512, MinimumLength = 1)]
-    public required string Receive { get; init; }
+    public string? Receive { get; init; }
     [StringLength(512, MinimumLength = 1)]
-    public required string Expect { get; init; }
+    public string? Expect { get; init; }
 }

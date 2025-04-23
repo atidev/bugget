@@ -7,7 +7,7 @@ namespace Bugget.DA.WebSockets;
 public interface IReportPageHubClient
 {
     Task SendReportPatchAsync(int reportId, PatchReportSocketView view, string? signalRConnectionId);
-    Task SendReportParticipantsAsync(int reportId, string[] participants);
+    Task SendNewReportParticipantAsync(int reportId, string newParticipant);
     Task SendBugCreateAsync(int reportId, BugSummaryDbModel summaryDbModel, string? signalRConnectionId);
     Task SendBugPatchAsync(int reportId, int bugId, BugPatchDto patchDto, string? signalRConnectionId);
 }

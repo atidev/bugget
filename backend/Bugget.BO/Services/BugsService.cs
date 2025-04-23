@@ -1,11 +1,13 @@
 using Authentication;
 using AutoMapper;
+using Bugget.BO.Errors;
 using Bugget.BO.Mappers;
 using Bugget.DA.Postgres;
 using Bugget.Entities.BO;
 using Bugget.Entities.BO.BugBo;
 using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DTO.Bug;
+using Monade;
 using TaskQueue;
 namespace Bugget.BO.Services;
 
@@ -21,8 +23,12 @@ public sealed class BugsService(BugsDbClient bugsDbClient, IMapper mapper, BugsE
         return bugsDbClient.UpdateBugObsoleteAsync(bug.ToBugUpdateDbModel());
     }
 
-    public async Task<BugSummaryDbModel> CreateBugAsync(UserIdentity user, int reportId, BugDto bug)
+    public async Task<MonadeStruct<BugSummaryDbModel>> CreateBugAsync(UserIdentity user, int reportId, BugDto bug)
     {
+        if(string.IsNullOrEmpty(bug.Expect) && string.IsNullOrEmpty(bug.Receive))
+        {
+            return BoErrors.BugMustHaveOneField;
+        }
         var bugSummaryDbModel = await bugsDbClient.CreateBugAsync(user.Id, user.OrganizationId, reportId, bug);
         await taskQueue.Enqueue(() => bugsEventsService.HandleCreateBugEventAsync(reportId, user, bugSummaryDbModel));
         return bugSummaryDbModel;

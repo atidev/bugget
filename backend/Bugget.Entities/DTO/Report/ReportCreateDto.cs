@@ -1,3 +1,5 @@
+using Bugget.Entities.DTO.Bug;
+
 namespace Bugget.Entities.DTO.Report;
 
 public sealed class ReportCreateDto

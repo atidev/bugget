@@ -67,7 +67,7 @@ public sealed class ReportsDbClient : PostgresClient
     {
         await using var conn = await DataSource.OpenConnectionAsync();
         var report = await conn.QuerySingleOrDefaultAsync<bool>(
-            "SELECT public.get_report_access(@reportId, @organizationId);",
+            "SELECT * FROM public.get_report_access(@reportId, @organizationId);",
             new { reportId, organizationId }
         );
 
@@ -94,11 +94,10 @@ public sealed class ReportsDbClient : PostgresClient
     public async Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto dto)
     {
         await using var conn = await DataSource.OpenConnectionAsync();
-        var report = await conn.QuerySingleAsync<ReportSummaryDbModel>(
+        return await conn.QuerySingleAsync<ReportSummaryDbModel>(
             "SELECT * FROM public.create_report_v2(@userId, @title, @teamId, @organizationId);",
             new { userId, title = dto.Title, teamId, organizationId }
         );
-        return report;
     }
 
     /// <summary>
@@ -109,14 +108,14 @@ public sealed class ReportsDbClient : PostgresClient
         await using var connection = await DataSource.OpenConnectionAsync();
 
         var jsonResult = await connection.QuerySingleAsync<ReportPatchResultDbModel>(
-            "SELECT public.patch_report(@report_id, @user_id, @organization_id, @title, @status, @responsible_user_id);",
+            "SELECT * FROM public.patch_report(@report_id, @organization_id, @title, @status, @responsible_user_id);",
             new
             {
                 report_id = reportId,
                 organization_id = organizationId,
                 title = dto.Title,
                 status = dto.Status,
-                responsible_user_id = dto.ResponsibleUserId,
+                responsible_user_id = dto.ResponsibleUserId
             }
         );
 

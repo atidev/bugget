@@ -1,4 +1,4 @@
-namespace Bugget.Entities.DTO;
+namespace Bugget.Entities.DTO.Bug;
 
 public sealed class BugDtoObsolete
 {

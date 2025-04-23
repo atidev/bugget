@@ -2,9 +2,9 @@ CREATE OR REPLACE FUNCTION public.create_report_v2(_user_id text, _title text, _
     RETURNS TABLE(
         id int,
         title text,
-        status text,
-        created_at timestamp,
-        updated_at timestamp,
+        status int,
+        created_at timestamp with time zone,
+        updated_at timestamp with time zone,
         creator_user_id text,
         creator_team_id text,
         responsible_user_id text,
@@ -18,7 +18,7 @@ BEGIN
     INSERT INTO public.reports(responsible_user_id, title, status, creator_user_id, creator_team_id, creator_organization_id, past_responsible_user_id)
         VALUES (_user_id, _title, 0, _user_id, _team_id, _organization_id, _user_id)
     RETURNING
-        id INTO new_report_id;
+        public.reports.id INTO new_report_id;
     -- Добавляем участников
     INSERT INTO public.report_participants(report_id, user_id)
         VALUES (new_report_id, _user_id);
@@ -35,7 +35,7 @@ BEGIN
         r.responsible_user_id,
         r.past_responsible_user_id
     FROM
-        public.reports r
+        public.reports AS r
     WHERE
         r.id = new_report_id;
 END;
@@ -67,36 +67,45 @@ CREATE OR REPLACE FUNCTION public.patch_report(_report_id integer, _organization
         status integer,
         responsible_user_id text,
         past_responsible_user_id text,
-        updated_at timestamp)
+        updated_at timestamp with time zone)
     LANGUAGE plpgsql
     AS $$
-DECLARE
-    report_id integer;
 BEGIN
     -- Проверка доступа
     CALL check_report_access(_report_id, _organization_id);
-    -- Обновление
+    ------------------------------------------------------------------
+    -- Обновление: квалифицируем столбцы таблицы ТОЛЬКО в правой части
+    ------------------------------------------------------------------
     UPDATE
-        public.reports
+        public.reports AS r
     SET
         updated_at = now(),
         past_responsible_user_id = CASE WHEN _responsible_user_id IS NOT NULL THEN
-            responsible_user_id
+            r.responsible_user_id 
         ELSE
-            past_responsible_user_id
+            r.past_responsible_user_id 
         END,
-        status = COALESCE(_status, status),
-        title = COALESCE(_title, title),
-        responsible_user_id = COALESCE(_responsible_user_id, responsible_user_id)
+        status = COALESCE(_status, r.status),
+        title = COALESCE(_title, r.title),
+        responsible_user_id = COALESCE(_responsible_user_id, r.responsible_user_id)
     WHERE
-        id = _report_id;
-RETURNING
-    id,
-    title,
-    status,
-    responsible_user_id,
-    past_responsible_user_id,
-    updated_at;
+        r.id = _report_id;
+        
+    ------------------------------------------------------------------
+    -- Возврат обновлённой строки
+    ------------------------------------------------------------------
+    RETURN QUERY
+    SELECT
+        r.id,
+        r.title,
+        r.status,
+        r.responsible_user_id,
+        r.past_responsible_user_id,
+        r.updated_at
+    FROM
+        public.reports AS r
+    WHERE
+        r.id = _report_id;
 END;
 $$;
 
@@ -269,7 +278,7 @@ BEGIN
         id = _report_id;
 END;
 $$;
-    
+
 CREATE OR REPLACE FUNCTION public.get_report_access(_report_id int, _organization_id text DEFAULT NULL)
     RETURNS boolean
     LANGUAGE sql
@@ -284,6 +293,6 @@ CREATE OR REPLACE FUNCTION public.get_report_access(_report_id int, _organizatio
             WHERE
                 r.id = _report_id
                 AND(_organization_id IS NULL
-                    OR r.creator_organization_id = _organization_id)
-        );
+                    OR r.creator_organization_id = _organization_id));
 $$;
+
