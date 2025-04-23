@@ -17,6 +17,11 @@ export enum RequestStates {
   ERROR = 3,
 }
 
+export enum AttachmentTypes {
+  RECEIVED_RESULT = 0,
+  EXPECTED_RESULT = 1,
+}
+
 export const reportStatusMap: Record<number, StatusMeta> = {
   0: {
     title: "В работе",

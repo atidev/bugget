@@ -17,7 +17,7 @@ import "./Bug.css";
 import CancelButton from "@/components/CancelButton/CancelButton";
 import SaveButton from "@/components/SaveButton/SaveButton";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import { BugStatuses, RequestStates } from "@/const";
+import { AttachmentTypes, BugStatuses, RequestStates } from "@/const";
 import Chat from "./components/Chat/Chat";
 import { uploadAttachmentFx } from "@/store/attachments";
 import { Bug as BugType } from "@/types/bug";
@@ -87,10 +87,10 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
 
   // 3. Обработчик выбора файла
   const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>,
     attachmentType: number
   ) => {
-    const file = e.target.files?.[0];
+    const file = event.target.files?.[0];
     if (!file || !bug.reportId || !bug.id) return;
 
     try {
@@ -105,13 +105,17 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
       alert("Ошибка при загрузке файла");
     } finally {
       // Сбросим value у input, чтобы повторно срабатывал onChange
-      e.target.value = "";
+      event.target.value = "";
     }
   };
 
   // todo: move to derived stores
-  const receivedFiles = attachments?.filter((item) => item.attachType === 0);
-  const expectedFiles = attachments?.filter((item) => item.attachType === 1);
+  const receivedFiles = attachments?.filter(
+    (item) => item.attachType === AttachmentTypes.RECEIVED_RESULT
+  );
+  const expectedFiles = attachments?.filter(
+    (item) => item.attachType === AttachmentTypes.EXPECTED_RESULT
+  );
 
   const handleSave = () => {
     if (typeof bug.id === "number") {
@@ -177,7 +181,9 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
             value={isNewBug ? newBugData.receive : bug?.receive || ""}
             onChange={(event) => handleResultUpdate(event, "receive")}
             files={receivedFiles}
-            onFileChange={(e) => handleFileChange(e, 0)}
+            onFileChange={(event) =>
+              handleFileChange(event, AttachmentTypes.RECEIVED_RESULT)
+            }
             withAttachments={!isNewBug}
           />
           <Result
@@ -185,7 +191,9 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
             value={isNewBug ? newBugData.expect : bug?.expect || ""}
             onChange={(event) => handleResultUpdate(event, "expect")}
             files={expectedFiles}
-            onFileChange={(e) => handleFileChange(e, 0)}
+            onFileChange={(event) =>
+              handleFileChange(event, AttachmentTypes.EXPECTED_RESULT)
+            }
             withAttachments={!isNewBug}
           />
         </div>
