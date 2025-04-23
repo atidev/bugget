@@ -6,13 +6,14 @@ using Bugget.Entities.DbModels;
 using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
+using Bugget.Entities.SocketViews;
 using Bugget.Entities.Views;
 
 namespace Bugget.BO.Mappers;
 
 public static class ReportMapper
 {
-    public static ReportView ToView(this ReportDbModel report, IReadOnlyDictionary<string, Employee> employeesDict)
+    public static ReportView ToView(this ReportObsoleteDbModel report, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
     {
         return new ReportView
         {
@@ -35,7 +36,7 @@ public static class ReportMapper
         };
     }
 
-    public static SearchReportsView ToView(this SearchReportsDbModel search, IReadOnlyDictionary<string, Employee> employeesDict)
+    public static SearchReportsView ToView(this SearchReportsDbModel search, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
     {
         return new SearchReportsView
         {
@@ -52,17 +53,17 @@ public static class ReportMapper
             ResponsibleUserId = report.ResponsibleId,
             CreatorUserId = userId,
             Bugs = report.Bugs.Select(b => new Bug
-                {
-                    Receive = b.Receive,
-                    Expect = b.Expect,
-                    CreatorUserId = userId,
-                })
+            {
+                Receive = b.Receive,
+                Expect = b.Expect,
+                CreatorUserId = userId,
+            })
                 .ToArray(),
             ParticipantsUserIds = new string[] { userId, report.ResponsibleId }.Distinct().ToArray()
         };
     }
 
-    public static ReportUpdate ToReportUpdate(this ReportUpdateDto report, int reportId, string userId)
+    public static ReportUpdate ToReportUpdate(this ReportPatchDto report, int reportId, string userId)
     {
         return new ReportUpdate
         {
@@ -113,7 +114,7 @@ public static class ReportMapper
         string? sort,
         uint skip,
         uint take,
-        IReadOnlyDictionary<string, IReadOnlyCollection<Employee>> employeesByTeam)
+        IReadOnlyDictionary<string, IReadOnlyCollection<EmployeeObsolete>> employeesByTeam)
     {
         List<string> resultUserIds = [];
         if (!string.IsNullOrEmpty(teamId))
@@ -137,6 +138,17 @@ public static class ReportMapper
             Skip = skip,
             Take = take,
             Sort = SortOption.Parse(sort)
+        };
+    }
+
+    public static PatchReportSocketView ToSocketView(this ReportPatchDto patchDto, ReportPatchResultDbModel? result)
+    {
+        return new PatchReportSocketView
+        {
+            Title = patchDto.Title,
+            Status = patchDto.Status,
+            ResponsibleUserId = patchDto.ResponsibleUserId,
+            PastResponsibleUserId = patchDto.ResponsibleUserId == null ? null : result?.PastResponsibleUserId
         };
     }
 }

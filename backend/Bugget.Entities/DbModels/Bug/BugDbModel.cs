@@ -12,6 +12,6 @@ public sealed class BugDbModel
     public required DateTimeOffset UpdatedAt { get; init; }
     public required string CreatorUserId { get; init; }
     public required int Status { get; init; }
-    public AttachmentDbModel[]? Attachments { get; init; }
-    public CommentDbModel[]? Comments { get; init; }
+    public AttachmentDbModel[]? Attachments { get; set; }
+    public CommentDbModel[]? Comments { get; set; }
 }

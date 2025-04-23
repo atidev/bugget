@@ -7,7 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Bugget.Features\Bugget.Features.csproj" />
+        <ProjectReference Include="..\Bugget.ExternalClients\Bugget.ExternalClients.csproj" />
+        <ProjectReference Include="..\Monade\Monade.csproj" />
+        <ProjectReference Include="..\TaskQueue\TaskQueue.csproj" />
     </ItemGroup>
     
 </Project>

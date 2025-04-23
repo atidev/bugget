@@ -6,9 +6,11 @@ public class Employee
     /// Уникальный идентификатор соответствующий хэдеру авторизации LDAP_USER_ID_KEY
     /// </summary>
     public required string Id { get; init; }
-    public string? FirstName { get; init; }
-    public string? LastName { get; init; }
-    public string? Surname { get; init; }
+
+    /// <summary>
+    /// Имя пользователя
+    /// </summary>
+    public string? Name { get; init; }
     
     /// <summary>
     /// Идентификатор пользователя в системе уведомлений
@@ -19,11 +21,16 @@ public class Employee
     /// Идентификатор команды/отдела
     /// </summary>
     public string? TeamId { get; init; }
-    
-    /// <summary>
-    /// Название команды/отдела
+
+     /// <summary>
+    /// Идентификатор организации
     /// </summary>
-    public string? TeamName { get; init; }
+    public string? OrganizationId { get; init; }
+
+    /// <summary>
+    /// Ссылка на фотографию пользователя
+    /// </summary>
+    public string? PhotoUrl { get; init; }
     
     /// <summary>
     /// Глубина пользователя в иерархии компании

@@ -4,7 +4,7 @@ public sealed class Report
 {
     public int? Id { get; set; }
     public required string Title { get; set; }
-    public int Status { get; set; } = (int)ReportStatus.Active;
+    public int Status { get; set; } = (int)ReportStatus.Backlog;
     public required string ResponsibleUserId { get; set; }
     public required string CreatorUserId { get; set; }
     public DateTimeOffset? CreatedAt { get; set; }
