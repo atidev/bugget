@@ -30,13 +30,13 @@ const Result = ({
   }, [textareaRef]);
 
   return (
-    <div className="flex grow-1 flex-col text-xs font-semibold mb-1">
-      <span className="mt-1 mb-1">{title}</span>
+    <div className="flex grow-1 flex-col mb-1">
+      <span className="mt-1 mb-1 font-semibold text-xs">{title}</span>
       <textarea
         ref={textareaRef}
         value={value}
         onChange={onChange}
-        className="textarea w-full mb-3 bug-section p-4 bg-base-100 focus:outline-none"
+        className="textarea w-full mb-3 p-3 bg-base-100 focus:outline-none"
       />
       {withAttachments && (
         <div className="attachments w-1/2">
