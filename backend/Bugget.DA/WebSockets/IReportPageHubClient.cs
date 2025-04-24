@@ -1,9 +1,13 @@
+using Bugget.Entities.DbModels.Bug;
+using Bugget.Entities.DTO.Bug;
 using Bugget.Entities.SocketViews;
 
-namespace Bugget.BO.WebSockets;
+namespace Bugget.DA.WebSockets;
 
 public interface IReportPageHubClient
 {
-    Task SendReportPatchAsync(int reportId, PatchReportSocketView view);
-    Task SendReportParticipantsAsync(int reportId, string[] participants);
+    Task SendReportPatchAsync(int reportId, PatchReportSocketView view, string? signalRConnectionId);
+    Task SendNewReportParticipantAsync(int reportId, string newParticipant);
+    Task SendBugCreateAsync(int reportId, BugSummaryDbModel summaryDbModel, string? signalRConnectionId);
+    Task SendBugPatchAsync(int reportId, int bugId, BugPatchDto patchDto, string? signalRConnectionId);
 }

@@ -1,4 +1,4 @@
-using Bugget.Authentication;
+using Authentication;
 using Bugget.BO.Services;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
@@ -19,7 +19,7 @@ public sealed class ReportsV2Controller(
     /// Создать репорт
     /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(ReportDbModel), 200)]
+    [ProducesResponseType(typeof(ReportSummaryDbModel), 200)]
     public Task<ReportSummaryDbModel> CreateReportAsync([FromBody] ReportV2CreateDto createDto)
     {
         var user = User.GetIdentity();
@@ -31,7 +31,7 @@ public sealed class ReportsV2Controller(
     /// </summary>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    [HttpGet("{reportId}")]
+    [HttpGet("{reportId:int}")]
     [ProducesResponseType(typeof(ReportDbModel), 200)]
     public Task<IActionResult> GetReportAsync([FromRoute] int reportId)
     {
@@ -40,13 +40,13 @@ public sealed class ReportsV2Controller(
     }
 
     /// <summary>
-    /// Частично обновить репорт ТОЛЬКО ДЛЯ ТЕСТА (должно идти через веб-сокет)
+    /// Частичное обновление репорта
     /// </summary>
-    [HttpPatch("{reportId}")]
-    [ProducesResponseType(typeof(ReportDbModel), 200)]
+    [HttpPatch("{reportId:int}")]
+    [ProducesResponseType(typeof(ReportPatchResultDbModel), 200)]
     public Task<ReportPatchResultDbModel> PatchReportAsync([FromRoute] int reportId, [FromBody] ReportPatchDto patchDto)
     {
         var user = User.GetIdentity();
-        return reportsService.PatchReportAsync(reportId, user.Id, user.OrganizationId, patchDto);
+        return reportsService.PatchReportAsync(reportId, user, patchDto);
     }
 }

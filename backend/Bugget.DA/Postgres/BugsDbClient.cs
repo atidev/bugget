@@ -1,24 +1,52 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Bugget.Entities.Config;
-using Bugget.Entities.Constants;
-using Bugget.Entities.DbModels;
 using Bugget.Entities.DbModels.Bug;
+using Bugget.Entities.DTO;
+using Bugget.Entities.DTO.Bug;
 using Dapper;
-using Microsoft.Extensions.Options;
-using Npgsql;
 
 namespace Bugget.DA.Postgres;
 
 public sealed class BugsDbClient : PostgresClient
 {
-    /// <summary>
-    /// Создает новый отчет и возвращает его полную структуру.
-    /// </summary>
-    public async Task<BugDbModel?> CreateBugAsync(BugCreateDbModel bugCreateDbModel)
+    public async Task<BugSummaryDbModel> CreateBugAsync(string userId, string? organizationId, int reportId, BugDto bugDto)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
-        
+
+        return await connection.QuerySingleAsync<BugSummaryDbModel>(
+            "SELECT * FROM public.create_bug_v2(@user_id, @organization_id, @report_id, @receive, @expect);",
+            new
+            {
+                user_id = userId,
+                organization_id = organizationId,
+                report_id = reportId,
+                receive = bugDto.Receive,
+                expect = bugDto.Expect,
+            }
+                );
+    }
+
+    public async Task<BugPatchResultDbModel> PatchBugAsync(int reportId, int bugId, string? organizationId, BugPatchDto patchDto)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+
+        return await connection.QuerySingleAsync<BugPatchResultDbModel>(
+            "SELECT * FROM public.patch_bug(@bug_id, @report_id,  @organization_id, @receive, @expect, @status);",
+            new
+            {
+                bug_id = bugId,
+                report_id = reportId,
+                organization_id = organizationId,
+                receive = patchDto.Receive,
+                expect = patchDto.Expect,
+                status = patchDto.Status
+            }
+        );
+    }
+
+    public async Task<BugDbModel?> CreateBugObsoleteAsync(BugCreateDbModel bugCreateDbModel)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+
         var jsonResult = await connection.ExecuteScalarAsync<string>(
             "SELECT public.create_bug(@report_id, @receive, @expect, @creator_user_id, @status);",
             new
@@ -35,11 +63,11 @@ public sealed class BugsDbClient : PostgresClient
             ? Deserialize<BugDbModel>(jsonResult)
             : null;
     }
-    
-    public async Task<BugDbModel?> UpdateBugAsync(BugUpdateDbModel updateBugDbModel)
+
+    public async Task<BugDbModel?> UpdateBugObsoleteAsync(BugUpdateDbModel updateBugDbModel)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
-        
+
         var jsonResult = await connection.ExecuteScalarAsync<string>(
             "SELECT public.update_bug(@bug_id, @report_id,  @updater_user_id, @receive, @expect, @status);",
             new
@@ -74,6 +102,6 @@ public sealed class BugsDbClient : PostgresClient
             ? Deserialize<BugDbModel>(jsonResult)
             : null;
     }
-    
+
     private T? Deserialize<T>(string json) => JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
 }

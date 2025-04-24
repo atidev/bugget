@@ -1,5 +1,5 @@
+using Authentication;
 using AutoMapper;
-using Bugget.Authentication;
 using Bugget.BO.Services;
 using Bugget.Entities.BO;
 using Bugget.Entities.Views;

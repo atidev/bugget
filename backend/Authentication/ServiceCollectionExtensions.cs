@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Bugget.Authentication;
+namespace Authentication;
 
 public static class ServiceCollectionExtensions
 {

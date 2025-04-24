@@ -1,4 +1,4 @@
-using Bugget.Authentication;
+using Authentication;
 using Bugget.BO.Mappers;
 using Bugget.BO.Services;
 using Bugget.Entities.DTO;

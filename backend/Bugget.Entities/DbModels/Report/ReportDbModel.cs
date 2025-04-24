@@ -13,6 +13,6 @@ public sealed class ReportDbModel
     public string? CreatorTeamId { get; init; }
     public required DateTimeOffset CreatedAt { get; init; }
     public required DateTimeOffset UpdatedAt { get; init; }
-    public string[] ParticipantsUserIds { get; set; }
+    public string[]? ParticipantsUserIds { get; set; }
     public BugDbModel[]? Bugs { get; set; }
 }

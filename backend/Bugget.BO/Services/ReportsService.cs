@@ -1,3 +1,4 @@
+using Authentication;
 using Bugget.BO.Errors;
 using Bugget.BO.Mappers;
 using Bugget.DA.Postgres;
@@ -20,43 +21,21 @@ public sealed class ReportsService(
     ReportEventsService reportEventsService,
     ILogger<ReportsService> logger)
 {
-    public async Task<ReportObsoleteDbModel?> CreateReportAsync(Report report)
-    {
-        var reportDbModel = await reportsDbClient.CreateReportAsync(report.ToReportDbModel());
-        if (reportDbModel == null)
-        {
-            return null;
-        }
-
-        await taskQueue.Enqueue(() => externalClientsActionService.ExecuteReportCreatePostActions(new ReportCreateContext(report, reportDbModel)));
-
-        return reportDbModel;
-    }
 
     public Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto createDto)
     {
         return reportsDbClient.CreateReportAsync(userId, teamId, organizationId, createDto);
     }
 
-    public async Task<ReportPatchResultDbModel> PatchReportAsync(int reportId, string userId, string? organizationId, ReportPatchDto patchDto)
+    public async Task<ReportPatchResultDbModel> PatchReportAsync(int reportId, UserIdentity user, ReportPatchDto patchDto)
     {
-        logger.LogInformation("Пользователь {@UserId} патчит отчёт {@ReportId}, {@PatchDto}", userId, reportId, patchDto);
+        logger.LogInformation("Пользователь {@UserId} патчит отчёт {@ReportId}, {@PatchDto}", user.Id, reportId, patchDto);
 
-        var result = await reportsDbClient.PatchReportAsync(reportId, userId, organizationId, patchDto);
+        var result = await reportsDbClient.PatchReportAsync(reportId, user.OrganizationId, patchDto);
 
-        await taskQueue.Enqueue(() => reportEventsService.HandlePatchReportEventAsync(reportId, userId, patchDto, result));
+        await taskQueue.Enqueue(() => reportEventsService.HandlePatchReportEventAsync(reportId, user, patchDto, result));
 
         return result;
-    }
-
-    public Task<ReportObsoleteDbModel[]> ListReportsAsync(string userId)
-    {
-        return reportsDbClient.ListReportsAsync(userId);
-    }
-
-    public Task<ReportObsoleteDbModel?> GetReportAsync(int reportId)
-    {
-        return reportsDbClient.GetReportAsync(reportId);
     }
 
     public async Task<MonadeStruct<ReportDbModel>> GetReportAsync(int reportId, string? organizationId)
@@ -70,7 +49,41 @@ public sealed class ReportsService(
         return report;
     }
 
-    public async Task<ReportObsoleteDbModel?> UpdateReportAsync(ReportUpdate report)
+    public async Task<bool> GetReportAccessAsync(int reportId, string? organizationId)
+    {
+        var reportAccess = await reportsDbClient.GetReportAccessAsync(reportId, organizationId);
+        if (reportAccess)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public async Task<ReportObsoleteDbModel?> CreateReportObsoleteAsync(Report report)
+    {
+        var reportDbModel = await reportsDbClient.CreateReportAsync(report.ToReportDbModel());
+        if (reportDbModel == null)
+        {
+            return null;
+        }
+
+        await taskQueue.Enqueue(() => externalClientsActionService.ExecuteReportCreatePostActions(new ReportCreateContext(report, reportDbModel)));
+
+        return reportDbModel;
+    }
+
+    public Task<ReportObsoleteDbModel[]> ListReportsAsync(string userId)
+    {
+        return reportsDbClient.ListReportsAsync(userId);
+    }
+
+    public Task<ReportObsoleteDbModel?> GetReportObsoleteAsync(int reportId)
+    {
+        return reportsDbClient.GetReportAsync(reportId);
+    }
+
+    public async Task<ReportObsoleteDbModel?> UpdateReportObsoleteAsync(ReportUpdate report)
     {
         var reportDbModel = await reportsDbClient.UpdateReportAsync(report.ToReportUpdateDbModel());
 

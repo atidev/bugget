@@ -34,10 +34,10 @@ public sealed class ReportsDbClient : PostgresClient
         // Открываем транзакцию для курсоров
         await using var multi = await conn.QueryMultipleAsync(@"
   SELECT * FROM public.get_report_v2(@reportId, @organizationId);
-  SELECT * FROM public.list_bugs(@reportId);
-  SELECT * FROM public.list_participants(@reportId);
-  SELECT * FROM public.list_comments(@reportId);
-  SELECT * FROM public.list_attachments(@reportId);
+  SELECT * FROM public.list_bugs_internal(@reportId);
+  SELECT * FROM public.list_participants_internal(@reportId);
+  SELECT * FROM public.list_comments_internal(@reportId);
+  SELECT * FROM public.list_attachments_internal(@reportId);
 ", new { reportId, organizationId });
 
         // проверка доступа к репорту
@@ -63,6 +63,17 @@ public sealed class ReportsDbClient : PostgresClient
         return report;
     }
 
+    public async Task<bool> GetReportAccessAsync(int reportId, string? organizationId)
+    {
+        await using var conn = await DataSource.OpenConnectionAsync();
+        var report = await conn.QuerySingleOrDefaultAsync<bool>(
+            "SELECT * FROM public.get_report_access(@reportId, @organizationId);",
+            new { reportId, organizationId }
+        );
+
+        return report;
+    }
+
     public async Task<ReportObsoleteDbModel[]> ListReportsAsync(string userId)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
@@ -82,43 +93,33 @@ public sealed class ReportsDbClient : PostgresClient
     /// </summary>
     public async Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto dto)
     {
-        await using var connection = await DataSource.OpenConnectionAsync();
-
-        var jsonResult = await connection.ExecuteScalarAsync<string>(
-            "SELECT public.create_report(@user_id, @title, @team_id, @organization_id);",
-            new
-            {
-                user_id = userId,
-                title = dto.Title,
-                team_id = teamId,
-                organization_id = organizationId,
-            }
+        await using var conn = await DataSource.OpenConnectionAsync();
+        return await conn.QuerySingleAsync<ReportSummaryDbModel>(
+            "SELECT * FROM public.create_report_v2(@userId, @title, @teamId, @organizationId);",
+            new { userId, title = dto.Title, teamId, organizationId }
         );
-
-        return Deserialize<ReportSummaryDbModel>(jsonResult!)!;
     }
 
     /// <summary>
     /// Обновляет краткую информацию об отчете и возвращает его краткую структуру.
     /// </summary>
-    public async Task<ReportPatchResultDbModel> PatchReportAsync(int reportId, string userId, string? organizationId, ReportPatchDto dto)
+    public async Task<ReportPatchResultDbModel> PatchReportAsync(int reportId, string? organizationId, ReportPatchDto dto)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
 
-        var jsonResult = await connection.ExecuteScalarAsync<string>(
-            "SELECT public.patch_report(@report_id, @user_id, @organization_id, @title, @status, @responsible_user_id);",
+        var jsonResult = await connection.QuerySingleAsync<ReportPatchResultDbModel>(
+            "SELECT * FROM public.patch_report(@report_id, @organization_id, @title, @status, @responsible_user_id);",
             new
             {
                 report_id = reportId,
-                user_id = userId,
                 organization_id = organizationId,
                 title = dto.Title,
                 status = dto.Status,
-                responsible_user_id = dto.ResponsibleUserId,
+                responsible_user_id = dto.ResponsibleUserId
             }
         );
 
-        return Deserialize<ReportPatchResultDbModel>(jsonResult!)!;
+        return jsonResult;
     }
 
 
@@ -197,7 +198,7 @@ public sealed class ReportsDbClient : PostgresClient
         await using var connection = await DataSource.OpenConnectionAsync();
 
         await connection.ExecuteAsync(
-            "SELECT public.change_status(@report_id, @new_status);",
+            "SELECT public.change_status_internal(@report_id, @new_status);",
             new { report_id = reportId, new_status = newStatus }
         );
     }

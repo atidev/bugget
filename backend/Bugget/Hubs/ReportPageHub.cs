@@ -1,8 +1,6 @@
-using Bugget.Authentication;
-using Bugget.BO.Services;
-using Bugget.Entities.DTO.Report;
+using Authentication;
 using Microsoft.AspNetCore.SignalR;
-
+using Bugget.BO.Services;
 namespace Bugget.Hubs;
 
 public sealed class ReportPageHub(
@@ -12,6 +10,17 @@ public sealed class ReportPageHub(
     // Подключение к группе комментариев по reportId
     public async Task JoinReportGroupAsync(int reportId)
     {
+        var user = Context.User?.GetIdentity();
+        if (user is null)
+        {
+            throw new HubException("пользователь не авторизован");
+        }
+
+        if (!await reportsService.GetReportAccessAsync(reportId, user.OrganizationId))
+        {
+            throw new HubException("отчет не найден");
+        }
+
         logger.LogInformation("Клиент {@ConnectionId} подключился к группе {@ReportId}", Context.ConnectionId, reportId);
         await Groups.AddToGroupAsync(Context.ConnectionId, $"{reportId}");
     }
@@ -28,22 +37,5 @@ public sealed class ReportPageHub(
     {
         logger.LogInformation("Клиент {@ConnectionId} отключился. Причина: {@Reason}", Context.ConnectionId, exception?.Message ?? "неизвестно");
         await base.OnDisconnectedAsync(exception);
-    }
-
-    public Task PatchReportAsync(int reportId, ReportPatchDto patchDto)
-    {
-        if (Context.User == null)
-        {
-            logger.LogError("Пользователь не авторизован");
-            return Task.CompletedTask;
-        }
-
-        var user = new UserIdentity(Context.User);
-        return reportsService.PatchReportAsync(
-            reportId,
-            user.Id,
-            user.OrganizationId,
-            patchDto
-        );
     }
 }

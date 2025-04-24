@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Bugget.Authentication;
+namespace Authentication;
 
 public static class UserIdentityExtensions
 {

@@ -11,5 +11,4 @@ public sealed class ReportSummaryDbModel
     public string? CreatorTeamId { get; init; }
     public required DateTimeOffset CreatedAt { get; init; }
     public required DateTimeOffset UpdatedAt { get; init; }
-    public required string[] ParticipantsUserIds { get; init; } 
 }

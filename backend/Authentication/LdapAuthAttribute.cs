@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace Bugget.Authentication;
+namespace Authentication;
 
 /// <summary>
 /// Аутентификация по LDAP
