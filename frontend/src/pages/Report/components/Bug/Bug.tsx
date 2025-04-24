@@ -22,7 +22,7 @@ import Chat from "./components/Chat/Chat";
 import { uploadAttachmentFx } from "@/store/attachments";
 import { Bug as BugType } from "@/types/bug";
 import Result from "./components/Result/Result";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect, useRef } from "react";
 import Heading from "./components/Heading/Heading";
 
 type BugProps = {
@@ -49,8 +49,9 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
   ]);
 
   const [newBugData, updateNewBugData] = useUnit([$newBugStore, updateNewBug]);
-
   const [reportRequestState] = useUnit([$reportRequestState]);
+  const receivedTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const expectedTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const bug = useStoreMap({
     store: $bugsByBugId,
@@ -70,6 +71,37 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
           };
     },
   });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const rawCssVar = getComputedStyle(root).getPropertyValue("--spacing");
+    const spacing = parseFloat(rawCssVar);
+    // вычисляем значение паддинга у <textarea />
+    // 3 -- потому что className p-3 у <textarea />
+    const calculatedTextareaPaddingEm = spacing * 3;
+
+    if (receivedTextareaRef.current && expectedTextareaRef.current) {
+      const fontSizePx = parseFloat(
+        getComputedStyle(receivedTextareaRef.current).fontSize
+      );
+      const calculatedTextareaPaddingPx =
+        calculatedTextareaPaddingEm * fontSizePx;
+      const textareaReceiveScrollHeight = `${
+        receivedTextareaRef.current.scrollHeight + calculatedTextareaPaddingPx
+      }px`;
+      const textareaExpectScrollHeight = `${
+        expectedTextareaRef.current.scrollHeight + calculatedTextareaPaddingPx
+      }px`;
+
+      if (textareaReceiveScrollHeight >= textareaExpectScrollHeight) {
+        receivedTextareaRef.current.style.height = textareaReceiveScrollHeight;
+        expectedTextareaRef.current.style.height = "100%";
+      } else {
+        expectedTextareaRef.current.style.height = textareaExpectScrollHeight;
+        receivedTextareaRef.current.style.height = "100%";
+      }
+    }
+  }, [receivedTextareaRef, expectedTextareaRef, newBugData, bug]);
 
   const attachments = useStoreMap({
     store: $attachmentsByBugId,
@@ -143,64 +175,62 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
 
   return (
     <div
-      className={`card card-border p-4 mb-3 shadow-lg border-gray-300 ${
+      className={`card card-border grid grid-cols-2 gap-2 p-4 mb-3 shadow-lg border-gray-300 ${
         bug.status === Number(BugStatuses.READY) ? "border-success" : ""
       }`}
     >
-      <div className="gap-2 flex flex-col">
-        <div className="flex items-center justify-between">
-          {reportRequestState !== RequestStates.DONE ? (
-            <div className="skeleton min-h-[2em] min-w-[30%] shrink-0" />
-          ) : (
-            <Heading isNewBug={isNewBug} bugId={bug.id} />
-          )}
+      <div className="flex items-center justify-between col-span-2">
+        {reportRequestState !== RequestStates.DONE ? (
+          <div className="skeleton min-h-[2em] min-w-[30%] shrink-0" />
+        ) : (
+          <Heading isNewBug={isNewBug} bugId={bug.id} />
+        )}
 
-          {/* Селект статуса (только для существующего бага) */}
-          {!isNewBug && reportRequestState === RequestStates.DONE && (
-            <Dropdown
-              className="max-w-[150px]"
-              onChange={(selected) => {
-                if (bug.id) {
-                  updateBugData({ id: bug.id, status: Number(selected) });
-                }
-              }}
-              value={bug.status}
-              options={[
-                { label: "Исправлен", value: BugStatuses.READY },
-                { label: "Открыт", value: BugStatuses.IN_PROGRESS },
-              ]}
-            />
-          )}
-          {reportRequestState !== RequestStates.DONE && (
-            <div className="skeleton min-h-[40px] min-w-[30%] shrink-0" />
-          )}
-        </div>
-        <div className="flex grow-1 gap-2">
-          <Result
-            title="Фактический результат"
-            value={isNewBug ? newBugData.receive : bug?.receive || ""}
-            onChange={(event) => handleResultUpdate(event, "receive")}
-            files={receivedFiles}
-            onFileChange={(event) =>
-              handleFileChange(event, AttachmentTypes.RECEIVED_RESULT)
-            }
-            withAttachments={!isNewBug}
+        {/* Селект статуса (только для существующего бага) */}
+        {!isNewBug && reportRequestState === RequestStates.DONE && (
+          <Dropdown
+            className="max-w-[150px]"
+            onChange={(selected) => {
+              if (bug.id) {
+                updateBugData({ id: bug.id, status: Number(selected) });
+              }
+            }}
+            value={bug.status}
+            options={[
+              { label: "Исправлен", value: BugStatuses.READY },
+              { label: "Открыт", value: BugStatuses.IN_PROGRESS },
+            ]}
           />
-          <Result
-            title="Ожидаемый результат"
-            value={isNewBug ? newBugData.expect : bug?.expect || ""}
-            onChange={(event) => handleResultUpdate(event, "expect")}
-            files={expectedFiles}
-            onFileChange={(event) =>
-              handleFileChange(event, AttachmentTypes.EXPECTED_RESULT)
-            }
-            withAttachments={!isNewBug}
-          />
-        </div>
+        )}
+        {reportRequestState !== RequestStates.DONE && (
+          <div className="skeleton min-h-[40px] min-w-[30%] shrink-0" />
+        )}
       </div>
+      <Result
+        title="Фактический результат"
+        value={isNewBug ? newBugData.receive : bug?.receive || ""}
+        onChange={(event) => handleResultUpdate(event, "receive")}
+        files={receivedFiles}
+        onFileChange={(event) =>
+          handleFileChange(event, AttachmentTypes.RECEIVED_RESULT)
+        }
+        withAttachments={!isNewBug}
+        textareaRef={receivedTextareaRef}
+      />
+      <Result
+        title="Ожидаемый результат"
+        value={isNewBug ? newBugData.expect : bug?.expect || ""}
+        onChange={(event) => handleResultUpdate(event, "expect")}
+        files={expectedFiles}
+        onFileChange={(event) =>
+          handleFileChange(event, AttachmentTypes.EXPECTED_RESULT)
+        }
+        withAttachments={!isNewBug}
+        textareaRef={expectedTextareaRef}
+      />
       {/* Кнопки "Сохранить" / "Отмена" */}
       {!isNewReport && isBugChanged && (
-        <div className="flex gap-2 justify-end mt-2">
+        <div className="flex gap-2 justify-end mt-2 col-span-2">
           <CancelButton
             isChanged={isBugChanged}
             onReset={() => {
@@ -220,7 +250,7 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
         </div>
       )}
       {!isNewBug && (
-        <div className="mt-2">
+        <div className="mt-2 col-span-2">
           <Chat reportId={bug.reportId!} bugId={bug.id!} />
         </div>
       )}

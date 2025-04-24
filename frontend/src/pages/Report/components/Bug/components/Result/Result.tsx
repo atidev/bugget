@@ -1,5 +1,5 @@
 import { Attachment } from "@/types/attachement";
-import { ChangeEvent, useEffect, useRef } from "react";
+import { ChangeEvent, Ref, useRef } from "react";
 import ImageCarousel from "./components/ImageCarousel/ImageCarousel";
 
 type Props = {
@@ -9,6 +9,7 @@ type Props = {
   withAttachments: boolean;
   files: Attachment[];
   onFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  textareaRef: Ref<HTMLTextAreaElement>;
 };
 
 const Result = ({
@@ -18,16 +19,9 @@ const Result = ({
   onFileChange,
   withAttachments,
   files,
+  textareaRef,
 }: Props) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [textareaRef]);
 
   return (
     <div className="flex grow-1 flex-col mb-1">
@@ -39,7 +33,7 @@ const Result = ({
         className="textarea w-full mb-3 p-3 bg-base-100 focus:outline-none"
       />
       {withAttachments && (
-        <div className="attachments w-1/2">
+        <div className="attachments w-1/2 mt-auto">
           {/* Скрытый input для выбора файла */}
           <input
             ref={fileInputRef}
