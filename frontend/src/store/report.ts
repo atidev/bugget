@@ -6,7 +6,7 @@ import {
   sample,
 } from "effector";
 import { fetchReport, createReport, updateReport } from "@/api/reports";
-import { ReportStatuses } from "@/const";
+import { ReportStatuses, RequestStates } from "@/const";
 import { User } from "@/types/user";
 import { NewReport, ReportFormUIData, Report } from "@/types/report";
 import { ReportResponse } from "@/api/reports/models";
@@ -84,12 +84,17 @@ export const resetReport = createEvent();
 export const updateTitle = createEvent<string>();
 export const updateStatus = createEvent<number>();
 export const updateResponsible = createEvent<User | null>();
+export const setRequestState = createEvent<RequestStates>();
 
-export const setIsNewReport = createEvent();
-
-export const $isNewReport = createStore(true)
-  .on(setIsNewReport, (_, isNew) => isNew)
-  .reset(clearReport);
+export const $reportRequestState = createStore(RequestStates.IDLE);
+$reportRequestState
+  .on(fetchReportFx.pending, (_, state) => {
+    return state ? RequestStates.PENDING : RequestStates.DONE;
+  })
+  .on(fetchReportFx.doneData, () => {
+    return RequestStates.DONE;
+  })
+  .on(setRequestState, (state, status) => status);
 
 export const $isReportChanged = createStore(false).reset(clearReport);
 
@@ -139,20 +144,6 @@ sample({
   source: $initialReportForm, // Берём данные из исходного стейта (загруженного с сервера)
   clock: resetReport, // Ждём, когда сработает resetReport
   target: $reportForm, // Копируем данные в редактируемый стор
-});
-
-// При загрузке отчёта устанавливаем `isNewReport`
-sample({
-  source: fetchReportFx.doneData,
-  fn: () => false, // Если отчёт загружен, это НЕ новый отчёт
-  target: setIsNewReport,
-});
-
-// При создании отчёта обновляем `isNewReport`
-sample({
-  source: createReportFx.doneData,
-  fn: () => false, // После успешного создания отчёта считаем его существующим
-  target: setIsNewReport,
 });
 
 sample({

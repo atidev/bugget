@@ -1,10 +1,10 @@
 main {
   max-width: 1440px;
-  margin: 20px auto 60px;
+  margin: 0 auto 60px;
 }
 
 @media (max-width: 1460px) {
   main { 
-    margin: 20px 10px 60px;
+    margin: 0 10px 60px;
   }
 }

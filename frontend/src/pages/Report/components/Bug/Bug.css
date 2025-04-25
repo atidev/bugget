@@ -28,8 +28,3 @@
 .select-wrapper {
   width: 100px;
 }
-
-.bug-content-wrapper {
-  display: flex;
-  flex-direction: column;
-}

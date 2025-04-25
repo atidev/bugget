@@ -5,7 +5,7 @@ import {
   updateResponsible,
   resetReport,
   $isReportChanged,
-  $isNewReport,
+  $reportRequestState,
   updateStatus,
   updateReportEvent,
 } from "@/store/report";
@@ -14,10 +14,11 @@ import CancelButton from "@/components/CancelButton/CancelButton";
 import SaveButton from "@/components/SaveButton/SaveButton";
 import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Avatar from "@/components/Avatar/Avatar";
-import { ReportStatuses } from "../../../../const";
+import { ReportStatuses, RequestStates } from "@/const";
 import Dropdown from "@/components/Dropdown/Dropdown";
 import { employeesAutocomplete } from "@/api/employees";
 import { User } from "@/types/user";
+import ParticipantsSkeleton from "./components/ParticipantsSkeleton";
 
 const autocompleteUsers = async (searchString: string) => {
   const response = await employeesAutocomplete(searchString);
@@ -27,14 +28,14 @@ const autocompleteUsers = async (searchString: string) => {
   }));
 };
 
-const ReportHeader = () => {
+const ReportHeader = ({ isNewReport }: { isNewReport: boolean }) => {
   const [
     reportForm,
     setTitle,
     setResponsibleId,
     isReportChanged,
+    reportRequestState,
     reset,
-    isNewReport,
     setUpdateStatus,
     updateReport,
   ] = useUnit([
@@ -42,8 +43,8 @@ const ReportHeader = () => {
     updateTitle,
     updateResponsible,
     $isReportChanged,
+    $reportRequestState,
     resetReport,
-    $isNewReport,
     updateStatus,
     updateReportEvent,
   ]);
@@ -54,18 +55,26 @@ const ReportHeader = () => {
 
   return (
     <div
-      className={`report-form p-4 mb-3 card card-border shadow-lg border-gray-300 ${
-        reportForm.status === Number(ReportStatuses.READY)
+      className={`report-header p-4 mb-3 card card-border shadow-lg border-gray-300 gap-2 ${
+        reportForm.status === Number(ReportStatuses.READY) &&
+        reportRequestState === RequestStates.DONE
           ? "border-success"
           : ""
       }`}
     >
-      <div className="flex items-center justify-between items-start">
-        {isNewReport ? (
-          <span className="text-2xl">Новый репорт</span>
+      <div className="flex justify-between items-center">
+        {reportRequestState !== RequestStates.DONE && !isNewReport ? (
+          <div className="skeleton min-h-[40px]" />
         ) : (
           <span className="text-2xl">
-            Репорт<span className="text-gray-300">#{reportForm.id}</span>
+            {!isNewReport ? (
+              <>
+                {" "}
+                Репорт <span className="text-gray-300">#{reportForm.id} </span>
+              </>
+            ) : (
+              <span>Новый репорт</span>
+            )}
           </span>
         )}
 
@@ -85,47 +94,60 @@ const ReportHeader = () => {
       </div>
       <div>
         <div className="text-xs font-semibold mt-1 mb-1">Заголовок</div>
-        <input
-          type="text"
-          value={reportForm.title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Описание проблемы в двух словах"
-          className="input input-bordered w-full focus:outline-none"
-          maxLength={255}
-        />
+        {reportRequestState !== RequestStates.DONE && !isNewReport ? (
+          <div className="skeleton input w-full" />
+        ) : (
+          <input
+            type="text"
+            value={reportForm.title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Описание проблемы в двух словах"
+            className="input input-bordered w-full focus:outline-none"
+            maxLength={255}
+          />
+        )}
       </div>
 
       <div className="flex justify-between items-end">
         <div>
           <div className="text-xs font-semibold mb-1">Ответственный</div>
-
           <div className="flex gap-4 items-center">
-            <Autosuggest
-              onSelect={(entity) =>
-                handleUserSelect(
-                  entity ? { id: entity.id, name: entity.display } : null
-                )
-              }
-              externalString={reportForm.responsible?.name || ""}
-              autocompleteFn={autocompleteUsers}
-            />
+            {reportRequestState !== RequestStates.DONE && !isNewReport ? (
+              <div className="skeleton input shrink-0 min-w-[288px]" />
+            ) : (
+              <Autosuggest
+                onSelect={(entity) =>
+                  handleUserSelect(
+                    entity ? { id: entity.id, name: entity.display } : null
+                  )
+                }
+                externalString={reportForm.responsible?.name || ""}
+                autocompleteFn={autocompleteUsers}
+              />
+            )}
             <div className="participants-wrapper">
-              {!!reportForm.participants?.length &&
+              {reportRequestState !== RequestStates.DONE && !isNewReport ? (
+                <ParticipantsSkeleton />
+              ) : (
+                !!reportForm.participants?.length &&
                 reportForm.participants.map((p) => (
                   <div className="tooltip" key={p.id}>
                     <Avatar />
-                    <span key={p.id} className="tooltiptext rounded">
-                      {p.name}
-                    </span>
+                    <span className="tooltiptext rounded">{p.name}</span>
                   </div>
-                ))}
+                ))
+              )}
             </div>
           </div>
         </div>
         {!isNewReport && isReportChanged && reportForm.responsible?.id && (
           <div className="flex gap-2 justify-end">
             <CancelButton isChanged={isReportChanged} onReset={reset} />
-            <SaveButton isChanged={isReportChanged} onSave={updateReport} />
+            <SaveButton
+              isLoading={reportRequestState === RequestStates.PENDING}
+              isChanged={isReportChanged}
+              onSave={updateReport}
+            />
           </div>
         )}
       </div>
