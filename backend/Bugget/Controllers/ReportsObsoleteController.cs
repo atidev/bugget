@@ -1,4 +1,4 @@
-using Bugget.Authentication;
+using Authentication;
 using Bugget.BO.Mappers;
 using Bugget.BO.Services;
 using Bugget.DA.Files;
@@ -34,7 +34,7 @@ public sealed class ReportsObsoleteController(
     public async Task<ReportView?> CreateReportAsync([FromBody] ReportCreateDto createDto)
     {
         var user = User.GetIdentity();
-        var createdReport = await reportsService.CreateReportAsync(createDto.ToReport(user.Id));
+        var createdReport = await reportsService.CreateReportObsoleteAsync(createDto.ToReport(user.Id));
 
         return createdReport?.ToView(employeesDataAccess.DictEmployees());
     }
@@ -62,7 +62,7 @@ public sealed class ReportsObsoleteController(
     [ProducesResponseType(typeof(ReportObsoleteDbModel), 200)]
     public async Task<ReportView?> GetReportAsync([FromRoute] int reportId)
     {
-        var report = await reportsService.GetReportAsync(reportId);
+        var report = await reportsService.GetReportObsoleteAsync(reportId);
         return report?.ToView(employeesDataAccess.DictEmployees());
     }
 
@@ -77,7 +77,7 @@ public sealed class ReportsObsoleteController(
     public async Task<ReportView?> UpdateReportAsync([FromRoute] int reportId, [FromBody] ReportPatchDto updateDto)
     {
         var user = User.GetIdentity();
-        var report = await reportsService.UpdateReportAsync(updateDto.ToReportUpdate(reportId, user.Id));
+        var report = await reportsService.UpdateReportObsoleteAsync(updateDto.ToReportUpdate(reportId, user.Id));
 
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");

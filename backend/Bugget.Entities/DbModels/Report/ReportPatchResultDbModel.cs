@@ -7,4 +7,5 @@ public sealed class ReportPatchResultDbModel
     public required int Status { get; init; }
     public required string ResponsibleUserId { get; init; }
     public required string PastResponsibleUserId { get; init; }
+    public required DateTimeOffset UpdatedAt { get; init; }
 }

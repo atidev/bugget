@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Bugget.Authentication;
+using Authentication;
 using Bugget.BO.Services;
 using Bugget.Entities.Views;
 using Bugget.Entities.Views.Users;

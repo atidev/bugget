@@ -1,5 +1,6 @@
+using Authentication;
 using Bugget.BO.Mappers;
-using Bugget.BO.WebSockets;
+using Bugget.DA.WebSockets;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
 using Bugget.ExternalClients;
@@ -13,12 +14,12 @@ namespace Bugget.BO.Services
         ParticipantsService participantsService,
         ReportAutoStatusService autoStatusService)
     {
-        public async Task HandlePatchReportEventAsync(int reportId, string userId, ReportPatchDto patchDto, ReportPatchResultDbModel result)
+        public async Task HandlePatchReportEventAsync(int reportId, UserIdentity user, ReportPatchDto patchDto, ReportPatchResultDbModel result)
         {
             await Task.WhenAll(
-                reportPageHubClient.SendReportPatchAsync(reportId, patchDto.ToSocketView(result)),
-                externalClientsActionService.ExecuteReportPatchPostActions(new ReportPatchContext(userId, patchDto, result)),
-                participantsService.AddParticipantIfNotExistAsync(reportId, userId),
+                reportPageHubClient.SendReportPatchAsync(reportId, patchDto.ToSocketView(result), user.SignalRConnectionId),
+                externalClientsActionService.ExecuteReportPatchPostActions(new ReportPatchContext(user.Id, patchDto, result)),
+                participantsService.AddParticipantIfNotExistAsync(reportId, user.Id),
                 patchDto.ResponsibleUserId != null ? participantsService.AddParticipantIfNotExistAsync(reportId, patchDto.ResponsibleUserId) : Task.CompletedTask,
                 autoStatusService.CalculateStatusAsync(reportId, patchDto, result)
             );

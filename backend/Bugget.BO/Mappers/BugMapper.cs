@@ -11,7 +11,7 @@ namespace Bugget.BO.Mappers;
 
 public static class BugMapper
 {
-    public static Bug ToBug(this BugDto bug, int reportId, string creatorUserId)
+    public static Bug ToBug(this BugDtoObsolete bug, int reportId, string creatorUserId)
     {
         return new Bug
         {
@@ -76,7 +76,7 @@ public static class BugMapper
         };
     }
 
-    public static BugUpdate ToBugUpdate(this BugUpdateDto bugUpdateDto, int reportId, int bugId, string userId)
+    public static BugUpdate ToBugUpdate(this BugUpdateDtoObsolete bugUpdateDto, int reportId, int bugId, string userId)
     {
         return new BugUpdate
         {

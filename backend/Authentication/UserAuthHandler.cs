@@ -1,18 +1,19 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Bugget.Entities.Constants;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Bugget.Authentication;
+namespace Authentication;
 
 public class UserAuthHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,
-    UrlEncoder encoder)
-    : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
+    UrlEncoder encoder,
+    ISystemClock clock)
+    : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder, clock)
 {
-    private static readonly string? LdapUserIdKey = Environment.GetEnvironmentVariable(EnvironmentConstants.LdapUserIdKeyName);
+    private static readonly string? LdapUserIdKey = Environment.GetEnvironmentVariable("LDAP_USER_ID_KEY");
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -29,7 +30,7 @@ public class UserAuthHandler(
 
         var claims = new[]
         {
-            new Claim(ClaimsIdentity.DefaultNameClaimType, userId)
+            new Claim(ClaimTypes.NameIdentifier, userId),
         };
 
         return Task.FromResult(AuthenticateResult.Success(CreateTicket(claims)));
@@ -37,7 +38,7 @@ public class UserAuthHandler(
 
     private AuthenticationTicket CreateTicket(IEnumerable<Claim> claims)
     {
-        var identity = new ClaimsIdentity(claims, Scheme.Name, ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+        var identity = new ClaimsIdentity(claims, Scheme.Name, ClaimTypes.NameIdentifier, ClaimsIdentity.DefaultRoleClaimType);
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
         return ticket;
