@@ -19,6 +19,11 @@ public sealed class AuthController(EmployeesDataAccess employeesDataAccess) : Ap
     [HttpGet]
     public IActionResult GetCurrentUser()
     {
+        foreach (var header in Request.Headers)
+        {
+            Console.WriteLine($"{header.Key}: {header.Value}");
+        }
+        
         var user = User.GetIdentity();
         if (!employeesDataAccess.DictEmployees().TryGetValue(user.Id, out var employee))
         {
