@@ -3,7 +3,7 @@ namespace Bugget.Entities.BO;
 public class EmployeeObsolete
 {
     /// <summary>
-    /// Уникальный идентификатор соответствующий хэдеру авторизации LDAP_USER_ID_KEY
+    /// Уникальный идентификатор соответствующий хэдеру авторизации USER_ID_KEY
     /// </summary>
     public required string Id { get; init; }
     public string? FirstName { get; init; }

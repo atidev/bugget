@@ -16,7 +16,7 @@ namespace Bugget.Controllers;
 /// <summary>
 /// Api для работы с репортами
 /// </summary>
-[LdapAuth]
+[Auth]
 [Route("bugget/public/v1/reports")]
 [Obsolete("Используйте ReportsV2Controller")]
 public sealed class ReportsObsoleteController(

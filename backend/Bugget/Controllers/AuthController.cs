@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bugget.Controllers;
 
-[LdapAuth]
+[Auth]
 [Route("bugget/public/v1/auth")]
 public sealed class AuthController(EmployeesDataAccess employeesDataAccess) : ApiController
 {

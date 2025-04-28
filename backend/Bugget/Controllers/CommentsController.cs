@@ -12,7 +12,7 @@ namespace Bugget.Controllers;
 /// <summary>
 /// Api для работы с комментами
 /// </summary>
-[LdapAuth]
+[Auth]
 [Route("bugget/public/v1/reports/{reportId}/bugs/{bugId}/comments")]
 public sealed class CommentsController(
     CommentsService commentsService,

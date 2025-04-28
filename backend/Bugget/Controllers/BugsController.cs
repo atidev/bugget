@@ -13,7 +13,7 @@ namespace Bugget.Controllers;
 /// <summary>
 /// Api для работы с багами
 /// </summary>
-[LdapAuth]
+[Auth]
 [Route("bugget/public/v1/reports/{reportId}/bugs")]
 public sealed class BugsController(BugsService bugsService,
     IHubContext<ReportPageHub> hubContext,
