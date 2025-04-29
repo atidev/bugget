@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.StaticFiles;
 namespace Bugget.Controllers;
 
 [Auth]
-[Route("bugget/public/v1/reports/{reportId}/bug/{bugId}/attachments")]
+[Route("/v1/reports/{reportId}/bug/{bugId}/attachments")]
 public sealed class AttachmentsController(AttachmentService attachmentService) : ApiController
 {
     [HttpPost]

@@ -11,7 +11,7 @@ namespace Bugget.Controllers;
 /// Api для работы с сотрудниками
 /// </summary>
 [Auth]
-[Route("bugget/public/v1/employees")]
+[Route("/v1/employees")]
 public sealed class EmployeesController(EmployeesService service) : ApiController
 {
     /// <summary>

@@ -12,7 +12,7 @@ namespace Bugget.Controllers;
 /// Api для работы с командами
 /// </summary>
 [Auth]
-[Route("bugget/public/v1/teams")]
+[Route("/v1/teams")]
 public sealed class TeamsController(EmployeesService service) : ApiController
 {
     /// <summary>
