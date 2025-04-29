@@ -10,7 +10,7 @@ namespace Bugget.Controllers;
 /// <summary>
 /// Api для работы с сотрудниками
 /// </summary>
-[LdapAuth]
+[Auth]
 [Route("bugget/public/v1/employees")]
 public sealed class EmployeesController(EmployeesService service) : ApiController
 {

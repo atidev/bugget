@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace Bugget.Controllers;
 
-[LdapAuth]
+[Auth]
 [Route("bugget/public/v1/reports/{reportId}/bug/{bugId}/attachments")]
 public sealed class AttachmentsController(AttachmentService attachmentService) : ApiController
 {

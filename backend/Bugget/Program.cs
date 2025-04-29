@@ -88,7 +88,7 @@ builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesDataAcc
 builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesFileClient>());
 
 builder.Services.AddHealthChecks();
-builder.Services.AddLdapAuth();
+builder.Services.AddAuthHeaders();
 builder.Services.AddSingleton<ITaskQueue, TaskQueue.TaskQueue>()
     .AddHostedService(provider => (TaskQueue.TaskQueue)provider.GetRequiredService<ITaskQueue>());
 

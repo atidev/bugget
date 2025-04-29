@@ -13,15 +13,15 @@ public class UserAuthHandler(
     ISystemClock clock)
     : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder, clock)
 {
-    private static readonly string? LdapUserIdKey = Environment.GetEnvironmentVariable("LDAP_USER_ID_KEY");
+    private static readonly string? UserIdKey = Environment.GetEnvironmentVariable("USER_ID_KEY");
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var headers = Request.Headers;
 
         var userId = string.Empty;
-        if (!string.IsNullOrEmpty(LdapUserIdKey))
-            userId = headers[LdapUserIdKey].ToString();
+        if (!string.IsNullOrEmpty(UserIdKey))
+            userId = headers[UserIdKey].ToString();
 
         if (string.IsNullOrEmpty(userId))
         {

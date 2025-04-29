@@ -11,7 +11,7 @@ namespace Bugget.Controllers;
 /// <summary>
 /// Api для работы с командами
 /// </summary>
-[LdapAuth]
+[Auth]
 [Route("bugget/public/v1/teams")]
 public sealed class TeamsController(EmployeesService service) : ApiController
 {

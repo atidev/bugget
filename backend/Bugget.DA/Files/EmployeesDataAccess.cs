@@ -73,7 +73,7 @@ public sealed class EmployeesDataAccess(ILogger<EmployeesDataAccess> logger) : B
         },
         new EmployeeObsolete
         {
-            Id = "any-ldap-id",
+            Id = "any-id-1",
             FirstName = "Петр",
             LastName = "Петров",
             Surname = "Петрович",
