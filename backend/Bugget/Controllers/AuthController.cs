@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bugget.Controllers;
 
 [Auth]
-[Route("bugget/public/v1/auth")]
+[Route("/v1/auth")]
 public sealed class AuthController(EmployeesDataAccess employeesDataAccess) : ApiController
 {
     /// <summary>

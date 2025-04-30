@@ -11,7 +11,7 @@ namespace Bugget.Controllers;
 /// Api для работы с багами
 /// </summary>
 [Auth]
-[Route("bugget/public/v2/reports/{reportId}/bugs")]
+[Route("/v2/reports/{reportId}/bugs")]
 public sealed class BugsV2Controller(BugsService bugsService) : ApiController
 {
     /// <summary>

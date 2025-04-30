@@ -13,7 +13,7 @@ namespace Bugget.Controllers;
 /// Api для работы с комментами
 /// </summary>
 [Auth]
-[Route("bugget/public/v1/reports/{reportId}/bugs/{bugId}/comments")]
+[Route("/v1/reports/{reportId}/bugs/{bugId}/comments")]
 public sealed class CommentsController(
     CommentsService commentsService,
     IHubContext<ReportPageHub> hubContext,
