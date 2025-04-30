@@ -136,7 +136,7 @@ app.UseCors("CorsPolicy");
 
 app.UseMiddleware<ResultExceptionHandlerMiddleware>();
 
-app.MapHub<ReportPageHub>("/bugget/public/v1/report-page-hub"); // Подключаем хаб
+app.MapHub<ReportPageHub>("/v1/report-page-hub"); // Подключаем хаб
 
 app.Run();
 
