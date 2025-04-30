@@ -73,35 +73,23 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
   });
 
   useEffect(() => {
-    const root = document.documentElement;
-    const rawCssVar = getComputedStyle(root).getPropertyValue("--spacing");
-    const spacing = parseFloat(rawCssVar);
-    // вычисляем значение паддинга у <textarea />
-    // 3 -- потому что className p-3 у <textarea />
-    const calculatedTextareaPaddingEm = spacing * 3;
+    const receivedTextarea = receivedTextareaRef.current;
+    const expectedTextarea = expectedTextareaRef.current;
+    if (!receivedTextarea || !expectedTextarea) return;
 
-    if (receivedTextareaRef.current && expectedTextareaRef.current) {
-      const fontSizePx = parseFloat(
-        getComputedStyle(receivedTextareaRef.current).fontSize
-      );
-      const calculatedTextareaPaddingPx =
-        calculatedTextareaPaddingEm * fontSizePx;
-      const textareaReceiveScrollHeight = `${
-        receivedTextareaRef.current.scrollHeight + calculatedTextareaPaddingPx
-      }px`;
-      const textareaExpectScrollHeight = `${
-        expectedTextareaRef.current.scrollHeight + calculatedTextareaPaddingPx
-      }px`;
+    receivedTextarea.style.height = "auto";
+    expectedTextarea.style.height = "auto";
 
-      if (textareaReceiveScrollHeight >= textareaExpectScrollHeight) {
-        receivedTextareaRef.current.style.height = textareaReceiveScrollHeight;
-        expectedTextareaRef.current.style.height = "100%";
-      } else {
-        expectedTextareaRef.current.style.height = textareaExpectScrollHeight;
-        receivedTextareaRef.current.style.height = "100%";
-      }
-    }
-  }, [receivedTextareaRef, expectedTextareaRef, newBugData, bug]);
+    const maxScrollHeight = Math.max(
+      receivedTextarea.scrollHeight,
+      expectedTextarea.scrollHeight
+    );
+
+    // 5пх -- число, чтобы высота была чуть выше, чтобы не показывался скролл
+    const height = `${maxScrollHeight + 5}px`;
+    receivedTextarea.style.height = height;
+    expectedTextarea.style.height = height;
+  }, [bug.receive, bug.expect]);
 
   const attachments = useStoreMap({
     store: $attachmentsByBugId,
