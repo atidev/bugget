@@ -1,9 +1,8 @@
-using Authentication;
 using Bugget.BO.Mappers;
 using Bugget.BO.Services;
 using Bugget.DA.Files;
-using Bugget.Entities.BO;
-using Bugget.Entities.BO.ReportBo;
+using Bugget.DA.Interfaces;
+using Bugget.Entities.Authentication;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
 using Bugget.Entities.Views;
@@ -16,13 +15,12 @@ namespace Bugget.Controllers;
 /// <summary>
 /// Api для работы с репортами
 /// </summary>
-[Auth]
 [Route("/v1/reports")]
 [Obsolete("Используйте ReportsV2Controller")]
 public sealed class ReportsObsoleteController(
     ReportsService reportsService,
     IHubContext<ReportPageHub> hubContext,
-    EmployeesDataAccess employeesDataAccess) : ApiController
+    IEmployeesClient employeesClient) : ApiController
 {
     /// <summary>
     /// Создать репорт
@@ -36,7 +34,7 @@ public sealed class ReportsObsoleteController(
         var user = User.GetIdentity();
         var createdReport = await reportsService.CreateReportObsoleteAsync(createDto.ToReport(user.Id));
 
-        return createdReport?.ToView(employeesDataAccess.DictEmployees());
+        return createdReport?.ToView(employeesClient.DictEmployees());
     }
 
     /// <summary>
@@ -50,7 +48,7 @@ public sealed class ReportsObsoleteController(
         var user = User.GetIdentity();
 
         var reports = await reportsService.ListReportsAsync(user.Id);
-        return reports.Select(r => r.ToView(employeesDataAccess.DictEmployees())).ToArray();
+        return reports.Select(r => r.ToView(employeesClient.DictEmployees())).ToArray();
     }
 
     /// <summary>
@@ -63,7 +61,7 @@ public sealed class ReportsObsoleteController(
     public async Task<ReportView?> GetReportAsync([FromRoute] int reportId)
     {
         var report = await reportsService.GetReportObsoleteAsync(reportId);
-        return report?.ToView(employeesDataAccess.DictEmployees());
+        return report?.ToView(employeesClient.DictEmployees());
     }
 
     /// <summary>
@@ -82,7 +80,7 @@ public sealed class ReportsObsoleteController(
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");
 
-        return report?.ToView(employeesDataAccess.DictEmployees());
+        return report?.ToView(employeesClient.DictEmployees());
     }
 
     /// <summary>
@@ -110,9 +108,9 @@ public sealed class ReportsObsoleteController(
                 sort,
                 skip,
                 take,
-                employeesDataAccess.DictByTeamEmployees()
+                employeesClient.DictEmployeesByTeam()
                 ));
         
-        return searchResult.ToView(employeesDataAccess.DictEmployees());
+        return searchResult.ToView(employeesClient.DictEmployees());
     }
 }

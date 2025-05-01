@@ -1,4 +1,4 @@
-namespace Authentication;
+namespace Bugget.Authentication;
 
 public static class AuthSchemeNames
 {

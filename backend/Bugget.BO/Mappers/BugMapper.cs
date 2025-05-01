@@ -48,7 +48,7 @@ public static class BugMapper
         };
     }
 
-    public static BugView ToView(this BugDbModel bug, IReadOnlyDictionary<string, EmployeeObsolete> employeesDict)
+    public static BugView ToView(this BugDbModel bug, IReadOnlyDictionary<string, Employee> employeesDict)
     {
         return new BugView
         {

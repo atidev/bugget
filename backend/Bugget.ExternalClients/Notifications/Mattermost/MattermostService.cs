@@ -1,4 +1,5 @@
 using Bugget.DA.Files;
+using Bugget.DA.Interfaces;
 using Bugget.Entities.Adapters;
 using Bugget.ExternalClients.Context;
 using Bugget.ExternalClients.Interfaces;
@@ -6,65 +7,65 @@ using Bugget.ExternalClients.Interfaces;
 namespace Bugget.ExternalClients.Notifications.Mattermost;
 
 public sealed class MattermostService(
-    EmployeesDataAccess employeesDataAccess,
+    IEmployeesClient employeesClient,
     MattermostClient mattermostClient) : IReportCreatePostAction, IReportUpdatePostAction, IReportPatchPostAction
 {
-    public Task ExecuteAsync(ReportCreateContext createContext)
+    public async Task ExecuteAsync(ReportCreateContext createContext)
     {
         if (createContext.Report.ResponsibleUserId == createContext.ReportDbModel.CreatorUserId)
-            return Task.CompletedTask;
+            return;
 
-        var responsibleEmployee = employeesDataAccess.GetEmployee(createContext.Report.ResponsibleUserId);
-        var creatorEmployee = employeesDataAccess.GetEmployee(createContext.Report.CreatorUserId);
+        var responsibleEmployee = await employeesClient.GetEmployeeAsync(createContext.Report.ResponsibleUserId);
+        var creatorEmployee = await employeesClient.GetEmployeeAsync(createContext.Report.CreatorUserId);
         if (responsibleEmployee == null || creatorEmployee == null)
-            return Task.CompletedTask;
+            return ;
 
         var message = ReportMessageBuilder.GetYourResponsibleInNewReportMessage(
-            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, EmployeeAdapter.Transform(creatorEmployee).Name
+            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, creatorEmployee.Name
         );
 
-        return mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
+        await mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
     }
 
-    public Task ExecuteAsync(ReportUpdateContext createContext)
+    public async Task ExecuteAsync(ReportUpdateContext createContext)
     {
         // не меняля ответственного
         if (createContext.Report.ResponsibleUserId == null)
-            return Task.CompletedTask;
+            return;
 
         if (createContext.Report.UpdaterUserId == createContext.Report.ResponsibleUserId)
-            return Task.CompletedTask;
+            return ;
 
-        var responsibleEmployee = employeesDataAccess.GetEmployee(createContext.Report.ResponsibleUserId);
-        var updaterEmployee = employeesDataAccess.GetEmployee(createContext.Report.UpdaterUserId);
+        var responsibleEmployee = await employeesClient.GetEmployeeAsync(createContext.Report.ResponsibleUserId);
+        var updaterEmployee = await employeesClient.GetEmployeeAsync(createContext.Report.UpdaterUserId);
         if (responsibleEmployee == null || updaterEmployee == null)
-            return Task.CompletedTask;
+            return ;
 
         var message = ReportMessageBuilder.GetYourResponsibleInExistReportMessage(
-            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, EmployeeAdapter.Transform(updaterEmployee).Name
+            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, updaterEmployee.Name
         );
 
-        return mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
+        await mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
     }
 
-    public Task ExecuteAsync(ReportPatchContext reportPatchContext)
+    public async Task ExecuteAsync(ReportPatchContext reportPatchContext)
     {
         // не меняли ответственного
         if (reportPatchContext.PatchDto.ResponsibleUserId == null)
-            return Task.CompletedTask;
+            return;
 
         if (reportPatchContext.UserId == reportPatchContext.Result.ResponsibleUserId)
-            return Task.CompletedTask;
+            return;
 
-        var responsibleEmployee = employeesDataAccess.GetEmployee(reportPatchContext.Result.ResponsibleUserId);
-        var updaterEmployee = employeesDataAccess.GetEmployee(reportPatchContext.UserId);
+        var responsibleEmployee = await employeesClient.GetEmployeeAsync(reportPatchContext.Result.ResponsibleUserId);
+        var updaterEmployee = await employeesClient.GetEmployeeAsync(reportPatchContext.UserId);
         if (responsibleEmployee == null || updaterEmployee == null)
-            return Task.CompletedTask;
+            return;
 
         var message = ReportMessageBuilder.GetYourResponsibleAfterPatchReportMessage(
-            reportPatchContext.Result.Id, reportPatchContext.Result.Title, EmployeeAdapter.Transform(updaterEmployee).Name
+            reportPatchContext.Result.Id, reportPatchContext.Result.Title, updaterEmployee.Name
         );
 
-        return mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
+        await mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
     }
 }

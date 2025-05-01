@@ -1,4 +1,4 @@
-using Authentication;
+using Bugget.Entities.Authentication;
 using Bugget.BO.Errors;
 using Bugget.BO.Mappers;
 using Bugget.DA.Postgres;

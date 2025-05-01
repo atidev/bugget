@@ -10,7 +10,6 @@
         <ProjectReference Include="..\Bugget.ExternalClients\Bugget.ExternalClients.csproj" />
         <ProjectReference Include="..\Monade\Monade.csproj" />
         <ProjectReference Include="..\TaskQueue\TaskQueue.csproj" />
-        <ProjectReference Include="..\Authentication\Authentication.csproj" />
     </ItemGroup>
     
 </Project>

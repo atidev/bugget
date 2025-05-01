@@ -26,9 +26,58 @@ public sealed class EmployeesFileClient(ILogger<EmployeesFileClient> logger) : B
     public Task<IEnumerable<Employee>> GetEmployeesAsync(IEnumerable<string> userIds, string? organizationId)
     {
         var employees = userIds
-            .Select(id => EmployeesDict.Value.TryGetValue(id, out var employee) ? employee : null)
+            .Select(id => EmployeesDict.Value.GetValueOrDefault(id))
             .Where(e => e != null);
         return Task.FromResult(employees!);
+    }
+
+    public IReadOnlyDictionary<string, Employee> DictEmployees()
+    {
+        return EmployeesDict.Value;
+    }
+    
+    public IReadOnlyDictionary<string, IReadOnlyCollection<Employee>> DictEmployeesByTeam()
+    {
+        return _employees
+            .Where(e => !string.IsNullOrEmpty(e.TeamId))
+            .GroupBy(e => e.TeamId!)
+            .ToDictionary(
+                grp => grp.Key!,
+                grp => (IReadOnlyCollection<Employee>)grp
+                    .Select(e => new Employee
+                    {
+                        Id = e.Id,
+                        Name = e.Name,
+                        NotificationUserId = e.NotificationUserId,
+                        TeamId = e.TeamId,
+                        OrganizationId = e.OrganizationId,
+                        PhotoUrl = e.PhotoUrl,
+                        Depth = e.Depth
+                    })
+                    .ToList()
+            );
+    }
+    
+    public async Task<(IEnumerable<Employee>, int)> AutocompleteEmployeesAsync(
+        string userId,
+        string searchString,
+        int skip,
+        int take,
+        uint depth)
+    {
+        var user = await GetEmployeeAsync(userId);
+        if (user == null)
+            return ([], 0);
+
+        var foundedUsers = _employees
+            // текущая глубина + 1
+            .Where(e => user.Depth == null || e.Depth >= user.Depth - depth)
+            .Where(v => v.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(v => v.Name.IndexOf(searchString, StringComparison.OrdinalIgnoreCase))
+            .ThenBy(v => v.Name)
+            .ToArray();
+
+        return (foundedUsers.Skip(skip).Take(take), foundedUsers.Length);
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -38,7 +87,7 @@ public sealed class EmployeesFileClient(ILogger<EmployeesFileClient> logger) : B
 
     private async Task LoadEmployeesAsync()
     {
-        string employeesFilePath = Path.Combine(AppContext.BaseDirectory, "employees_v2.json");
+        string employeesFilePath = Path.Combine(AppContext.BaseDirectory, "employees.json");
 
         if (File.Exists(employeesFilePath))
         {

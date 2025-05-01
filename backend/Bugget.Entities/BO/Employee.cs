@@ -1,3 +1,4 @@
+
 namespace Bugget.Entities.BO;
 
 public class Employee
@@ -7,22 +8,28 @@ public class Employee
     /// </summary>
     public required string Id { get; init; }
 
+    private readonly string? _name;
+
     /// <summary>
-    /// Имя пользователя
+    /// Имя пользователя. Если значение не задано или пустое — возвращает Id.
     /// </summary>
-    public string? Name { get; init; }
-    
+    public string Name
+    {
+        get => string.IsNullOrEmpty(_name) ? Id : _name!;
+        init => _name = value;
+    }
+
     /// <summary>
     /// Идентификатор пользователя в системе уведомлений
     /// </summary>
     public string? NotificationUserId { get; init; }
-    
+
     /// <summary>
     /// Идентификатор команды/отдела
     /// </summary>
     public string? TeamId { get; init; }
 
-     /// <summary>
+    /// <summary>
     /// Идентификатор организации
     /// </summary>
     public string? OrganizationId { get; init; }
@@ -31,7 +38,7 @@ public class Employee
     /// Ссылка на фотографию пользователя
     /// </summary>
     public string? PhotoUrl { get; init; }
-    
+
     /// <summary>
     /// Глубина пользователя в иерархии компании
     /// </summary>

@@ -1,7 +1,7 @@
-using Authentication;
 using Bugget.BO.Mappers;
 using Bugget.BO.Services;
-using Bugget.Entities.DTO;
+using Bugget.DA.Interfaces;
+using Bugget.Entities.Authentication;
 using Bugget.Entities.DTO.Bug;
 using Bugget.Entities.Views;
 using Bugget.Hubs;
@@ -13,11 +13,10 @@ namespace Bugget.Controllers;
 /// <summary>
 /// Api для работы с багами
 /// </summary>
-[Auth]
 [Route("/v1/reports/{reportId}/bugs")]
 public sealed class BugsController(BugsService bugsService,
     IHubContext<ReportPageHub> hubContext,
-    EmployeesService employeesService) : ApiController
+    IEmployeesClient employeesClient) : ApiController
 {
     /// <summary>
     /// Добавить баг
@@ -31,7 +30,7 @@ public sealed class BugsController(BugsService bugsService,
     {
         var user = User.GetIdentity();
         var createdBug = await bugsService.CreateBugObsoleteAsync(createDto.ToBug(reportId, user.Id));
-        return createdBug?.ToView(employeesService.DictEmployees());
+        return createdBug?.ToView(employeesClient.DictEmployees());
     }
     
     /// <summary>
@@ -51,6 +50,6 @@ public sealed class BugsController(BugsService bugsService,
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");
 
-        return updatedBug?.ToView(employeesService.DictEmployees());
+        return updatedBug?.ToView(employeesClient.DictEmployees());
     }
 }

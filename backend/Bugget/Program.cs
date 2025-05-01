@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Authentication;
+using Bugget.Authentication;
 using Bugget.BO.Services;
 using Bugget.DA.Files;
 using Bugget.DA.Postgres;
@@ -14,6 +14,9 @@ using Bugget.ExternalClients;
 using TaskQueue;
 using Microsoft.AspNetCore.SignalR;
 using Bugget.DA.WebSockets;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Bugget.Entities.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,9 +55,8 @@ builder.Services.AddCors(options =>
 builder.Services.Configure<PostgresSqlConnectionsConfig>(builder.Configuration.GetSection(nameof(PostgresSqlConnectionsConfig)));
 builder.Services.Configure<FileStorageConfiguration>(
     builder.Configuration.GetSection(nameof(FileStorageConfiguration)));
-
-builder.Services.AddControllers()
-    .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = SnakeCaseNamingPolicy.Instance; });
+builder.Services.Configure<AuthHeadersOptions>(
+    builder.Configuration.GetSection("ExternalSettings:Authentication"));
 
 builder.Services.AddAutoMapper(typeof(Bugget.Entities.MappingProfiles.BugMappingProfile).Assembly);
 
@@ -64,7 +66,6 @@ builder.Services
     .AddSingleton<ReportsService>()
     .AddSingleton<BugsService>()
     .AddSingleton<CommentsService>()
-    .AddSingleton<EmployeesService>()
     .AddSingleton<AttachmentService>()
     .AddSingleton<ReportEventsService>()
     .AddSingleton<ReportAutoStatusService>()
@@ -79,13 +80,14 @@ builder.Services
     .AddSingleton<CommentsDbClient>()
     .AddSingleton<BugsDbClient>()
     .AddSingleton<AttachmentDbClient>()
-    .AddSingleton<EmployeesDataAccess>()
     .AddSingleton<EmployeesFileClient>()
+    .AddSingleton<TeamsFileClient>()
     .AddSingleton<ParticipantsDbClient>()
-    .AddSingleton<IEmployeesClient>((sp) => sp.GetRequiredService<EmployeesFileClient>());
+    .AddSingleton<IEmployeesClient>((sp) => sp.GetRequiredService<EmployeesFileClient>())
+    .AddSingleton<ITeamsClient>((sp) => sp.GetRequiredService<TeamsFileClient>());
 
-builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesDataAccess>());
 builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesFileClient>());
+builder.Services.AddHostedService((sp) => sp.GetRequiredService<TeamsFileClient>());
 
 builder.Services.AddHealthChecks();
 builder.Services.AddAuthHeaders();
@@ -108,11 +110,30 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddSingleton<ResultExceptionHandlerMiddleware>();
 
-builder.Services.AddControllers()
+builder.Services.AddControllers((options) =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+        .AddAuthenticationSchemes(AuthSchemeNames.Headers)
+        .RequireAuthenticatedUser()
+        .Build();
+
+    options.Filters.Add(new AuthorizeFilter(policy));
+})
+.AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = SnakeCaseNamingPolicy.Instance; })
     .ConfigureApiBehaviorOptions(o =>
         o.InvalidModelStateResponseFactory = _ => new ModelStateInvalidHandler());
 
 builder.Services.AddSingleton<IReportPageHubClient, ReportPageHubClient>();
+
+var externalPath = Path.Combine(AppContext.BaseDirectory, "external_settings.json");
+if (File.Exists(externalPath))
+{
+    builder.Configuration.AddJsonFile(externalPath, optional: false, reloadOnChange: true);
+}
+else
+{
+    Console.WriteLine("File external_settings.json not found");
+}
 
 var app = builder.Build();
 

@@ -1,4 +1,4 @@
-using Authentication;
+using Bugget.Entities.Authentication;
 using Bugget.BO.Mappers;
 using Bugget.DA.WebSockets;
 using Bugget.Entities.DbModels.Report;

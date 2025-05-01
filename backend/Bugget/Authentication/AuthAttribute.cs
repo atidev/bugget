@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace Authentication;
+namespace Bugget.Authentication;
 
 /// <summary>
 /// Аутентификация по хэдерам
