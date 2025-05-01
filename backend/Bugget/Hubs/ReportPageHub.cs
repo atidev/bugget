@@ -1,6 +1,6 @@
-using Authentication;
 using Microsoft.AspNetCore.SignalR;
 using Bugget.BO.Services;
+using Bugget.Entities.Authentication;
 namespace Bugget.Hubs;
 
 public sealed class ReportPageHub(

@@ -1,6 +1,5 @@
-using Authentication;
-using AutoMapper;
 using Bugget.BO.Services;
+using Bugget.Entities.Authentication;
 using Bugget.Entities.BO;
 using Bugget.Entities.Views;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace Bugget.Controllers;
 
-[Auth]
 [Route("/v1/reports/{reportId}/bug/{bugId}/attachments")]
 public sealed class AttachmentsController(AttachmentService attachmentService) : ApiController
 {

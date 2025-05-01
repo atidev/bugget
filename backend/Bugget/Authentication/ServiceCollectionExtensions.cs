@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Authentication;
+namespace Bugget.Authentication;
 
 public static class ServiceCollectionExtensions
 {
     public static AuthenticationBuilder AddAuthHeaders(this IServiceCollection services) =>
-        services.AddAuthentication()
+        services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = AuthSchemeNames.Headers;
+    })
             .AddScheme<AuthenticationSchemeOptions, UserAuthHandler>(
                 AuthSchemeNames.Headers, o => { });
 }

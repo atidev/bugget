@@ -1,6 +1,7 @@
-using Authentication;
 using Bugget.BO.Mappers;
 using Bugget.BO.Services;
+using Bugget.DA.Interfaces;
+using Bugget.Entities.Authentication;
 using Bugget.Entities.DTO;
 using Bugget.Entities.Views;
 using Bugget.Hubs;
@@ -12,12 +13,11 @@ namespace Bugget.Controllers;
 /// <summary>
 /// Api для работы с комментами
 /// </summary>
-[Auth]
 [Route("/v1/reports/{reportId}/bugs/{bugId}/comments")]
 public sealed class CommentsController(
     CommentsService commentsService,
     IHubContext<ReportPageHub> hubContext,
-    EmployeesService employeesService) : ApiController
+    IEmployeesClient employeesClient) : ApiController
 {
     /// <summary>
     /// Добавить комментарий
@@ -42,7 +42,7 @@ public sealed class CommentsController(
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveComments", comment.BugId);
         
-        return Ok(comment?.ToCommentView(employeesService.DictEmployees()));
+        return Ok(comment?.ToCommentView(employeesClient.DictEmployees()));
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public sealed class CommentsController(
     public async Task<CommentView[]> ListCommentsAsync([FromRoute] int reportId, [FromRoute] int bugId)
     {
         var comments = await commentsService.ListCommentsAsync(reportId, bugId);
-        return comments.Select(c => c.ToCommentView(employeesService.DictEmployees())).ToArray();
+        return comments.Select(c => c.ToCommentView(employeesClient.DictEmployees())).ToArray();
     }
 
     /// <summary>

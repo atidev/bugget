@@ -1,35 +1,34 @@
-using Authentication;
-using Bugget.DA.Files;
-using Bugget.Entities.Adapters;
-using Bugget.Entities.Constants;
-using Bugget.Entities.Views;
+using Bugget.DA.Interfaces;
+using Bugget.Entities.Authentication;
 using Bugget.Entities.Views.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bugget.Controllers;
 
-[Auth]
 [Route("/v1/auth")]
-public sealed class AuthController(EmployeesDataAccess employeesDataAccess) : ApiController
+public sealed class AuthController(IEmployeesClient employeesClient) : ApiController
 {
     /// <summary>
     /// Получить данные текущего пользователя
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    public IActionResult GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser()
     {
         var user = User.GetIdentity();
-        if (!employeesDataAccess.DictEmployees().TryGetValue(user.Id, out var employee))
+        
+        var employee = await employeesClient.GetEmployeeAsync(user.Id);
+        if (employee == null)
         {
-            return BadRequest("user not found");
+            return Unauthorized();
         }
 
         return Ok(new UserAuthView
         {
             Id = employee.Id,
-            Name = EmployeeAdapter.Transform(employee).Name,
-            TeamId = employee.TeamId
+            Name = employee.Name,
+            PhotoUrl = employee.PhotoUrl,
+            TeamId = user.TeamId 
         });
     }
 }

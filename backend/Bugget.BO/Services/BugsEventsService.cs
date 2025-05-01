@@ -1,4 +1,4 @@
-using Authentication;
+using Bugget.Entities.Authentication;
 using Bugget.DA.WebSockets;
 using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DTO.Bug;

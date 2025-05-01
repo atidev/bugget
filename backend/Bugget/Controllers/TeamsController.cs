@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
-using Authentication;
 using Bugget.BO.Services;
-using Bugget.Entities.Constants;
+using Bugget.DA.Files;
+using Bugget.DA.Interfaces;
+using Bugget.Entities.Authentication;
 using Bugget.Entities.Views;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,16 +11,15 @@ namespace Bugget.Controllers;
 /// <summary>
 /// Api для работы с командами
 /// </summary>
-[Auth]
 [Route("/v1/teams")]
-public sealed class TeamsController(EmployeesService service) : ApiController
+public sealed class TeamsController(ITeamsClient teamsClient) : ApiController
 {
     /// <summary>
     /// Поиск команды по имени
     /// </summary>
     [HttpGet("autocomplete")]
     [ProducesResponseType(typeof(FoundedTeamsView), 200)]
-    public IActionResult AutocompleteEmployees([FromQuery] [Required] string searchString,
+    public IActionResult AutocompleteTeams([FromQuery] [Required] string searchString,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 10,
         [FromQuery] uint depth = 1)
@@ -29,8 +28,14 @@ public sealed class TeamsController(EmployeesService service) : ApiController
             return BadRequest();
 
         var user = User.GetIdentity();
-        var (teams, total) = service.AutocompleteTeams(
-            user.Id,
+        if(string.IsNullOrEmpty(user.TeamId))
+            return Ok(new FoundedTeamsView{
+                Teams = [],
+                Total = 0
+            });
+
+        var (teams, total) = teamsClient.AutocompleteTeams(
+            user.TeamId,
             searchString,
             skip,
             take,

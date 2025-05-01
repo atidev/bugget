@@ -1,5 +1,5 @@
-using Authentication;
 using Bugget.BO.Services;
+using Bugget.Entities.Authentication;
 using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DTO.Bug;
 using Bugget.Extensions;
@@ -10,7 +10,6 @@ namespace Bugget.Controllers;
 /// <summary>
 /// Api для работы с багами
 /// </summary>
-[Auth]
 [Route("/v2/reports/{reportId}/bugs")]
 public sealed class BugsV2Controller(BugsService bugsService) : ApiController
 {

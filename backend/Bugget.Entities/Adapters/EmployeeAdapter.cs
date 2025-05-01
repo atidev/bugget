@@ -22,19 +22,14 @@ public static class EmployeeAdapter
         return new EmployeeView { Id = e.Id, Name = fullName };
     }
     
-    public static UserView ToUserView(EmployeeObsolete e)
+    public static UserView ToUserView(Employee e)
     {
-        var sb = new StringBuilder()
-            .AppendWithSeparator(e.Surname)
-            .AppendWithSeparator(e.FirstName)
-            .AppendWithSeparator(e.LastName);
-        
-        return new UserView { Id = e.Id, Name = sb.ToString().TrimEnd() };
+        return new UserView { Id = e.Id, Name = e.Name, TeamId = e.TeamId, PhotoUrl = null };
     }
     
     public static UserView ToUserView(string userId)
     {
-        return new UserView { Id = userId, Name = string.Empty };
+        return new UserView { Id = userId, Name = string.Empty, TeamId = null, PhotoUrl = null };
     }
 
     private static StringBuilder AppendWithSeparator(this StringBuilder sb, string? addValue)

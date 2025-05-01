@@ -1,5 +1,5 @@
-using Authentication;
 using Bugget.BO.Services;
+using Bugget.Entities.Authentication;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
 using Bugget.Extensions;
@@ -10,7 +10,6 @@ namespace Bugget.Controllers;
 /// <summary>
 /// v2 Api для работы с репортами
 /// </summary>
-[Auth]
 [Route("/v2/reports")]
 public sealed class ReportsV2Controller(
     ReportsService reportsService) : ApiController

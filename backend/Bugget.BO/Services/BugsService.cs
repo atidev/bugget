@@ -1,4 +1,3 @@
-using Authentication;
 using AutoMapper;
 using Bugget.BO.Errors;
 using Bugget.BO.Mappers;
@@ -7,6 +6,7 @@ using Bugget.Entities.BO;
 using Bugget.Entities.BO.BugBo;
 using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DTO.Bug;
+using Bugget.Entities.Authentication;
 using Monade;
 using TaskQueue;
 namespace Bugget.BO.Services;
