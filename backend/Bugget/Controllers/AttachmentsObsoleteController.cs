@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.StaticFiles;
 namespace Bugget.Controllers;
 
 [Route("/v1/reports/{reportId}/bug/{bugId}/attachments")]
-[Obsolete]
+[Obsolete("Use v2")]
 public sealed class AttachmentsObsoleteController(AttachmentObsoleteService attachmentObsoleteService) : ApiController
 {
     [HttpPost]

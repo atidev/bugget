@@ -5,12 +5,16 @@ public sealed class AttachmentDbModel
     public required int Id { get; init; }
     
     /// <summary>
-    /// Идентификатор сущности ожидаю, получаю, коммент
+    /// Идентификатор сущности к которой прикреплен файл
     /// </summary>
-    public int? EntityId { get; init; }
+    public int? EntityId 
+    { 
+        get => EntityId ?? BugId;
+        init => EntityId = value;
+    }
 
     /// <summary>
-    /// Тип сущности ожидаю, получаю, коммент
+    /// Тип сущности к которой прикреплен файл
     /// </summary>
     public required int AttachType { get; init; }
     
@@ -23,7 +27,11 @@ public sealed class AttachmentDbModel
     /// <summary>
     /// Относительный путь либо S3‑key
     /// </summary>
-    public string? StorageKey { get; init; }
+    public string? StorageKey 
+    { 
+        get => StorageKey ?? Path; 
+        init => StorageKey = value; 
+    }
 
     /// <summary>
     /// Относительный путь
@@ -34,7 +42,7 @@ public sealed class AttachmentDbModel
     /// <summary>
     /// Тип хранилища 0=Local, 1=S3Standard, 2=S3Cold
     /// </summary>
-    public int? StorageKind { get; init; }
+    public int? StorageKind { get; init; } = 0;
 
     /// <summary>
     /// Дата создания вложения
@@ -64,10 +72,10 @@ public sealed class AttachmentDbModel
     /// <summary>
     /// Есть ли превью
     /// </summary>
-    public bool? HasPreview { get; init; }
+    public bool? HasPreview { get; init; } = false;
 
     /// <summary>
     /// Сжато ли вложение gzip
     /// </summary>
-    public bool? IsGzipCompressed { get; init; }
+    public bool? IsGzipCompressed { get; init; } = false;
 }

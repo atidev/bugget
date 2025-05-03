@@ -14,6 +14,7 @@ namespace Bugget.Controllers;
 /// Api для работы с багами
 /// </summary>
 [Route("/v1/reports/{reportId}/bugs")]
+[Obsolete("Use v2")]
 public sealed class BugsObsoleteController(BugsService bugsService,
     IHubContext<ReportPageHub> hubContext,
     IEmployeesClient employeesClient) : ApiController
