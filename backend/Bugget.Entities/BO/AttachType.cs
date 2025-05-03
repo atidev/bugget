@@ -2,7 +2,7 @@ namespace Bugget.Entities.BO;
 
 public enum AttachType
 {
-    Receive,
+    Fact,
     Expected,
     Comment
 }

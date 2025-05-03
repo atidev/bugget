@@ -3,6 +3,7 @@ using Bugget.BO.Services;
 using Bugget.DA.Interfaces;
 using Bugget.Entities.Authentication;
 using Bugget.Entities.DTO;
+using Bugget.Entities.DTO.Comment;
 using Bugget.Entities.Views;
 using Bugget.Hubs;
 using Microsoft.AspNetCore.Mvc;
@@ -14,8 +15,9 @@ namespace Bugget.Controllers;
 /// Api для работы с комментами
 /// </summary>
 [Route("/v1/reports/{reportId}/bugs/{bugId}/comments")]
-public sealed class CommentsController(
-    CommentsService commentsService,
+[Obsolete("Используй CommentsV2Controller")]
+public sealed class CommentsObsoleteController(
+    CommentsObsoleteService commentsService,
     IHubContext<ReportPageHub> hubContext,
     IEmployeesClient employeesClient) : ApiController
 {
@@ -28,7 +30,7 @@ public sealed class CommentsController(
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(CommentView), 200)]
-    public async Task<IActionResult> CreateCommentAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromBody] CommentDto createDto)
+    public async Task<IActionResult> CreateCommentAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromBody] CommentObsoleteDto createDto)
     {
         var user = User.GetIdentity();
         var comment = await commentsService.CreateCommentAsync(createDto.ToComment(bugId, reportId, user.Id));

@@ -1,5 +1,6 @@
 using Bugget.BO.Mappers;
 using Bugget.BO.Services;
+using Bugget.BO.Services.Reports;
 using Bugget.DA.Files;
 using Bugget.DA.Interfaces;
 using Bugget.Entities.Authentication;

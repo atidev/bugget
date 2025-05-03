@@ -3,6 +3,7 @@ using Bugget.Entities.BO;
 using Bugget.Entities.Constants;
 using Bugget.Entities.DbModels.Comment;
 using Bugget.Entities.DTO;
+using Bugget.Entities.DTO.Comment;
 using Bugget.Entities.Views;
 
 namespace Bugget.BO.Mappers;
@@ -20,7 +21,7 @@ public static class CommentMapper
         };
     }
 
-    public static Comment ToComment(this CommentDto comment, int bugId, int reportId, string userId)
+    public static Comment ToComment(this CommentObsoleteDto comment, int bugId, int reportId, string userId)
     {
         return new Comment
         {

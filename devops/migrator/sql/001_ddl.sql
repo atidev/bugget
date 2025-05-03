@@ -61,7 +61,6 @@ CREATE TABLE IF NOT EXISTS public.comments (
     created_at timestamp with time zone not null default now(),
     updated_at timestamp with time zone not null default now(),
 
-
     CONSTRAINT fk_comments_bugs
         FOREIGN KEY (bug_id)
         REFERENCES public.bugs(id)

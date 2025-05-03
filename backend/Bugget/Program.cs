@@ -5,7 +5,6 @@ using Bugget.Authentication;
 using Bugget.BO.Services;
 using Bugget.DA.Files;
 using Bugget.DA.Postgres;
-using Bugget.Entities.Config;
 using Bugget.Hubs;
 using Bugget.Middlewares;
 using Microsoft.OpenApi.Models;
@@ -17,6 +16,12 @@ using Bugget.DA.WebSockets;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Bugget.Entities.Options;
+using Bugget.BO.Services.Reports;
+using Bugget.BO.Services.Comments;
+using Bugget.BO.Services.Attachments;
+using Bugget.BO.Interfaces;
+using Bugget.Configurations;
+using HeyRed.Mime;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +30,16 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables()
     .AddCommandLine(args);
+
+var externalPath = Path.Combine(AppContext.BaseDirectory, "external_settings.json");
+if (File.Exists(externalPath))
+{
+    builder.Configuration.AddJsonFile(externalPath, optional: false, reloadOnChange: true);
+}
+else
+{
+    Console.WriteLine("File external_settings.json not found");
+}
 
 builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
 builder.Services.AddSignalR(options =>
@@ -51,10 +66,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-
-builder.Services.Configure<PostgresSqlConnectionsConfig>(builder.Configuration.GetSection(nameof(PostgresSqlConnectionsConfig)));
-builder.Services.Configure<FileStorageConfiguration>(
-    builder.Configuration.GetSection(nameof(FileStorageConfiguration)));
+builder.Services.Configure<FileStorageOptions>(
+    builder.Configuration.GetSection(nameof(FileStorageOptions)));
 builder.Services.Configure<AuthHeadersOptions>(
     builder.Configuration.GetSection("ExternalSettings:Authentication"));
 
@@ -65,26 +78,38 @@ builder.Services.AddExternalClients();
 builder.Services
     .AddSingleton<ReportsService>()
     .AddSingleton<BugsService>()
-    .AddSingleton<CommentsService>()
-    .AddSingleton<AttachmentService>()
+    .AddSingleton<BugsEventsService>()
+    .AddSingleton<AttachmentObsoleteService>()
     .AddSingleton<ReportEventsService>()
     .AddSingleton<ReportAutoStatusService>()
     .AddSingleton<ParticipantsService>()
-    .AddSingleton<BugsEventsService>();
+    .AddSingleton<AttachmentWriterService>()
+    .AddSingleton<AttachmentService>()
+    .AddSingleton<AttachmentEventsService>()
+    .AddSingleton<ImageOptimizator>()
+    .AddSingleton<TextOptimizator>()
+    .AddSingleton<IAttachmentKeyGenerator,LocalAttachmentKeyGenerator>()
+    .AddSingleton<CommentsObsoleteService>()
+    .AddSingleton<CommentsService>()
+    .AddSingleton<CommentEventsService>()
+    .AddSingleton<LimitsService>();
 
 // для маппинга snake_case в c# типы средствами dapper
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 builder.Services
     .AddSingleton<ReportsDbClient>()
+    .AddSingleton<CommentsObsoleteDbClient>()
     .AddSingleton<CommentsDbClient>()
     .AddSingleton<BugsDbClient>()
+    .AddSingleton<AttachmentObsoleteDbClient>()
     .AddSingleton<AttachmentDbClient>()
     .AddSingleton<EmployeesFileClient>()
     .AddSingleton<TeamsFileClient>()
     .AddSingleton<ParticipantsDbClient>()
     .AddSingleton<IEmployeesClient>((sp) => sp.GetRequiredService<EmployeesFileClient>())
-    .AddSingleton<ITeamsClient>((sp) => sp.GetRequiredService<TeamsFileClient>());
+    .AddSingleton<ITeamsClient>((sp) => sp.GetRequiredService<TeamsFileClient>())
+    .AddSingleton<IFileStorageClient,LocalFileStorageClient>();
 
 builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesFileClient>());
 builder.Services.AddHostedService((sp) => sp.GetRequiredService<TeamsFileClient>());
@@ -94,19 +119,7 @@ builder.Services.AddAuthHeaders();
 builder.Services.AddSingleton<ITaskQueue, TaskQueue.TaskQueue>()
     .AddHostedService(provider => (TaskQueue.TaskQueue)provider.GetRequiredService<ITaskQueue>());
 
-#region Swagger
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Report API", Version = "v1" });
-    // Подключаем XML-документацию
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPath);
-});
-
-#endregion
+builder.Services.AddSwaggerConfiguration(builder.Configuration);
 
 builder.Services.AddSingleton<ResultExceptionHandlerMiddleware>();
 
@@ -125,32 +138,14 @@ builder.Services.AddControllers((options) =>
 
 builder.Services.AddSingleton<IReportPageHubClient, ReportPageHubClient>();
 
-var externalPath = Path.Combine(AppContext.BaseDirectory, "external_settings.json");
-if (File.Exists(externalPath))
-{
-    builder.Configuration.AddJsonFile(externalPath, optional: false, reloadOnChange: true);
-}
-else
-{
-    Console.WriteLine("File external_settings.json not found");
-}
-
 var app = builder.Build();
 
-#region Swagger
-
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Report API v1");
-    c.RoutePrefix = ""; // Доступ по http://localhost:7777/swagger
-});
-
-#endregion
+app.UseSwaggerConfiguration();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
 app.MapHealthChecks("/_ping");
 
 app.UseCors("CorsPolicy");

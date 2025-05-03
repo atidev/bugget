@@ -1,3 +1,5 @@
+using Bugget.Entities.DbModels.Attachment;
+
 namespace Bugget.Entities.DbModels.Comment;
 
 public sealed class CommentDbModel
@@ -8,4 +10,5 @@ public sealed class CommentDbModel
     public required string CreatorUserId { get; init; }
     public required DateTimeOffset CreatedAt { get; init; }
     public required DateTimeOffset UpdatedAt { get; init; }
+    public AttachmentDbModel[]? Attachments { get; set; }
 }

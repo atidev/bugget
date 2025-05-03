@@ -1,3 +1,4 @@
+using Bugget.Entities.DbModels.Attachment;
 using Bugget.Entities.DbModels.Comment;
 
 namespace Bugget.Entities.DbModels.Bug;

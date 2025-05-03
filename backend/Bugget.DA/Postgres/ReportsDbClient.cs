@@ -1,6 +1,9 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Bugget.Entities.BO;
 using Bugget.Entities.BO.Search;
 using Bugget.Entities.DbModels;
+using Bugget.Entities.DbModels.Attachment;
 using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DbModels.Comment;
 using Bugget.Entities.DbModels.Report;
@@ -52,12 +55,21 @@ public sealed class ReportsDbClient : PostgresClient
 
         // 3. Группируем по багам
         var commentsByBug = comments.GroupBy(c => c.BugId).ToDictionary(g => g.Key, g => g.ToArray());
-        var attachmentsByBug = attachments.GroupBy(a => a.BugId).ToDictionary(g => g.Key, g => g.ToArray());
+        var attachmentsByEntity = attachments.GroupBy(a => a.EntityId).ToDictionary(g => g.Key, g => g.ToArray());
 
         foreach (var bug in report.Bugs)
         {
             bug.Comments = commentsByBug.TryGetValue(bug.Id, out var c) ? c : [];
-            bug.Attachments = attachmentsByBug.TryGetValue(bug.Id, out var a) ? a : [];
+            bug.Attachments = attachmentsByEntity.TryGetValue(bug.Id, out var a) 
+            ? a.Where(a => a.AttachType == (int)AttachType.Fact || a.AttachType == (int)AttachType.Expected).ToArray() 
+            : [];
+        }
+
+        foreach (var comment in comments)
+        {
+            comment.Attachments = attachmentsByEntity.TryGetValue(comment.Id, out var a) 
+            ? a.Where(a => a.AttachType == (int)AttachType.Comment).ToArray() 
+            : [];
         }
 
         return report;

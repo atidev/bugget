@@ -13,16 +13,16 @@ public class TaskQueue(ILogger<TaskQueue> logger, IServiceProvider serviceProvid
 
     private record TaskContext(Func<IServiceProvider, CancellationToken, Task> WorkItem, Activity Activity);
 
-    public ValueTask Enqueue(Func<IServiceProvider, CancellationToken, Task> workItem)
+    public ValueTask EnqueueAsync(Func<IServiceProvider, CancellationToken, Task> workItem)
     {
         var nestedActivity = new Activity($"{nameof(TaskQueue)}.{nameof(ExecuteAsync)}").Start();
 
         return _queue.Writer.WriteAsync(new TaskContext(workItem, nestedActivity));
     }
 
-    public ValueTask Enqueue(Func<CancellationToken, Task> workItem) => Enqueue((_, token) => workItem(token));
+    public ValueTask EnqueueAsync(Func<CancellationToken, Task> workItem) => EnqueueAsync((_, token) => workItem(token));
 
-    public ValueTask Enqueue(Func<Task> workItem) => Enqueue((_, _) => workItem());
+    public ValueTask EnqueueAsync(Func<Task> workItem) => EnqueueAsync((_, _) => workItem());
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken) => Parallel
         .ForEachAsync(_queue.Reader.ReadAllAsync(stoppingToken), new ParallelOptions

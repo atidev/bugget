@@ -1,4 +1,4 @@
-namespace Bugget.Entities.Config;
+namespace Bugget.Entities.Options;
 
 public class MattermostOptions
 {
