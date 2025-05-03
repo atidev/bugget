@@ -2,6 +2,9 @@ using Bugget.BO.Interfaces;
 using Bugget.DA.Interfaces;
 using Bugget.Entities.BO.AttachmentBo;
 using Bugget.Entities.Constants;
+using Microsoft.Extensions.Options;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Webp;
 
 namespace Bugget.BO.Services.Attachments
 {
@@ -9,8 +12,17 @@ namespace Bugget.BO.Services.Attachments
         ImageOptimizator imageWriter,
         IAttachmentKeyGenerator keyGen,
         IFileStorageClient fileStorage,
-        TextOptimizator textOptimizator)
+        TextOptimizator textOptimizator,
+        IOptions<OptimizatorSettings> opt)
     {
+        private readonly WebpEncoder _encoder = new WebpEncoder
+        {
+            Quality = opt.Value.WebpQuality,
+            FileFormat = opt.Value.FileFormat,
+            Method = opt.Value.Method,
+            TransparentColorMode = opt.Value.TransparentColorMode
+        };
+
         private static bool IsDevelopment =
             Environment.GetEnvironmentVariable(EnvironmentConstants.AspnetcoreEnvironment)?
                 .Equals("development", StringComparison.OrdinalIgnoreCase) ?? false;
@@ -29,8 +41,8 @@ namespace Bugget.BO.Services.Attachments
             FileMeta fileMeta,
             CancellationToken ct = default)
         {
-            var fileMime = IsDevelopment 
-                ? fileMeta.ContentType 
+            var fileMime = IsDevelopment
+                ? fileMeta.ContentType
                 : MimeHelper.GuessMime(originalStream);
 
             var ext = Path.GetExtension(fileMeta.FileName).ToLowerInvariant();
@@ -40,26 +52,30 @@ namespace Bugget.BO.Services.Attachments
                 var storageKey = keyGen.GetOriginalKey(organizationId, reportId, entityId, "webp");
                 var previewKey = keyGen.GetPreviewKey(storageKey);
 
-                // 1) Получили оптимизированный WebP-поток
-                await using var optimizedStream =
-                    await imageWriter.OptimizeOriginalAsync(originalStream, ct);
-                await fileStorage.WriteAsync(storageKey, optimizedStream, ct);
+                using var img = await imageWriter.OptimizeOriginalAsync(originalStream);
 
-                if (optimizedStream.CanSeek)
-                    optimizedStream.Position = 0;
+                await using var origMs = new MemoryStream();
+                await img.SaveAsWebpAsync(origMs, _encoder, ct);
+                origMs.Position = 0;
 
-                // 2) Получили preview-поток
-                await using var previewStream =
-                    await imageWriter.GeneratePreviewAsync(optimizedStream, ct);
-                await fileStorage.WriteAsync(previewKey, previewStream, ct);
+                var previewImg = imageWriter.GeneratePreviewAsync(img); // clone
+                await using var prevMs = new MemoryStream();
+                await previewImg.SaveAsWebpAsync(prevMs, _encoder, ct);
+                prevMs.Position = 0;
+
+                await Task.WhenAll(
+                    fileStorage.WriteAsync(storageKey, origMs, ct),
+                    fileStorage.WriteAsync(previewKey, prevMs, ct));
+
+                previewImg.Dispose();
 
                 return new AttachmentSaveResult(
                     StorageKey: storageKey,
                     MimeType: "image/webp",
-                    LengthBytes: optimizedStream.Length,
+                    LengthBytes: origMs.Length,
                     IsGzipCompressed: false,
                     HasPreview: true,
-                    PreviewLengthBytes: previewStream.Length
+                    PreviewLengthBytes: prevMs.Length
                 );
             }
 

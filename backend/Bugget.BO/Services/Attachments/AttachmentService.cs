@@ -169,7 +169,7 @@ public sealed class AttachmentService(
         if (validationError != null)
             return validationError;
 
-        // 2) Лимиты (замыкание подставит нужный метод)
+        // 2) Лимиты 
         var limitError = await validateLimit();
         if (limitError != null)
             return limitError;

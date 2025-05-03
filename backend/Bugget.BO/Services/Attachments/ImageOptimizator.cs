@@ -1,33 +1,20 @@
-using Bugget.Entities.Options;
+using Bugget.Entities.BO.AttachmentBo;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
 namespace Bugget.BO.Services.Attachments;
 
-public sealed class ImageOptimizator
+public sealed class ImageOptimizator(IOptions<OptimizatorSettings> opt)
 {
-    private readonly OptimizatorOptions _opt;
-    private readonly WebpEncoder _encoder;
+    private readonly OptimizatorSettings _opt = opt.Value;
 
-    public ImageOptimizator(IOptions<OptimizatorOptions> opt)
-    {
-        _opt = opt.Value;
-        _encoder = new WebpEncoder
-        {
-            Quality = _opt.WebpQuality,
-            FileFormat = WebpFileFormatType.Lossy
-        };
-    }
-
-    public async Task<Stream> OptimizeOriginalAsync(
-        Stream input,
-        CancellationToken ct = default)
+    public async Task<Image<Rgba32>> OptimizeOriginalAsync(
+        Stream input)
     {
         if (input.CanSeek) input.Position = 0;
-        using var image = await Image.LoadAsync<Rgba32>(input, ct);
+        var image = await Image.LoadAsync<Rgba32>(input);
         image.Mutate(x =>
         {
             x.AutoOrient();
@@ -40,34 +27,21 @@ public sealed class ImageOptimizator
         });
         image.Metadata.ExifProfile = null;
         image.Metadata.IccProfile = null;
-
-        var ms = new MemoryStream();
-        await image.SaveAsWebpAsync(ms, _encoder, ct);
-        ms.Position = 0;
-        return ms;
+        return image;
     }
 
-    public async Task<Stream> GeneratePreviewAsync(
-        Stream input,
-        CancellationToken ct = default)
+    public Image<Rgba32> GeneratePreviewAsync(Image<Rgba32> source)
     {
-        if (input.CanSeek) input.Position = 0;
-        using var image = await Image.LoadAsync<Rgba32>(input, ct);
-        image.Mutate(x =>
+        var preview = source.Clone(ctx =>
         {
-            x.AutoOrient();
-            x.Resize(new ResizeOptions
-            {
-                Size = new Size(_opt.MaxPreviewSize, _opt.MaxPreviewSize),
+            ctx.Resize(new ResizeOptions {
+                Size = new Size(_opt.MaxPreviewSize,_opt.MaxPreviewSize),
                 Mode = ResizeMode.Max
             });
+            ctx.AutoOrient();
         });
-        image.Metadata.ExifProfile = null;
-        image.Metadata.IccProfile = null;
-
-        var ms = new MemoryStream();
-        await image.SaveAsWebpAsync(ms, _encoder, ct);
-        ms.Position = 0;
-        return ms;
+        preview.Metadata.ExifProfile = null;
+        preview.Metadata.IccProfile  = null;
+        return preview;
     }
 }

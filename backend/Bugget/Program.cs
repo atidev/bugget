@@ -21,7 +21,7 @@ using Bugget.BO.Services.Comments;
 using Bugget.BO.Services.Attachments;
 using Bugget.BO.Interfaces;
 using Bugget.Configurations;
-using HeyRed.Mime;
+using SixLabors.ImageSharp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,8 +94,7 @@ builder.Services
     .AddSingleton<CommentEventsService>()
     .AddSingleton<LimitsService>();
 
-// для маппинга snake_case в c# типы средствами dapper
-Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
 
 builder.Services
     .AddSingleton<ReportsDbClient>()
@@ -137,6 +136,14 @@ builder.Services.AddControllers((options) =>
         o.InvalidModelStateResponseFactory = _ => new ModelStateInvalidHandler());
 
 builder.Services.AddSingleton<IReportPageHubClient, ReportPageHubClient>();
+
+#region заклинания
+// для маппинга snake_case в c# типы средствами dapper
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+// настройка image sharp
+Configuration.Default.MaxDegreeOfParallelism = Environment.ProcessorCount; // multi-threaded encode
+Configuration.Default.PreferContiguousImageBuffers = true; // меньше аллокаций в обработке
+#endregion
 
 var app = builder.Build();
 
