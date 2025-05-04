@@ -7,7 +7,7 @@ WORKDIR /src
 # необходимо для работы с библиотекой Mime
 RUN apt-get update \
  && apt-get install -y --no-install-recommends libmagic1 libmagic-data \
- && rm -rf /var/lib/apt/lists/* \
+ && rm -rf /var/lib/apt/lists/*
   
 COPY ./*.sln ./*/*.csproj ./
 RUN for file in $(ls *.csproj); do mkdir -p ${file%.*}/ && mv $file ${file%.*}/; done
