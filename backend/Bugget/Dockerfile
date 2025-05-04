@@ -1,5 +1,5 @@
 ARG SDK_TAG=9.0-bookworm-slim
-ARG RUNTIME_TAG=9.0-composite-ubuntu-chiseled-extra
+ARG RUNTIME_TAG=9.0-noble-chiseled-composite-extra
 
 FROM mcr.microsoft.com/dotnet/sdk:${SDK_TAG} AS build
 WORKDIR /src
