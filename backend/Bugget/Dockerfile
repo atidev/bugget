@@ -1,13 +1,11 @@
-ARG SDK_TAG=9.0-alpine
-ARG RUNTIME_TAG=9.0-alpine
+ARG SDK_TAG=9.0-bookworm-slim
+ARG RUNTIME_TAG=9.0-composite-ubuntu-chiseled-extra
 
 FROM mcr.microsoft.com/dotnet/sdk:${SDK_TAG} AS build
 WORKDIR /src
 
 COPY ./*.sln ./*/*.csproj ./
 RUN for file in $(ls *.csproj); do mkdir -p ${file%.*}/ && mv $file ${file%.*}/; done
-RUN dotnet restore
-
 RUN dotnet restore
 
 COPY . .
