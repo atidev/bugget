@@ -19,7 +19,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE public.check_comment_access(IN _comment_id integer, IN _bug_id integer, IN _report_id integer, IN _organization_id text)
+CREATE OR REPLACE PROCEDURE public.check_comment_access(IN _user_id text, IN _comment_id integer, IN _bug_id integer, IN _report_id integer, IN _organization_id text)
 LANGUAGE plpgsql
 AS $$
 BEGIN
@@ -35,7 +35,8 @@ BEGIN
             AND b.id = _bug_id
             AND b.report_id = _report_id
             AND(_organization_id IS NULL
-                OR r.creator_organization_id = _organization_id)) THEN
+                OR r.creator_organization_id = _organization_id)
+            AND c.creator_user_id = _user_id) THEN
     RAISE EXCEPTION 'Comment % not found or access denied', _comment_id
         USING ERRCODE = 'P0404';
     END IF;
@@ -60,13 +61,13 @@ END;
 $$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION public.get_comment_attachments_count(_organization_id text, _report_id int, _bug_id int, _comment_id int)
+CREATE OR REPLACE FUNCTION public.get_comment_attachments_count(_user_id text, _organization_id text, _report_id int, _bug_id int, _comment_id int)
     RETURNS int
     AS $$
 DECLARE
     _comment_attach_type int = 2;
 BEGIN
-    CALL check_comment_access(_comment_id, _bug_id, _report_id, _organization_id);
+    CALL check_comment_access(_user_id, _comment_id, _bug_id, _report_id, _organization_id);
     RETURN (
         SELECT
             COUNT(*)

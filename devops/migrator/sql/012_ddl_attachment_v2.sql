@@ -9,3 +9,7 @@ ALTER TABLE public.attachments
   ADD COLUMN IF NOT EXISTS has_preview boolean DEFAULT false,
   ADD COLUMN IF NOT EXISTS is_gzip_compressed boolean DEFAULT false,
   ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone DEFAULT now();
+
+ALTER TABLE public.attachments
+  DROP CONSTRAINT IF EXISTS fk_attachments_bugs;
+

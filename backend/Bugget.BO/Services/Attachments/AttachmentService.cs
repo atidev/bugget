@@ -13,7 +13,6 @@ using Bugget.BO.Interfaces;
 namespace Bugget.BO.Services.Attachments;
 
 public sealed class AttachmentService(
-    AttachmentOptimizator attachmentOptimizator,
     AttachmentDbClient attachmentDbClient,
     ITaskQueue taskQueue,
     AttachmentEventsService attachmentEventsService,
@@ -111,6 +110,23 @@ public sealed class AttachmentService(
             await attachmentEventsService.HandleAttachmentDeleteEventAsync(reportId, user, attachmentDbModel));
 
         return;
+    }
+
+    public async Task DeleteCommentAttachmentsInternalAsync(
+        int commentId)
+    {
+        var attachmentsDbModels = await attachmentDbClient.DeleteCommentAttachmentsAsync(commentId);
+        if (attachmentsDbModels.Length == 0)
+            return;
+
+        foreach (var attachmentDbModel in attachmentsDbModels)
+        {
+            await fileStorageClient.DeleteAsync(attachmentDbModel.StorageKey);
+            if( attachmentDbModel.HasPreview.Value)
+            {
+                await fileStorageClient.DeleteAsync(keyGen.GetPreviewKey(attachmentDbModel.StorageKey));
+            }
+        }
     }
 
     public Task<MonadeStruct<AttachmentDbModel>> SaveBugAttachmentAsync(

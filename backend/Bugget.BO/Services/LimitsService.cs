@@ -41,6 +41,7 @@ public sealed class LimitsService(
         int commentId)
     {
         var commentAttachmentsCount = await attachmentDbClient.GetCommentAttachmentsCountAsync(
+            user.Id,
             user.OrganizationId,
             reportId,
             bugId,

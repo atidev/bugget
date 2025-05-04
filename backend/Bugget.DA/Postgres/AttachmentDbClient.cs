@@ -3,8 +3,21 @@ using Dapper;
 
 namespace Bugget.DA.Postgres;
 
-public class AttachmentDbClient: PostgresClient
+public class AttachmentDbClient : PostgresClient
 {
+    public async Task<AttachmentDbModel[]> DeleteCommentAttachmentsAsync(int commentId)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+
+        return (await connection.QueryAsync<AttachmentDbModel>(
+            "SELECT * FROM public.delete_comment_attachments_internal(@commentId)",
+            new
+            {
+                commentId
+            }
+        )).ToArray();
+    }
+
     public async Task<AttachmentDbModel> UpdateAttachmentAsync(UpdateAttachmentDbModel updateAttachmentDbModel)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
@@ -25,7 +38,8 @@ public class AttachmentDbClient: PostgresClient
         );
     }
 
-    public async Task<AttachmentDbModel?> GetBugAttachmentAsync(string? organizationId, int reportId, int bugId, int attachmentId){
+    public async Task<AttachmentDbModel?> GetBugAttachmentAsync(string? organizationId, int reportId, int bugId, int attachmentId)
+    {
         await using var connection = await DataSource.OpenConnectionAsync();
 
         return await connection.QuerySingleOrDefaultAsync<AttachmentDbModel>(
@@ -40,7 +54,8 @@ public class AttachmentDbClient: PostgresClient
         );
     }
 
-    public async Task<AttachmentDbModel?> GetCommentAttachmentAsync(string? organizationId, int reportId, int bugId, int commentId, int attachmentId){
+    public async Task<AttachmentDbModel?> GetCommentAttachmentAsync(string? organizationId, int reportId, int bugId, int commentId, int attachmentId)
+    {
         await using var connection = await DataSource.OpenConnectionAsync();
 
         return await connection.QuerySingleOrDefaultAsync<AttachmentDbModel>(
@@ -59,7 +74,7 @@ public class AttachmentDbClient: PostgresClient
     public async Task<int> GetBugAttachmentsCountAsync(string? organizationId, int reportId, int bugId, int attachType)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
-        
+
         var result = await connection.ExecuteScalarAsync<int>(
             "SELECT public.get_bug_attachments_count(@organizationId, @reportId, @bugId, @attachType)",
             new
@@ -74,14 +89,15 @@ public class AttachmentDbClient: PostgresClient
         return result;
     }
 
-    public async Task<int> GetCommentAttachmentsCountAsync(string? organizationId, int reportId, int bugId, int commentId)
+    public async Task<int> GetCommentAttachmentsCountAsync(string userId, string? organizationId, int reportId, int bugId, int commentId)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
-        
+
         var result = await connection.ExecuteScalarAsync<int>(
-            "SELECT public.get_comment_attachments_count(@organizationId, @reportId, @bugId, @commentId)",
+            "SELECT public.get_comment_attachments_count(@userId, @organizationId, @reportId, @bugId, @commentId)",
             new
             {
+                userId,
                 organizationId,
                 reportId,
                 bugId,

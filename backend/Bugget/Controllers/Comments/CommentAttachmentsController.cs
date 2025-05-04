@@ -53,7 +53,7 @@ public sealed class CommentAttachmentsController(AttachmentService attachmentSer
             bugId,
             commentId,
             fileStream,
-            new FileMeta(file.FileName, file.Length, file.ContentType),
+            new FileMeta(file.FileName, file.Length, mimeType),
             ct)
             .AsActionResultAsync();
     }

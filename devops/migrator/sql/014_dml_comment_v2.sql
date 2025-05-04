@@ -28,11 +28,10 @@ CREATE OR REPLACE FUNCTION public.delete_comment_v2(_organization_id text, _user
     AS $$
 BEGIN
     -- Проверка доступа
-    CALL check_comment_access(_comment_id, _bug_id, _report_id, _organization_id);
+    CALL check_comment_access(_user_id, _comment_id, _bug_id, _report_id, _organization_id);
     -- Удаляем комментарий
     DELETE FROM public.comments
-    WHERE public.comments.id = _comment_id
-        AND public.comments.creator_user_id = _user_id;
+    WHERE public.comments.id = _comment_id;
 END;
 $$;
 
@@ -48,7 +47,7 @@ CREATE OR REPLACE FUNCTION public.update_comment_v2(_organization_id text, _user
     AS $$
 BEGIN
     -- 1) Проверяем, что комментарий существует и вы имеете к нему доступ
-    CALL check_comment_access(_comment_id, _bug_id, _report_id, _organization_id);
+    CALL check_comment_access(_user_id, _comment_id, _bug_id, _report_id, _organization_id);
     -- 2) Обновляем и сразу возвращаем новые значения
     RETURN QUERY UPDATE
         public.comments c
@@ -57,7 +56,6 @@ BEGIN
         updated_at = now()
     WHERE
         c.id = _comment_id
-        AND c.creator_user_id = _user_id
     RETURNING
         c.id,
         c.bug_id,
@@ -65,6 +63,43 @@ BEGIN
         c.creator_user_id,
         c.created_at,
         c.updated_at;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.delete_comment_attachments_internal(_comment_id integer)
+    RETURNS TABLE(
+        id integer,
+        attach_type integer,
+        entity_id integer,
+        storage_key text,
+        storage_kind integer,
+        creator_user_id text,
+        length_bytes bigint,
+        file_name text,
+        mime_type text,
+        has_preview boolean,
+        is_gzip_compressed boolean,
+        created_at timestamp with time zone,
+        updated_at timestamp with time zone)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    RETURN QUERY DELETE FROM public.attachments a
+    WHERE a.entity_id = _comment_id
+    RETURNING
+        a.id,
+        a.attach_type,
+        a.entity_id,
+        a.storage_key,
+        a.storage_kind,
+        a.creator_user_id,
+        a.length_bytes,
+        a.file_name,
+        a.mime_type,
+        a.has_preview,
+        a.is_gzip_compressed,
+        a.created_at,
+        a.updated_at;
 END;
 $$;
 
