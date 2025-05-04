@@ -4,13 +4,15 @@ public sealed class AttachmentDbModel
 {
     public required int Id { get; init; }
     
+    private readonly int? _entityId;
+
     /// <summary>
     /// Идентификатор сущности к которой прикреплен файл
     /// </summary>
     public int? EntityId 
-    { 
-        get => EntityId ?? BugId;
-        init => EntityId = value;
+    {
+        get => _entityId ?? BugId;
+        init => _entityId = value;
     }
 
     /// <summary>
@@ -22,15 +24,17 @@ public sealed class AttachmentDbModel
     /// Идентификатор бага
     /// </summary>
     [Obsolete]
-    public int BugId { get; init; } 
+    public int BugId { get; init; }
+
+    private readonly string? _storageKey;
     
     /// <summary>
     /// Относительный путь либо S3‑key
     /// </summary>
     public string? StorageKey 
     { 
-        get => StorageKey ?? Path; 
-        init => StorageKey = value; 
+        get => _storageKey ?? Path; 
+        init => _storageKey = value; 
     }
 
     /// <summary>

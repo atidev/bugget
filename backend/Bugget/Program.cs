@@ -153,7 +153,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapHealthChecks("/_ping");
+app.MapHealthChecks("/_internal/ping");
 
 app.UseCors("CorsPolicy");
 

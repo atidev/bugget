@@ -1,23 +1,36 @@
-ARG SDK_VERSION=9.0
-ARG RUNTIME_VERSION=9.0
+ARG SDK_TAG=9.0-alpine
+ARG RUNTIME_TAG=9.0-alpine
 
-FROM mcr.microsoft.com/dotnet/aspnet:${RUNTIME_VERSION}-alpine AS base
-EXPOSE 7777
-
-FROM mcr.microsoft.com/dotnet/sdk:${SDK_VERSION}-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:${SDK_TAG} AS build
 WORKDIR /src
 
 COPY ./*.sln ./*/*.csproj ./
 RUN for file in $(ls *.csproj); do mkdir -p ${file%.*}/ && mv $file ${file%.*}/; done
 RUN dotnet restore
 
-ARG RUNTIME_VERSION
+RUN dotnet restore
+
 COPY . .
-WORKDIR /src/Bugget
-RUN dotnet publish Bugget.csproj -c Release -o /app -f net${RUNTIME_VERSION}
 
-FROM base AS final
+# 3) Публикуем под нужный RID, который вычисляем из TARGETPLATFORM
+ARG TARGETPLATFORM
+RUN set -eux; \
+    case "$TARGETPLATFORM" in \
+      "linux/amd64") RID=linux-musl-x64 ;; \
+      "linux/arm64") RID=linux-musl-arm64 ;; \
+      *) echo "Unsupported platform: $TARGETPLATFORM"; exit 1 ;; \
+    esac; \
+    dotnet publish Bugget/Bugget.csproj \
+      -c Release \
+      -r $RID \
+      --self-contained=false \
+      -p:PublishSingleFile=false \
+      -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:${RUNTIME_TAG} AS runtime
 WORKDIR /app
-COPY --from=build /app .
 
+COPY --from=build /app/publish .
+
+EXPOSE 7777
 ENTRYPOINT ["dotnet", "Bugget.dll"]
