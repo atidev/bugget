@@ -151,8 +151,6 @@ app.UseSwaggerConfiguration();
 // регистрируем до авторизации
 app.MapHealthChecks("/_internal/ping");
 
-app.UseAuthorization();
-
 app.MapControllers();
 
 app.UseCors("CorsPolicy");
