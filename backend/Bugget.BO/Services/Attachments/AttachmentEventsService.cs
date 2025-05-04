@@ -10,13 +10,15 @@ namespace Bugget.BO.Services.Attachments
     public class AttachmentEventsService(
         IReportPageHubClient reportPageHubClient,
         IFileStorageClient fileStorageClient,
-        IAttachmentKeyGenerator keyGen
+        IAttachmentKeyGenerator keyGen,
+        AttachmentOptimizator attachmentOptimizator
             )
     {
         public async Task HandleAttachmentCreateEventAsync(int reportId, UserIdentity user, AttachmentDbModel attachmentDbModel)
         {
             await Task.WhenAll(
-                reportPageHubClient.SendAttachmentCreateAsync(reportId, attachmentDbModel.ToSocketView(), user.SignalRConnectionId)
+                reportPageHubClient.SendAttachmentCreateAsync(reportId, attachmentDbModel.ToSocketView(), user.SignalRConnectionId),
+                attachmentOptimizator.OptimizeAttachmentAsync(user.OrganizationId, reportId, attachmentDbModel)
         );
         }
 

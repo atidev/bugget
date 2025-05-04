@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Bugget.BO.Services.Attachments;
 using Bugget.Entities.Authentication;
 using Bugget.Entities.BO;
@@ -6,29 +7,56 @@ using Bugget.Entities.Constants;
 using Bugget.Entities.DbModels.Attachment;
 using Bugget.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using Monade;
 
 namespace Bugget.Controllers;
 
 [Route("/v2/reports/{reportId}/bugs/{bugId}/attachments")]
 public sealed class BugAttachmentsController(AttachmentService attachmentService) : ApiController
 {
+    private static bool IsDevelopment =
+        Environment.GetEnvironmentVariable(EnvironmentConstants.AspnetcoreEnvironment)?
+            .Equals("development", StringComparison.OrdinalIgnoreCase) ?? false;
+
     [HttpPost]
     [ProducesResponseType(typeof(AttachmentDbModel), 200)]
     public async Task<IActionResult> CreateAttachment(
         [FromRoute] int reportId,
         [FromRoute] int bugId,
-        [FromQuery(Name = "attachType")] int attachType,
-        IFormFile file
+        [Required][FromQuery(Name = "attachType")] int attachType,
+        IFormFile file,
+        CancellationToken ct
         )
     {
-        await using var stream = file.OpenReadStream();
+        // Открываем поток. IFormFile.OpenReadStream обычно CanSeek == true,
+        // но если вдруг нет, то оборачиваем в FileBufferingReadStream:
+        Stream fileStream = file.OpenReadStream();
+        if (!fileStream.CanSeek)
+        {
+            fileStream = new FileBufferingReadStream(
+                HttpContext.Request.Body,
+                _ = 1024 * 1024,    // threshold before disk
+                _ = 8 * 1024,         // buffer size
+                _ = Path.GetTempPath()
+            );
+            // Переписать файл из Request.Body в наш буфер:
+            await file.CopyToAsync(fileStream, ct);
+            fileStream.Position = 0;
+        }
+
+        // Детектим MIME
+        var mimeType = IsDevelopment ? file.ContentType : await MimeHelper.GuessMimeAsync(fileStream, ct);
+
         return await attachmentService.SaveBugAttachmentAsync(
             User.GetIdentity(),
             reportId,
             bugId,
-            stream,
+            fileStream,
             (AttachType)attachType,
-            new FileMeta(file.FileName, file.Length, file.ContentType)).AsActionResultAsync();
+            new FileMeta(file.FileName, file.Length, mimeType),
+            ct)
+            .AsActionResultAsync(202);
     }
 
     [HttpGet("{id}/content")]

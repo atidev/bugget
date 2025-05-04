@@ -1,6 +1,6 @@
 namespace Bugget.Entities.DbModels.Attachment;
 
-public sealed class AttachmentCreateDbModel
+public sealed class CreateAttachmentDbModel
 {
     /// <summary>
     /// Идентификатор сущности ожидаю, получаю, коммент
@@ -19,7 +19,7 @@ public sealed class AttachmentCreateDbModel
     public required string StorageKey { get; init; }
 
     /// <summary>
-    /// Тип хранилища 0=Local, 1=S3Standard, 2=S3Cold
+    /// Тип хранилища 0=Temp , 1=Standard, 2=Cold
     /// </summary>
     public required int StorageKind { get; init; }
 
@@ -42,14 +42,4 @@ public sealed class AttachmentCreateDbModel
     /// Тип вложения
     /// </summary>
     public required string MimeType { get; init; }
-
-    /// <summary>
-    /// Есть ли превью
-    /// </summary>
-    public required bool HasPreview { get; init; }
-
-    /// <summary>
-    /// Сжато ли вложение gzip
-    /// </summary>
-    public required bool IsGzipCompressed { get; init; }
 }

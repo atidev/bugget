@@ -44,7 +44,7 @@ public sealed class AttachmentDbModel
     public required string Path { get; init; }
 
     /// <summary>
-    /// Тип хранилища 0=Local, 1=S3Standard, 2=S3Cold
+    /// Тип хранилища 0=Temp , 1=Standard, 2=Cold
     /// </summary>
     public int? StorageKind { get; init; } = 0;
 

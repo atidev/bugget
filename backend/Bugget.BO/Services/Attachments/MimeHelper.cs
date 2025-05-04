@@ -1,29 +1,27 @@
 using System.Buffers;
 using HeyRed.Mime;
 
-namespace Bugget.BO.Services.Attachments;
-
 public static class MimeHelper
 {
     private const int DetectionBufferSize = 4 * 1024;
 
-    public static string GuessMime(Stream stream)
+    public static async Task<string> GuessMimeAsync(Stream stream, CancellationToken ct = default)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-        long originalPosition = 0;
-        if (stream.CanSeek)
-            originalPosition = stream.Position;
+        // Сохраняем позицию, если можем
+        long origPos = stream.CanSeek ? stream.Position : 0;
 
-        byte[] buffer = ArrayPool<byte>.Shared.Rent(DetectionBufferSize);
+        // Читаем в арендованный буфер
+        var buffer = ArrayPool<byte>.Shared.Rent(DetectionBufferSize);
         try
         {
-            int bytesRead = stream.Read(buffer, 0, DetectionBufferSize);
+            int bytesRead = await stream.ReadAsync(buffer, 0, DetectionBufferSize, ct);
 
+            // Сбрасываем позицию, если это возможно
             if (stream.CanSeek)
-                stream.Position = originalPosition;
-            
+                stream.Position = origPos;
+
             var mime = MimeGuesser.GuessMimeType(buffer[..bytesRead]);
             return string.IsNullOrWhiteSpace(mime)
                 ? "application/octet-stream"

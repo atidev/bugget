@@ -68,6 +68,12 @@ public class ReportPageHubClient(IHubContext<ReportPageHub> hubContext) : IRepor
             .SendAsync(eventName, attachmentSocketView);
     }
 
+    public Task SendAttachmentOptimizedAsync(int reportId, AttachmentSocketView attachmentSocketView)
+    {
+        return hubContext.Clients.Group($"{reportId}")
+            .SendAsync("ReceiveAttachmentOptimized", attachmentSocketView);
+    }
+
     public Task SendAttachmentDeleteAsync(int reportId, AttachmentSocketView attachmentSocketView, string? signalRConnectionId)
     {
         string eventName = attachmentSocketView.AttachType == (int)AttachType.Comment

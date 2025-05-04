@@ -2,7 +2,6 @@ using Bugget.DA.Postgres;
 using Bugget.Entities.Authentication;
 using Bugget.Entities.BO;
 using Bugget.Entities.BO.AttachmentBo;
-using Bugget.BO.Validators;
 using Monade;
 using TaskQueue;
 using Bugget.Entities.DbModels.Attachment;
@@ -14,7 +13,7 @@ using Bugget.BO.Interfaces;
 namespace Bugget.BO.Services.Attachments;
 
 public sealed class AttachmentService(
-    AttachmentWriterService attachmentWriterService,
+    AttachmentOptimizator attachmentOptimizator,
     AttachmentDbClient attachmentDbClient,
     ITaskQueue taskQueue,
     AttachmentEventsService attachmentEventsService,
@@ -120,9 +119,9 @@ public sealed class AttachmentService(
         int bugId,
         Stream fileStream,
         AttachType attachType,
-        FileMeta fileMeta)
+        FileMeta fileMeta,
+        CancellationToken ct)
     {
-
         Task<Error?> validateLimit() => limitsService.ValidateBugAttachmentLimitAsync(user, reportId, bugId, attachType);
 
         return SaveAsync(
@@ -132,7 +131,8 @@ public sealed class AttachmentService(
             validateLimit: validateLimit,
             fileStream: fileStream,
             attachType: attachType,
-            fileMeta: fileMeta);
+            fileMeta: fileMeta,
+            ct: ct);
     }
 
     public Task<MonadeStruct<AttachmentDbModel>> SaveCommentAttachmentAsync(
@@ -141,7 +141,8 @@ public sealed class AttachmentService(
         int bugId,
         int commentId,
         Stream fileStream,
-        FileMeta fileMeta)
+        FileMeta fileMeta,
+        CancellationToken ct)
     {
         Task<Error?> validateLimit() => limitsService.ValidateCommentAttachmentLimitAsync(user, reportId, bugId, commentId);
 
@@ -152,7 +153,8 @@ public sealed class AttachmentService(
             validateLimit: validateLimit,
             fileStream: fileStream,
             attachType: AttachType.Comment,
-            fileMeta: fileMeta);
+            fileMeta: fileMeta,
+            ct: ct);
     }
 
     private async Task<MonadeStruct<AttachmentDbModel>> SaveAsync(
@@ -162,7 +164,8 @@ public sealed class AttachmentService(
         Func<Task<Error?>> validateLimit,
         Stream fileStream,
         AttachType attachType,
-        FileMeta fileMeta)
+        FileMeta fileMeta,
+        CancellationToken ct)
     {
         // 1) Общая валидация по метаданным
         var validationError = AttachmentValidator.Validate(fileMeta);
@@ -174,31 +177,28 @@ public sealed class AttachmentService(
         if (limitError != null)
             return limitError;
 
-        // 3) Process + сохранение файла
-        var saveResult = await attachmentWriterService.ProcessAsync(
-            user.OrganizationId,
-            reportId,
-            entityId,
-            fileStream,
-            fileMeta,
-            CancellationToken.None);
+        var canOptimize = AttachmentOptimizator.CanOptimize(fileMeta.TrustedMimeType);
 
-        logger.LogInformation("Attachment saved: {@FileName}, compress score {@from}-{@to}-{@preview} percent {@percent}%",
-        fileMeta.FileName, fileStream.Length, saveResult.LengthBytes, saveResult.PreviewLengthBytes, (1 - (double)saveResult.LengthBytes / fileStream.Length) * 100);
+        // 3) Сохраняем как есть во временный путь
+        var storageKey = canOptimize ?
+        keyGen.GetTempKey(user.OrganizationId, reportId, entityId, Path.GetExtension(fileMeta.FileName).ToLowerInvariant())
+        : keyGen.GetOriginalKey(user.OrganizationId, reportId, entityId, Path.GetExtension(fileMeta.FileName).ToLowerInvariant());
+        await fileStorageClient.WriteAsync(storageKey, fileStream, ct);
+
+        logger.LogInformation("Attachment saved: {@FileName} to {tmpPath}",
+        fileMeta.FileName, storageKey);
 
         // 4) Формируем модель для БД
-        var createModel = new AttachmentCreateDbModel
+        var createModel = new CreateAttachmentDbModel
         {
             EntityId = entityId,
             AttachType = (int)attachType,
-            StorageKey = saveResult.StorageKey,
-            StorageKind = (int)StorageKind.Local,
+            StorageKey = storageKey,
+            StorageKind = canOptimize ? (int)StorageKind.Temp : (int)StorageKind.Standard,
             CreatorUserId = user.Id,
-            LengthBytes = saveResult.LengthBytes + saveResult.PreviewLengthBytes,
             FileName = fileMeta.FileName,
-            MimeType = saveResult.MimeType,
-            HasPreview = saveResult.HasPreview,
-            IsGzipCompressed = saveResult.IsGzipCompressed
+            MimeType = fileMeta.TrustedMimeType,
+            LengthBytes = fileStream.Length
         };
 
         // 5) Сохраняем в БД

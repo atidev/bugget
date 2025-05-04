@@ -5,6 +5,26 @@ namespace Bugget.DA.Postgres;
 
 public class AttachmentDbClient: PostgresClient
 {
+    public async Task<AttachmentDbModel> UpdateAttachmentAsync(UpdateAttachmentDbModel updateAttachmentDbModel)
+    {
+        await using var connection = await DataSource.OpenConnectionAsync();
+
+        return await connection.QuerySingleAsync<AttachmentDbModel>(
+            "SELECT * FROM public.update_attachment_internal(@id, @storage_key, @storage_kind, @length_bytes, @file_name, @mime_type, @has_preview, @is_gzip_compressed)",
+            new
+            {
+                id = updateAttachmentDbModel.Id,
+                storage_key = updateAttachmentDbModel.StorageKey,
+                storage_kind = updateAttachmentDbModel.StorageKind,
+                length_bytes = updateAttachmentDbModel.LengthBytes,
+                file_name = updateAttachmentDbModel.FileName,
+                mime_type = updateAttachmentDbModel.MimeType,
+                has_preview = updateAttachmentDbModel.HasPreview,
+                is_gzip_compressed = updateAttachmentDbModel.IsGzipCompressed
+            }
+        );
+    }
+
     public async Task<AttachmentDbModel?> GetBugAttachmentAsync(string? organizationId, int reportId, int bugId, int attachmentId){
         await using var connection = await DataSource.OpenConnectionAsync();
 
@@ -72,12 +92,12 @@ public class AttachmentDbClient: PostgresClient
         return result;
     }
 
-    public async Task<AttachmentDbModel> CreateAttachment(AttachmentCreateDbModel attachmentCreateDbModel)
+    public async Task<AttachmentDbModel> CreateAttachment(CreateAttachmentDbModel attachmentCreateDbModel)
     {
         await using var connection = await DataSource.OpenConnectionAsync();
 
         return await connection.QuerySingleAsync<AttachmentDbModel>(
-            "SELECT * FROM public.create_attachment_internal(@entity_id, @attach_type, @storage_key, @storage_kind, @creator_user_id, @length_bytes, @file_name, @mime_type, @has_preview, @is_gzip_compressed)",
+            "SELECT * FROM public.create_attachment_internal(@entity_id, @attach_type, @storage_key, @storage_kind, @creator_user_id, @length_bytes, @file_name, @mime_type)",
             new
             {
                 entity_id = attachmentCreateDbModel.EntityId,
@@ -88,8 +108,6 @@ public class AttachmentDbClient: PostgresClient
                 length_bytes = attachmentCreateDbModel.LengthBytes,
                 file_name = attachmentCreateDbModel.FileName,
                 mime_type = attachmentCreateDbModel.MimeType,
-                has_preview = attachmentCreateDbModel.HasPreview,
-                is_gzip_compressed = attachmentCreateDbModel.IsGzipCompressed
             }
         );
     }

@@ -12,8 +12,7 @@ public static class BoErrors
 
     public static readonly BadRequestError AttachmentFileNotSelectedOrEmpty = new BadRequestError("attachment_file_not_selected_or_empty", "Файл не выбран или пуст.");
     public static readonly BadRequestError AttachmentFileTooLarge = new BadRequestError("attachment_file_too_large", "Файл превышает допустимый размер 10 МБ.");
-    public static BadRequestError AttachmentFileExtensionNotAllowed(string ext) => new BadRequestError("attachment_file_extension_not_allowed", $"Недопустимое расширение файла: {ext}");
-    public static BadRequestError AttachmentFileExtensionBlocked(string ext) => new BadRequestError("attachment_file_extension_blocked", $"Запрещённое расширение файла: {ext}");
+    public static readonly BadRequestError AttachmentFileExtensionNotFound = new BadRequestError("attachment_file_extension_not_found", "Расширение файла не найдено.");
     public static readonly BadRequestError AttachmentFileNameInvalidChars = new BadRequestError("attachment_file_name_invalid_chars", "Имя файла содержит недопустимые символы.");
     public static readonly BadRequestError AttachmentLimitExceeded = new BadRequestError("attachment_limit_exceeded", "Превышен лимит количества файлов.");
     public static readonly BadRequestError AttachmentTypeNotAllowed = new BadRequestError("attachment_type_not_allowed", "Недопустимый тип файла.");

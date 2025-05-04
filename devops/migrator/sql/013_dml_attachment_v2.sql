@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE public.check_bug_access(IN _bug_id integer,IN _report_id integer, IN _organization_id text)
+CREATE OR REPLACE PROCEDURE public.check_bug_access(IN _bug_id integer, IN _report_id integer, IN _organization_id text)
 LANGUAGE plpgsql
 AS $$
 BEGIN
@@ -19,7 +19,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE public.check_comment_access(IN _comment_id integer, IN _bug_id integer,IN _report_id integer, IN _organization_id text)
+CREATE OR REPLACE PROCEDURE public.check_comment_access(IN _comment_id integer, IN _bug_id integer, IN _report_id integer, IN _organization_id text)
 LANGUAGE plpgsql
 AS $$
 BEGIN
@@ -41,7 +41,6 @@ BEGIN
     END IF;
 END;
 $$;
-
 
 CREATE OR REPLACE FUNCTION public.get_bug_attachments_count(_organization_id text, _report_id int, _bug_id int, _attach_type int)
     RETURNS int
@@ -121,8 +120,7 @@ BEGIN
     FROM
         public.attachments a
         JOIN public.bugs b ON a.entity_id = b.id
-    WHERE
-        (a.attach_type = _fact_attach_type
+    WHERE (a.attach_type = _fact_attach_type
         OR a.attach_type = _expected_attach_type)
         AND b.report_id = _report_id
     UNION ALL
@@ -152,7 +150,7 @@ $$
 LANGUAGE plpgsql
 STABLE;
 
-CREATE OR REPLACE FUNCTION public.create_attachment_internal(_entity_id int, _attach_type int, _storage_key text, _storage_kind int, _creator_user_id text, _length_bytes bigint, _file_name text, _mime_type text, _has_preview boolean, _is_gzip_compressed boolean)
+CREATE OR REPLACE FUNCTION public.create_attachment_internal(_entity_id int, _attach_type int, _storage_key text, _storage_kind int, _creator_user_id text, _length_bytes bigint, _file_name text, _mime_type text)
     RETURNS TABLE(
         id int,
         attach_type int,
@@ -171,8 +169,8 @@ CREATE OR REPLACE FUNCTION public.create_attachment_internal(_entity_id int, _at
 DECLARE
     new_attachment_id int;
 BEGIN
-    INSERT INTO public.attachments(entity_id, attach_type, storage_key, storage_kind, creator_user_id, length_bytes, file_name, mime_type, has_preview, is_gzip_compressed, bug_id, path)
-        VALUES (_entity_id, _attach_type, _storage_key, _storage_kind, _creator_user_id, _length_bytes, _file_name, _mime_type, _has_preview, _is_gzip_compressed, _entity_id, _storage_key)
+    INSERT INTO public.attachments(entity_id, attach_type, storage_key, storage_kind, creator_user_id, length_bytes, file_name, mime_type, bug_id, path)
+        VALUES (_entity_id, _attach_type, _storage_key, _storage_kind, _creator_user_id, _length_bytes, _file_name, _mime_type, _entity_id, _storage_key)
     RETURNING
         public.attachments.id INTO new_attachment_id;
     --  Возвращаем данные
@@ -374,3 +372,49 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION public.update_attachment_internal(_id int, _storage_key text, _storage_kind int, _length_bytes bigint, _file_name text, _mime_type text, _has_preview boolean, _is_gzip_compressed boolean)
+    RETURNS TABLE(
+        id int,
+        attach_type int,
+        entity_id int,
+        storage_key text,
+        storage_kind int,
+        creator_user_id text,
+        length_bytes bigint,
+        file_name text,
+        mime_type text,
+        has_preview boolean,
+        is_gzip_compressed boolean,
+        created_at timestamp with time zone)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    RETURN query UPDATE
+        public.attachments
+    SET
+        storage_key = _storage_key,
+        storage_kind = _storage_kind,
+        length_bytes = _length_bytes,
+        file_name = _file_name,
+        mime_type = _mime_type,
+        has_preview = _has_preview,
+        is_gzip_compressed = _is_gzip_compressed,
+        updated_at = now(),
+        path = _storage_key
+    WHERE
+        public.attachments.id = _id
+    RETURNING
+        public.attachments.id,
+        public.attachments.attach_type,
+        public.attachments.entity_id,
+        public.attachments.storage_key,
+        public.attachments.storage_kind,
+        public.attachments.creator_user_id,
+        public.attachments.length_bytes,
+        public.attachments.file_name,
+        public.attachments.mime_type,
+        public.attachments.has_preview,
+        public.attachments.is_gzip_compressed,
+        public.attachments.created_at;
+END;
+$$;

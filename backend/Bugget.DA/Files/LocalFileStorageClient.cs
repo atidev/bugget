@@ -22,8 +22,8 @@ namespace Bugget.DA.Files
             if (content.CanSeek)
                 content.Position = 0;
 
-            await using var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
-            await content.CopyToAsync(fs, ct);
+            await using var outFs = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920, true);
+            await content.CopyToAsync(outFs, ct);
         }
 
         public Task<Stream> ReadAsync(string storageKey, CancellationToken ct = default)
