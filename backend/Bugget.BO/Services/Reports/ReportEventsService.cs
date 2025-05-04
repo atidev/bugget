@@ -6,10 +6,10 @@ using Bugget.Entities.DTO.Report;
 using Bugget.ExternalClients;
 using Bugget.ExternalClients.Context;
 
-namespace Bugget.BO.Services
-{
-    public class ReportEventsService(
-        IReportPageHubClient reportPageHubClient,
+namespace Bugget.BO.Services.Reports;
+
+public class ReportEventsService(
+    IReportPageHubClient reportPageHubClient,
         ExternalClientsActionService externalClientsActionService,
         ParticipantsService participantsService,
         ReportAutoStatusService autoStatusService)
@@ -21,8 +21,7 @@ namespace Bugget.BO.Services
                 externalClientsActionService.ExecuteReportPatchPostActions(new ReportPatchContext(user.Id, patchDto, result)),
                 participantsService.AddParticipantIfNotExistAsync(reportId, user.Id),
                 patchDto.ResponsibleUserId != null ? participantsService.AddParticipantIfNotExistAsync(reportId, patchDto.ResponsibleUserId) : Task.CompletedTask,
-                autoStatusService.CalculateStatusAsync(reportId, patchDto, result)
-            );
-        }
+            autoStatusService.CalculateStatusAsync(reportId, patchDto, result)
+        );
     }
 }

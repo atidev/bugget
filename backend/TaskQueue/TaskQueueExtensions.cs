@@ -3,7 +3,7 @@ namespace TaskQueue;
 public static class TaskQueueExtensions
 {
     public static ValueTask Enqueue(this ITaskQueue taskQueue, Func<IServiceProvider, CancellationToken, Task> workItem, Action<Exception, string?, object[]> onError, string? errorMessage = null, params object[] messageParams) =>
-        taskQueue.Enqueue((sp, ct) => workItem(sp, ct)
+        taskQueue.EnqueueAsync((sp, ct) => workItem(sp, ct)
             .ContinueWith(t =>
             {
                 if (t is { IsFaulted: true, Exception: { } exception })

@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.StaticFiles;
 namespace Bugget.Controllers;
 
 [Route("/v1/reports/{reportId}/bug/{bugId}/attachments")]
-public sealed class AttachmentsController(AttachmentService attachmentService) : ApiController
+[Obsolete("Use v2")]
+public sealed class AttachmentsObsoleteController(AttachmentObsoleteService attachmentObsoleteService) : ApiController
 {
     [HttpPost]
     public async Task<IActionResult> CreateAttachment(
@@ -19,7 +20,7 @@ public sealed class AttachmentsController(AttachmentService attachmentService) :
         )
     {
         await using var stream = file.OpenReadStream();
-        var attachment = await attachmentService.SaveAttachment(
+        var attachment = await attachmentObsoleteService.SaveAttachmentObsoleteAsync(
             bugId, User.GetIdentity().Id, stream, (AttachType)attachType, file.FileName);
         return Ok(new AttachmentView
         {
@@ -35,14 +36,14 @@ public sealed class AttachmentsController(AttachmentService attachmentService) :
     [HttpGet("{id}/content")]
     public async Task<FileContentResult> GetAttachmentContent(int id)
     {
-        var (content, fileName) = await attachmentService.GetAttachmentContent(id);
+        var (content, fileName) = await attachmentObsoleteService.GetAttachmentContentObsoleteAsync(id);
         return new FileContentResult(content, GetMimeTypeForFileExtension(fileName));
     }
-    
+
     [HttpDelete("{id}")]
     public Task DeleteAttachmentContent(int id)
     {
-        return attachmentService.DeleteAttachment(id);
+        return attachmentObsoleteService.DeleteAttachmentObsoleteAsync(id);
     }
 
     private string GetMimeTypeForFileExtension(string filePath)

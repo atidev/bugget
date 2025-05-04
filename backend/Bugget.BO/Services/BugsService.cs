@@ -30,14 +30,14 @@ public sealed class BugsService(BugsDbClient bugsDbClient, IMapper mapper, BugsE
             return BoErrors.BugMustHaveOneField;
         }
         var bugSummaryDbModel = await bugsDbClient.CreateBugAsync(user.Id, user.OrganizationId, reportId, bug);
-        await taskQueue.Enqueue(() => bugsEventsService.HandleCreateBugEventAsync(reportId, user, bugSummaryDbModel));
+        await taskQueue.EnqueueAsync(() => bugsEventsService.HandleCreateBugEventAsync(reportId, user, bugSummaryDbModel));
         return bugSummaryDbModel;
     }
 
     public async Task<BugPatchResultDbModel> PatchBugAsync(UserIdentity user, int reportId, int bugId, BugPatchDto patchDto)
     {
         var bugPatchResultDbModel = await bugsDbClient.PatchBugAsync(reportId, bugId, user.OrganizationId, patchDto);
-        await taskQueue.Enqueue(() => bugsEventsService.HandlePatchBugEventAsync(reportId, bugId, user, patchDto));
+        await taskQueue.EnqueueAsync(() => bugsEventsService.HandlePatchBugEventAsync(reportId, bugId, user, patchDto));
         return bugPatchResultDbModel;
     }
 

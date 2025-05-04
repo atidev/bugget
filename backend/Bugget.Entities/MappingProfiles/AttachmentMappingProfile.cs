@@ -1,6 +1,7 @@
 using AutoMapper;
 using Bugget.Entities.BO;
 using Bugget.Entities.DbModels;
+using Bugget.Entities.DbModels.Attachment;
 using Bugget.Entities.Views;
 
 namespace Bugget.Entities.MappingProfiles;

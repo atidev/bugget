@@ -68,7 +68,7 @@ public static class BugMapper
                 BugId = bug.Id,
                 ReportId = bug.ReportId,
                 Path = a.Path,
-                CreatedAt = a.CreatedAt!.Value,
+                CreatedAt = a.CreatedAt,
                 AttachType = a.AttachType
             }).ToArray(),
             Comments = bug.Comments?.Select(c => c.ToCommentView(employeesDict))

@@ -5,13 +5,13 @@ using Bugget.Entities.DTO.Bug;
 using Bugget.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Bugget.Controllers;
+namespace Bugget.Controllers.Bugs;
 
 /// <summary>
 /// Api для работы с багами
 /// </summary>
 [Route("/v2/reports/{reportId}/bugs")]
-public sealed class BugsV2Controller(BugsService bugsService) : ApiController
+public sealed class BugsController(BugsService bugsService) : ApiController
 {
     /// <summary>
     /// Добавить баг

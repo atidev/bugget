@@ -6,7 +6,7 @@ using Bugget.Entities.DbModels.Comment;
 
 namespace Bugget.BO.Services;
 
-public sealed class CommentsService(CommentsDbClient commentsDbClient)
+public sealed class CommentsObsoleteService(CommentsObsoleteDbClient commentsDbClient)
 {
     public Task<CommentDbModel?> CreateCommentAsync(Comment comment)
     {

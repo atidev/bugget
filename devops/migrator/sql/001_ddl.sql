@@ -44,11 +44,7 @@ CREATE TABLE IF NOT EXISTS public.attachments (
     bug_id INT NOT NULL,
     path TEXT NOT NULL,
     created_at timestamp with time zone not null default now(),
-    attach_type INT NOT NULL,
-
-    CONSTRAINT fk_attachments_bugs
-        FOREIGN KEY (bug_id)
-        REFERENCES public.bugs(id)
+    attach_type INT NOT NULL
 );
 
 -- Таблица комментариев
@@ -60,7 +56,6 @@ CREATE TABLE IF NOT EXISTS public.comments (
     creator_user_id text NOT NULL,
     created_at timestamp with time zone not null default now(),
     updated_at timestamp with time zone not null default now(),
-
 
     CONSTRAINT fk_comments_bugs
         FOREIGN KEY (bug_id)

@@ -24,6 +24,11 @@ public class UserAuthHandler(
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        if (Request.Path.Equals("/_internal/ping"))
+        {
+            return AuthenticateResult.NoResult();
+        }
+        
         var headers = Request.Headers;
 
         var userId = GetHeaderOrDefault(headers, UserIdHeader, DefaultUserId);

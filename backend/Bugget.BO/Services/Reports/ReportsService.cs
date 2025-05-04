@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Monade;
 using TaskQueue;
 
-namespace Bugget.BO.Services;
+namespace Bugget.BO.Services.Reports;
 
 public sealed class ReportsService(
     ReportsDbClient reportsDbClient,
@@ -29,11 +29,9 @@ public sealed class ReportsService(
 
     public async Task<ReportPatchResultDbModel> PatchReportAsync(int reportId, UserIdentity user, ReportPatchDto patchDto)
     {
-        logger.LogInformation("Пользователь {@UserId} патчит отчёт {@ReportId}, {@PatchDto}", user.Id, reportId, patchDto);
-
         var result = await reportsDbClient.PatchReportAsync(reportId, user.OrganizationId, patchDto);
 
-        await taskQueue.Enqueue(() => reportEventsService.HandlePatchReportEventAsync(reportId, user, patchDto, result));
+        await taskQueue.EnqueueAsync(() => reportEventsService.HandlePatchReportEventAsync(reportId, user, patchDto, result));
 
         return result;
     }
@@ -68,7 +66,7 @@ public sealed class ReportsService(
             return null;
         }
 
-        await taskQueue.Enqueue(() => externalClientsActionService.ExecuteReportCreatePostActions(new ReportCreateContext(report, reportDbModel)));
+        await taskQueue.EnqueueAsync(() => externalClientsActionService.ExecuteReportCreatePostActions(new ReportCreateContext(report, reportDbModel)));
 
         return reportDbModel;
     }
@@ -90,7 +88,7 @@ public sealed class ReportsService(
         if (reportDbModel == null)
             return null;
 
-        await taskQueue.Enqueue(() => externalClientsActionService.ExecuteReportUpdatePostActions(new ReportUpdateContext(report, reportDbModel)));
+        await taskQueue.EnqueueAsync(() => externalClientsActionService.ExecuteReportUpdatePostActions(new ReportUpdateContext(report, reportDbModel)));
 
         return reportDbModel;
     }

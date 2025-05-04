@@ -3,11 +3,11 @@ namespace TaskQueue;
 public interface ITaskQueue
 {
 
-    ValueTask Enqueue(Func<IServiceProvider, CancellationToken, Task> workItem);
+    ValueTask EnqueueAsync(Func<IServiceProvider, CancellationToken, Task> workItem);
 
 
-    ValueTask Enqueue(Func<CancellationToken, Task> workItem);
+    ValueTask EnqueueAsync(Func<CancellationToken, Task> workItem);
 
 
-    ValueTask Enqueue(Func<Task> workItem);
+    ValueTask EnqueueAsync(Func<Task> workItem);
 }

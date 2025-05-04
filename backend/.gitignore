@@ -212,3 +212,5 @@ _dependentPackages/
 # Fake
 .fake/
 /.idea
+
+/Bugget/file-storage/
