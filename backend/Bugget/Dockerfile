@@ -14,8 +14,8 @@ COPY . .
 ARG TARGETPLATFORM
 RUN set -eux; \
     case "$TARGETPLATFORM" in \
-      "linux/amd64") RID=linux-musl-x64 ;; \
-      "linux/arm64") RID=linux-musl-arm64 ;; \
+      "linux/amd64") RID=linux-x64 ;; \
+      "linux/arm64") RID=linux-arm64 ;; \
       *) echo "Unsupported platform: $TARGETPLATFORM"; exit 1 ;; \
     esac; \
     dotnet publish Bugget/Bugget.csproj \
