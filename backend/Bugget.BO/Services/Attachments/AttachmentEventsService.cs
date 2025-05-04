@@ -25,7 +25,7 @@ namespace Bugget.BO.Services.Attachments
         public async Task HandleAttachmentDeleteEventAsync(int reportId, UserIdentity user, AttachmentDbModel attachmentDbModel)
         {
             await Task.WhenAll(
-                reportPageHubClient.SendAttachmentDeleteAsync(reportId, attachmentDbModel.ToSocketView(), user.SignalRConnectionId),
+                reportPageHubClient.SendAttachmentDeleteAsync(reportId, attachmentDbModel.Id, attachmentDbModel.EntityId.Value, attachmentDbModel.AttachType, user.SignalRConnectionId),
                 fileStorageClient.DeleteAsync(attachmentDbModel.StorageKey),
                 attachmentDbModel.HasPreview.Value ? fileStorageClient.DeleteAsync(keyGen.GetPreviewKey(attachmentDbModel.StorageKey)) : Task.CompletedTask
             );

@@ -29,8 +29,6 @@ public sealed class ReportsService(
 
     public async Task<ReportPatchResultDbModel> PatchReportAsync(int reportId, UserIdentity user, ReportPatchDto patchDto)
     {
-        logger.LogInformation("Пользователь {@UserId} патчит отчёт {@ReportId}, {@PatchDto}", user.Id, reportId, patchDto);
-
         var result = await reportsDbClient.PatchReportAsync(reportId, user.OrganizationId, patchDto);
 
         await taskQueue.EnqueueAsync(() => reportEventsService.HandlePatchReportEventAsync(reportId, user, patchDto, result));

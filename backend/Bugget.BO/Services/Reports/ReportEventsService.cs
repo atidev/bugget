@@ -5,7 +5,6 @@ using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
 using Bugget.ExternalClients;
 using Bugget.ExternalClients.Context;
-using Bugget.BO.Services.Reports;
 
 namespace Bugget.BO.Services.Reports;
 

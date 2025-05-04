@@ -2,6 +2,7 @@ namespace Bugget.Entities.BO;
 
 public enum BugStatus
 {
-    Active,
-    Archived
+    Active = 0,
+    Archived = 1,
+    Rejected = 2
 }

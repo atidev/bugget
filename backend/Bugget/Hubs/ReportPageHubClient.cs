@@ -70,24 +70,28 @@ public class ReportPageHubClient(IHubContext<ReportPageHub> hubContext) : IRepor
 
     public Task SendAttachmentOptimizedAsync(int reportId, AttachmentSocketView attachmentSocketView)
     {
+        string eventName = attachmentSocketView.AttachType == (int)AttachType.Comment
+        ? "ReceiveCommentAttachmentOptimized"
+        : "ReceiveBugAttachmentOptimized";
+
         return hubContext.Clients.Group($"{reportId}")
-            .SendAsync("ReceiveAttachmentOptimized", attachmentSocketView);
+            .SendAsync(eventName, attachmentSocketView);
     }
 
-    public Task SendAttachmentDeleteAsync(int reportId, AttachmentSocketView attachmentSocketView, string? signalRConnectionId)
+    public Task SendAttachmentDeleteAsync(int reportId, int id ,int entityId, int attachType, string? signalRConnectionId)
     {
-        string eventName = attachmentSocketView.AttachType == (int)AttachType.Comment
+        string eventName = attachType == (int)AttachType.Comment
         ? "ReceiveCommentAttachmentDelete"
         : "ReceiveBugAttachmentDelete";
 
         if (signalRConnectionId == null)
         {
             return hubContext.Clients.Group($"{reportId}")
-                .SendAsync(eventName, attachmentSocketView);
+                .SendAsync(eventName, id, entityId, attachType);
         }
 
         return hubContext.Clients.GroupExcept($"{reportId}", signalRConnectionId)
-            .SendAsync(eventName, attachmentSocketView);
+            .SendAsync(eventName, id, entityId, attachType);
     }
 
     public Task SendCommentCreateAsync(int reportId, CommentSummaryDbModel commentSummaryDbModel, string? signalRConnectionId)
