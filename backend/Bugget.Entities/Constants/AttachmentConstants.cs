@@ -5,10 +5,10 @@ public static class AttachmentConstants
     public const string PreviewMimeType = "image/webp";
 
     public static readonly string[] CompressibleMimeTypes =
-                { "text/plain", "text/csv", "application/json", "text/markdown", "text/json" };
+        { "text/plain", "text/csv", "application/json", "text/markdown", "text/json" };
 
     public static readonly string[] ImageMimeTypes =
-            { "image/png", "image/jpeg", "image/webp" };
+        { "image/png", "image/jpeg", "image/webp" };
 
     public static readonly string[] MediaMimeTypes =
         { "image/gif" };
@@ -19,7 +19,4 @@ public static class AttachmentConstants
             .Concat(MediaMimeTypes)
             .Concat(CompressibleMimeTypes)
             .ToArray());
-
-
-
 }

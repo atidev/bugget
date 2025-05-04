@@ -95,8 +95,6 @@ builder.Services
     .AddSingleton<CommentEventsService>()
     .AddSingleton<LimitsService>();
 
-
-
 builder.Services
     .AddSingleton<ReportsDbClient>()
     .AddSingleton<CommentsObsoleteDbClient>()
@@ -150,11 +148,12 @@ var app = builder.Build();
 
 app.UseSwaggerConfiguration();
 
+// регистрируем до авторизации
+app.MapHealthChecks("/_internal/ping");
+
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.MapHealthChecks("/_internal/ping");
 
 app.UseCors("CorsPolicy");
 
