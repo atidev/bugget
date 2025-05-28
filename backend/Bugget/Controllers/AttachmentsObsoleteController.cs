@@ -2,6 +2,7 @@ using Bugget.BO.Services;
 using Bugget.Entities.Authentication;
 using Bugget.Entities.BO;
 using Bugget.Entities.Views;
+using Bugget.Entities.Views.Attachment;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 
@@ -22,7 +23,7 @@ public sealed class AttachmentsObsoleteController(AttachmentObsoleteService atta
         await using var stream = file.OpenReadStream();
         var attachment = await attachmentObsoleteService.SaveAttachmentObsoleteAsync(
             bugId, User.GetIdentity().Id, stream, (AttachType)attachType, file.FileName);
-        return Ok(new AttachmentView
+        return Ok(new AttachmentObsoleteView
         {
             Id = attachment.Id!.Value,
             BugId = attachment.BugId,

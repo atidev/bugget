@@ -1,14 +1,14 @@
 using System.ComponentModel.DataAnnotations;
+using Bugget.BO.Mappers;
 using Bugget.BO.Services.Attachments;
 using Bugget.Entities.Authentication;
 using Bugget.Entities.BO;
 using Bugget.Entities.BO.AttachmentBo;
 using Bugget.Entities.Constants;
-using Bugget.Entities.DbModels.Attachment;
+using Bugget.Entities.Views.Attachment;
 using Bugget.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Monade;
 
 namespace Bugget.Controllers;
 
@@ -20,7 +20,7 @@ public sealed class BugAttachmentsController(AttachmentService attachmentService
             .Equals("development", StringComparison.OrdinalIgnoreCase) ?? false;
 
     [HttpPost]
-    [ProducesResponseType(typeof(AttachmentDbModel), 200)]
+    [ProducesResponseType(typeof(AttachmentView), 200)]
     public async Task<IActionResult> CreateAttachment(
         [FromRoute] int reportId,
         [FromRoute] int bugId,
@@ -56,7 +56,7 @@ public sealed class BugAttachmentsController(AttachmentService attachmentService
             (AttachType)attachType,
             new FileMeta(file.FileName, file.Length, mimeType),
             ct)
-            .AsActionResultAsync(202);
+            .AsActionResultAsync((attachmentDbModel) => AttachmentMapper.ToView(attachmentDbModel, reportId), 202);
     }
 
     [HttpGet("{id}/content")]

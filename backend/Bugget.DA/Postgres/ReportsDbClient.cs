@@ -54,8 +54,8 @@ public sealed class ReportsDbClient : PostgresClient
         var attachments = (await multi.ReadAsync<AttachmentDbModel>()).ToArray();
 
         // 3. Группируем по багам
-        var commentsByBug = comments.GroupBy(c => c.BugId).ToDictionary(g => g.Key, g => g.ToArray());
-        var attachmentsByEntity = attachments.GroupBy(a => a.EntityId).ToDictionary(g => g.Key, g => g.ToArray());
+        var commentsByBug = comments.GroupBy(c => c.BugId).ToDictionary(g => g.Key, g => g.OrderBy(c => c.CreatedAt).ToArray());
+        var attachmentsByEntity = attachments.GroupBy(a => a.EntityId).ToDictionary(g => g.Key, g => g.OrderBy(a => a.CreatedAt).ToArray());
 
         foreach (var bug in report.Bugs)
         {

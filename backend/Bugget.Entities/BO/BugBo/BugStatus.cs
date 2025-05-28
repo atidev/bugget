@@ -1,4 +1,4 @@
-namespace Bugget.Entities.BO;
+namespace Bugget.Entities.BO.BugBo;
 
 public enum BugStatus
 {
