@@ -6,6 +6,7 @@ using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DTO;
 using Bugget.Entities.DTO.Bug;
 using Bugget.Entities.Views;
+using Bugget.Entities.Views.Attachment;
 
 namespace Bugget.BO.Mappers;
 
@@ -67,11 +68,14 @@ public static class BugMapper
                 Id = a.Id,
                 BugId = bug.Id,
                 ReportId = bug.ReportId,
-                Path = a.Path,
+                EntityId = a.EntityId!.Value,
+                AttachType = a.AttachType,
                 CreatedAt = a.CreatedAt,
-                AttachType = a.AttachType
+                HasPreview = a.HasPreview.Value,
+                FileName = a.FileName ?? string.Empty,
+                CreatorUserId = a.CreatorUserId ?? string.Empty,
             }).ToArray(),
-            Comments = bug.Comments?.Select(c => c.ToCommentView(employeesDict))
+            Comments = bug.Comments?.Select(c => c.ToCommentView(bug.ReportId, employeesDict))
                 .ToArray(),
         };
     }

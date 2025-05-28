@@ -12,5 +12,5 @@ public sealed class ReportView
     public required DateTimeOffset CreatedAt { get; init; }
     public required DateTimeOffset UpdatedAt { get; init; }
     public required UserView[] Participants { get; init; } 
-    public required BugView[] Bugs { get; init; }
+    public BugView[]? Bugs { get; init; }
 }

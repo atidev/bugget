@@ -18,8 +18,7 @@ public sealed class ReportsService(
     ReportsDbClient reportsDbClient,
     ExternalClientsActionService externalClientsActionService,
     ITaskQueue taskQueue,
-    ReportEventsService reportEventsService,
-    ILogger<ReportsService> logger)
+    ReportEventsService reportEventsService)
 {
 
     public Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto createDto)
@@ -44,7 +43,7 @@ public sealed class ReportsService(
             return BoErrors.ReportNotFoundError;
         }
 
-        return report;
+        return ApplyBoSort(report);
     }
 
     public async Task<bool> GetReportAccessAsync(int reportId, string? organizationId)
@@ -76,9 +75,21 @@ public sealed class ReportsService(
         return reportsDbClient.ListReportsAsync(userId);
     }
 
-    public Task<ReportObsoleteDbModel?> GetReportObsoleteAsync(int reportId)
+    public async Task<ReportObsoleteDbModel?> GetReportObsoleteAsync(int reportId)
     {
-        return reportsDbClient.GetReportAsync(reportId);
+        var report = await reportsDbClient.GetReportAsync(reportId);
+        if (report == null)
+        {
+            return null;
+        }
+
+        foreach (var bug in report.Bugs)
+        {
+            bug.Comments = bug.Comments?.OrderBy(c => c.CreatedAt).ToArray();
+            bug.Attachments = bug.Attachments?.OrderBy(a => a.CreatedAt).ToArray();
+        }
+
+        return report;
     }
 
     public async Task<ReportObsoleteDbModel?> UpdateReportObsoleteAsync(ReportUpdate report)
@@ -96,5 +107,11 @@ public sealed class ReportsService(
     public Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)
     {
         return reportsDbClient.SearchReportsAsync(search);
+    }
+
+    private static ReportDbModel ApplyBoSort(ReportDbModel report)
+    {
+        report.Bugs = report.Bugs?.OrderBy(b => b.Status).ToArray();
+        return report;
     }
 }

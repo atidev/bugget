@@ -1,3 +1,4 @@
+using Bugget.Entities.Views.Attachment;
 using Bugget.Entities.Views.Users;
 
 namespace Bugget.Entities.Views;

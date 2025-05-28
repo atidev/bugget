@@ -44,7 +44,7 @@ public sealed class CommentsObsoleteController(
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveComments", comment.BugId);
         
-        return Ok(comment?.ToCommentView(employeesClient.DictEmployees()));
+        return Ok(comment?.ToCommentView(reportId, employeesClient.DictEmployees()));
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public sealed class CommentsObsoleteController(
     public async Task<CommentView[]> ListCommentsAsync([FromRoute] int reportId, [FromRoute] int bugId)
     {
         var comments = await commentsService.ListCommentsAsync(reportId, bugId);
-        return comments.Select(c => c.ToCommentView(employeesClient.DictEmployees())).ToArray();
+        return comments.Select(c => c.ToCommentView(reportId, employeesClient.DictEmployees())).ToArray();
     }
 
     /// <summary>

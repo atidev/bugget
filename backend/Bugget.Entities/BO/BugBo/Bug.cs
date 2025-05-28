@@ -1,3 +1,5 @@
+using Bugget.Entities.BO.BugBo;
+
 namespace Bugget.Entities.BO;
 
 public sealed class Bug
