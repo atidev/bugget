@@ -1,5 +1,5 @@
 import { Attachment } from "@/types/attachement";
-import { ChangeEvent, Ref, useRef } from "react";
+import { ChangeEvent, Ref, useRef, ClipboardEvent } from "react";
 import ImageCarousel from "./components/ImageCarousel/ImageCarousel";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
   onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
   withAttachments: boolean;
   files: Attachment[];
-  onFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onFileChange: (event: ChangeEvent<HTMLInputElement> | ClipboardEvent<HTMLTextAreaElement>) => void;
   textareaRef: Ref<HTMLTextAreaElement>;
 };
 
@@ -30,6 +30,7 @@ const Result = ({
         ref={textareaRef}
         value={value}
         onChange={onChange}
+        onPaste={onFileChange}
         className="textarea w-full mb-3 p-3 bg-base-100 focus:outline-none"
       />
       {withAttachments && (
