@@ -1,7 +1,7 @@
 services:
   frontend_bugget:
     container_name: frontend_bugget
-    image: ${FRONTEND_IMAGE:-gently4005/bugget-ui:latest}
+    image: ${FRONTEND_IMAGE:-atisudev/bugget-ui:latest}
     build:
       context: ${FRONTEND_BUILD_CONTEXT:-}
       dockerfile: ${FRONTEND_DOCKERFILE:-}
