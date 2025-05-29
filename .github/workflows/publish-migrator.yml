@@ -56,27 +56,26 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Build and push Migrator Multi-Arch
+      - name: Pick target platforms
         run: |
-          cd devops/migrator
-          docker buildx create --name mybuilder --use --bootstrap || docker buildx use mybuilder
-          docker buildx inspect mybuilder --bootstrap
-          docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            --cache-from=type=gha \
-            --cache-to=type=gha,mode=max \
-            -t ${{ secrets.DOCKER_LOGIN }}/bugget-migrator:${{ env.VERSION }} \
-            --push \
-            -f ./Dockerfile .
-
           if [[ "${{ env.IS_PLAIN_VERSION }}" == "true" ]]; then
-            docker buildx build \
-              --platform linux/amd64,linux/arm64 \
-              --cache-from=type=gha \
-              --cache-to=type=gha,mode=max \
-              -t ${{ secrets.DOCKER_LOGIN }}/bugget-migrator:latest \
-              --push \
-              -f ./Dockerfile .
+            # tag == latest → multi-arch
+            echo "TARGET_PLATFORMS=linux/amd64,linux/arm64" >> $GITHUB_ENV
+            echo "LATEST_TAG=,${{ secrets.DOCKER_LOGIN }}/bugget-migrator:latest" >> $GITHUB_ENV
           else
-            echo "🔁 Пропущен пуш latest, так как версия не в виде vX.Y.Z"
+            # не-latest → только amd64
+            echo "TARGET_PLATFORMS=linux/amd64" >> $GITHUB_ENV
+            echo "LATEST_TAG=" >> $GITHUB_ENV
           fi
+
+      - name: Build & push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./
+          file: ./backend/migrator/Dockerfile
+          platforms: ${{ env.TARGET_PLATFORMS }}
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_LOGIN }}/bugget-migrator:${{ env.VERSION }}${{ env.LATEST_TAG }}
+          cache-from: type=gha
+          cache-to:   type=gha,mode=max

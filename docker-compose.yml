@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres
+    container_name: postgres_bugget
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports: ["5432:5432"]
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    profiles: ["full", "back", "front"]
+
+  bugget-api:
+    build:
+      context: ./backend/bugget-api
+      dockerfile: Bugget/Dockerfile
+    container_name: bugget-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      POSTGRES_CONNECTION_STRING: Host=db;Port=5432;Database=postgres;Username=postgres
+    ports: ["7777:7777"]
+    depends_on:
+      db:
+        condition: service_started
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/bugget-api
+          target: /app
+    profiles: ["full", "back"]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_bugget
+    ports: ["80:80"]
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+    profiles: ["full", "front"]
+
+# глобальные опции
+x-defaults: &restart_policy
+  restart: unless-stopped
