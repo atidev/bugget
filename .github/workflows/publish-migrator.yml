@@ -58,7 +58,7 @@ jobs:
 
       - name: Build and push Migrator Multi-Arch
         run: |
-          cd devops/migrator
+          cd backend/migrator
           docker buildx create --name mybuilder --use --bootstrap || docker buildx use mybuilder
           docker buildx inspect mybuilder --bootstrap
           docker buildx build \

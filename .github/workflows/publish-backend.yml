@@ -58,7 +58,7 @@ jobs:
 
       - name: Build and push Backend Multi-Arch
         run: |
-          cd backend
+          cd backend/bugget-api
           docker buildx create --name mybuilder --use --bootstrap || docker buildx use mybuilder
           docker buildx inspect mybuilder --bootstrap
           docker buildx build \

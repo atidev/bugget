@@ -1,3 +1,0 @@
-include:
-  - ../components/postgres/docker-compose.yml
-  - ../components/backend/docker-compose.yml
