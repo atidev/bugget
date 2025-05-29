@@ -1,6 +1,19 @@
 # Bugget
 
 Платформа для построения процесса работы с баг-репортами
+  
 
-[Контрибьют](./CONTRIBUTING.md)  
-[Инструкция по локальному тестрованию](./devops/scripts/readme.md)
+## локальный запуск
+Весь проект
+```sh
+docker compose --profile full up
+```
+Только бэкенд
+```sh
+docker compose --profile back up
+```
+
+Только фронтенд
+```sh
+docker compose --profile front up
+```
