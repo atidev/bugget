@@ -43,12 +43,12 @@ public sealed class AttachmentObsoleteService(
     public async Task<Attachment> SaveAttachmentObsoleteAsync(int bugId, string userId, Stream fileStream, AttachType attachType, string fileName)
     {
         var bug = await bugService.GetBug(bugId);
-        return await SaveAttachmentObsoleteAsync(bug, userId, fileStream, attachType, fileName);
+        return await SaveAttachmentObsoleteAsync(bug, fileStream, attachType, fileName);
     }
 
-    private async Task<Attachment> SaveAttachmentObsoleteAsync(Bug bug, string userId, Stream fileStream, AttachType attachType, string fileName)
+    private async Task<Attachment> SaveAttachmentObsoleteAsync(Bug bug, Stream fileStream, AttachType attachType, string fileName)
     {
-        var relativePath = GetAttachmentFilePathObsolete(bug, fileName);
+        var relativePath = GetAttachmentFilePathObsolete(bug);
         var fullPath = GetAttachmentContentAbsolutePath(relativePath);
 
         if (await attachmentDbClient.FilePathExist(relativePath))
@@ -83,8 +83,8 @@ public sealed class AttachmentObsoleteService(
         return mapper.Map<Attachment>(attachment);
     }
 
-    private string GetAttachmentFilePathObsolete(Bug bug, string fileName) =>
-        $"{bug.ReportId}/{bug.Id}/{fileName.Trim('.')}";
+    private string GetAttachmentFilePathObsolete(Bug bug) =>
+        $"{bug.ReportId}/{bug.Id}/{Guid.NewGuid()}";
 
     private string GetAttachmentContentAbsolutePath(string attachmentRelativePath) 
         => Path.Combine(_baseDir, attachmentRelativePath);

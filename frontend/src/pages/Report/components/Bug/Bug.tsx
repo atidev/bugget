@@ -107,10 +107,17 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
 
   // 3. Обработчик выбора файла
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement> | React.ClipboardEvent<HTMLTextAreaElement>,
     attachmentType: number
   ) => {
-    const file = event.target.files?.[0];
+    let file: File | null = null;
+
+    if ('target' in event && event.target instanceof HTMLInputElement) {
+      file = event.target.files?.[0] || null;
+    } else if ('clipboardData' in event) {
+      file = event.clipboardData?.items[0]?.getAsFile() || null;
+    }
+    
     if (!file || !bug.reportId || !bug.id) return;
 
     try {
@@ -124,8 +131,9 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
       console.error(err);
       alert("Ошибка при загрузке файла");
     } finally {
-      // Сбросим value у input, чтобы повторно срабатывал onChange
-      event.target.value = "";
+      if ('target' in event && event.target instanceof HTMLInputElement) {
+        event.target.value = "";
+      }
     }
   };
 
