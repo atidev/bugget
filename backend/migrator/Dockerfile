@@ -1,8 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0.100-alpine3.20 AS build
 WORKDIR /app
 
-COPY . ./
-COPY ../../sql ./sql
+COPY backend/migrator ./
+COPY sql ./sql
 RUN dotnet restore
 
 RUN dotnet publish -c Release -o /out

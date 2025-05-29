@@ -15,3 +15,8 @@ postgres
 ```
 2 - запускам с конфигурацией **localMigrator**  
 3 - смотрим что получилось
+
+## локальный докер-билд, если он нужен, должен происходить из корневого каталога
+```sh
+docker build -t bugget-migrator -f ./backend/migrator/Dockerfile .
+```
