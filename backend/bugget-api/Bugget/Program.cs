@@ -7,7 +7,6 @@ using Bugget.DA.Files;
 using Bugget.DA.Postgres;
 using Bugget.Hubs;
 using Bugget.Middlewares;
-using Microsoft.OpenApi.Models;
 using Bugget.DA.Interfaces;
 using Bugget.ExternalClients;
 using TaskQueue;
@@ -22,144 +21,177 @@ using Bugget.BO.Services.Attachments;
 using Bugget.BO.Interfaces;
 using Bugget.Configurations;
 using SixLabors.ImageSharp;
+using OpenTelemetry.Metrics;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.Network;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()          // «bootstrap»-логгер
+    .WriteTo.Console()
+    .CreateLogger();
 
-builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-    .AddEnvironmentVariables()
-    .AddCommandLine(args);
-
-var externalPath = Path.Combine(AppContext.BaseDirectory, "external_settings.json");
-if (File.Exists(externalPath))
+try
 {
-    builder.Configuration.AddJsonFile(externalPath, optional: false, reloadOnChange: true);
-}
-else
-{
-    Console.WriteLine("File external_settings.json not found");
-}
+    Log.Information("Host starting");
 
-builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
-builder.Services.AddSignalR(options =>
-    {
-        options.EnableDetailedErrors = true; // Показывать ошибки в логе
-        options.KeepAliveInterval = TimeSpan.FromSeconds(15); // Пинг каждые 15 сек
-        options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // Клиент ждёт 60 сек перед разрывом
-    })
-    .AddJsonProtocol(options =>
-    {
-        options.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-    })
-    .AddHubOptions<ReportPageHub>(options => { options.AddFilter<HubExceptionHandlerFilter>(); });
+    var builder = WebApplication.CreateBuilder(args);
 
-// разрешаем cors для локального тестирования
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsPolicy", policy =>
+
+    builder.Configuration
+        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+        .AddEnvironmentVariables()
+        .AddCommandLine(args);
+
+    var externalPath = Path.Combine(AppContext.BaseDirectory, "external_settings.json");
+    if (File.Exists(externalPath))
     {
-        policy.SetIsOriginAllowed(_ => true) // Разрешает все Origins, но с `AllowCredentials()`
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials(); // Разрешаем куки и WebSockets
+        builder.Configuration.AddJsonFile(externalPath, optional: false, reloadOnChange: true);
+    }
+    else
+    {
+        Console.WriteLine("File external_settings.json not found");
+    }
+
+    builder.Host.UseSerilog((ctx, lc) =>
+        lc.ReadFrom.Configuration(ctx.Configuration)); 
+
+    builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
+    builder.Services.AddSignalR(options =>
+        {
+            options.EnableDetailedErrors = true; // Показывать ошибки в логе
+            options.KeepAliveInterval = TimeSpan.FromSeconds(15); // Пинг каждые 15 сек
+            options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // Клиент ждёт 60 сек перед разрывом
+        })
+        .AddJsonProtocol(options =>
+        {
+            options.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        })
+        .AddHubOptions<ReportPageHub>(options => { options.AddFilter<HubExceptionHandlerFilter>(); });
+
+    // разрешаем cors для локального тестирования
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("CorsPolicy", policy =>
+        {
+            policy.SetIsOriginAllowed(_ => true) // Разрешает все Origins, но с `AllowCredentials()`
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials(); // Разрешаем куки и WebSockets
+        });
     });
-});
 
-builder.Services.Configure<FileStorageOptions>(
-    builder.Configuration.GetSection(nameof(FileStorageOptions)));
-builder.Services.Configure<AuthHeadersOptions>(
-    builder.Configuration.GetSection("ExternalSettings:Authentication"));
+    builder.Services.Configure<FileStorageOptions>(
+        builder.Configuration.GetSection(nameof(FileStorageOptions)));
+    builder.Services.Configure<AuthHeadersOptions>(
+        builder.Configuration.GetSection("ExternalSettings:Authentication"));
 
-builder.Services.AddAutoMapper(typeof(Bugget.Entities.MappingProfiles.BugMappingProfile).Assembly);
+    builder.Services.AddAutoMapper(typeof(Bugget.Entities.MappingProfiles.BugMappingProfile).Assembly);
 
-builder.Services.AddExternalClients();
+    builder.Services.AddExternalClients();
 
-builder.Services
-    .AddSingleton<ReportsService>()
-    .AddSingleton<BugsService>()
-    .AddSingleton<BugsEventsService>()
-    .AddSingleton<AttachmentObsoleteService>()
-    .AddSingleton<ReportEventsService>()
-    .AddSingleton<ReportAutoStatusService>()
-    .AddSingleton<ParticipantsService>()
-    .AddSingleton<AttachmentOptimizator>()
-    .AddSingleton<AttachmentService>()
-    .AddSingleton<AttachmentEventsService>()
-    .AddSingleton<ImageOptimizeWriter>()
-    .AddSingleton<TextOptimizeWriter>()
-    .AddSingleton<AttachmentOptimizator>()
-    .AddSingleton<IAttachmentKeyGenerator,LocalAttachmentKeyGenerator>()
-    .AddSingleton<CommentsObsoleteService>()
-    .AddSingleton<CommentsService>()
-    .AddSingleton<CommentEventsService>()
-    .AddSingleton<LimitsService>();
+    builder.Services
+        .AddSingleton<ReportsService>()
+        .AddSingleton<BugsService>()
+        .AddSingleton<BugsEventsService>()
+        .AddSingleton<AttachmentObsoleteService>()
+        .AddSingleton<ReportEventsService>()
+        .AddSingleton<ReportAutoStatusService>()
+        .AddSingleton<ParticipantsService>()
+        .AddSingleton<AttachmentOptimizator>()
+        .AddSingleton<AttachmentService>()
+        .AddSingleton<AttachmentEventsService>()
+        .AddSingleton<ImageOptimizeWriter>()
+        .AddSingleton<TextOptimizeWriter>()
+        .AddSingleton<AttachmentOptimizator>()
+        .AddSingleton<IAttachmentKeyGenerator, LocalAttachmentKeyGenerator>()
+        .AddSingleton<CommentsObsoleteService>()
+        .AddSingleton<CommentsService>()
+        .AddSingleton<CommentEventsService>()
+        .AddSingleton<LimitsService>();
 
-builder.Services
-    .AddSingleton<ReportsDbClient>()
-    .AddSingleton<CommentsObsoleteDbClient>()
-    .AddSingleton<CommentsDbClient>()
-    .AddSingleton<BugsDbClient>()
-    .AddSingleton<AttachmentObsoleteDbClient>()
-    .AddSingleton<AttachmentDbClient>()
-    .AddSingleton<EmployeesFileClient>()
-    .AddSingleton<TeamsFileClient>()
-    .AddSingleton<ParticipantsDbClient>()
-    .AddSingleton<IEmployeesClient>((sp) => sp.GetRequiredService<EmployeesFileClient>())
-    .AddSingleton<ITeamsClient>((sp) => sp.GetRequiredService<TeamsFileClient>())
-    .AddSingleton<IFileStorageClient,LocalFileStorageClient>();
+    builder.Services
+        .AddSingleton<ReportsDbClient>()
+        .AddSingleton<CommentsObsoleteDbClient>()
+        .AddSingleton<CommentsDbClient>()
+        .AddSingleton<BugsDbClient>()
+        .AddSingleton<AttachmentObsoleteDbClient>()
+        .AddSingleton<AttachmentDbClient>()
+        .AddSingleton<EmployeesFileClient>()
+        .AddSingleton<TeamsFileClient>()
+        .AddSingleton<ParticipantsDbClient>()
+        .AddSingleton<IEmployeesClient>((sp) => sp.GetRequiredService<EmployeesFileClient>())
+        .AddSingleton<ITeamsClient>((sp) => sp.GetRequiredService<TeamsFileClient>())
+        .AddSingleton<IFileStorageClient, LocalFileStorageClient>();
 
-builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesFileClient>());
-builder.Services.AddHostedService((sp) => sp.GetRequiredService<TeamsFileClient>());
+    builder.Services.AddHostedService((sp) => sp.GetRequiredService<EmployeesFileClient>());
+    builder.Services.AddHostedService((sp) => sp.GetRequiredService<TeamsFileClient>());
 
-builder.Services.AddHealthChecks();
-builder.Services.AddAuthHeaders();
-builder.Services.AddSingleton<ITaskQueue, TaskQueue.TaskQueue>()
-    .AddHostedService(provider => (TaskQueue.TaskQueue)provider.GetRequiredService<ITaskQueue>());
+    builder.Services.AddHealthChecks();
+    builder.Services.AddAuthHeaders();
+    builder.Services.AddSingleton<ITaskQueue, TaskQueue.TaskQueue>()
+        .AddHostedService(provider => (TaskQueue.TaskQueue)provider.GetRequiredService<ITaskQueue>());
 
-builder.Services.AddSwaggerConfiguration(builder.Configuration);
+    builder.Services.AddSwaggerConfiguration(builder.Configuration);
 
-builder.Services.AddSingleton<ResultExceptionHandlerMiddleware>();
+    builder.Services.AddSingleton<ResultExceptionHandlerMiddleware>();
 
-builder.Services.AddControllers((options) =>
+    builder.Services.AddControllers((options) =>
+    {
+        var policy = new AuthorizationPolicyBuilder()
+            .AddAuthenticationSchemes(AuthSchemeNames.Headers)
+            .RequireAuthenticatedUser()
+            .Build();
+
+        options.Filters.Add(new AuthorizeFilter(policy));
+    })
+    .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = SnakeCaseNamingPolicy.Instance; })
+        .ConfigureApiBehaviorOptions(o =>
+            o.InvalidModelStateResponseFactory = _ => new ModelStateInvalidHandler());
+
+    builder.Services.AddSingleton<IReportPageHubClient, ReportPageHubClient>();
+
+    builder.Services.AddOpenTelemetry()
+        .WithMetrics(metrics => metrics
+            .AddRuntimeInstrumentation()
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddPrometheusExporter());
+
+    #region заклинания
+    // для маппинга snake_case в c# типы средствами dapper
+    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+    // настройка image sharp
+    Configuration.Default.MaxDegreeOfParallelism = Environment.ProcessorCount; // multi-threaded encode
+    Configuration.Default.PreferContiguousImageBuffers = true; // меньше аллокаций в обработке
+    #endregion
+
+    var app = builder.Build();
+
+    app.UseSwaggerConfiguration();
+    app.UseSerilogRequestLogging();
+
+    app.MapHealthChecks("/_internal/ping");
+    app.UseOpenTelemetryPrometheusScrapingEndpoint();
+    app.MapControllers();
+
+    app.UseCors("CorsPolicy");
+
+    app.UseMiddleware<ResultExceptionHandlerMiddleware>();
+
+    app.MapHub<ReportPageHub>("/v1/report-page-hub"); // Подключаем хаб
+
+    app.Run();
+
+}
+catch (Exception ex)
 {
-    var policy = new AuthorizationPolicyBuilder()
-        .AddAuthenticationSchemes(AuthSchemeNames.Headers)
-        .RequireAuthenticatedUser()
-        .Build();
-
-    options.Filters.Add(new AuthorizeFilter(policy));
-})
-.AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = SnakeCaseNamingPolicy.Instance; })
-    .ConfigureApiBehaviorOptions(o =>
-        o.InvalidModelStateResponseFactory = _ => new ModelStateInvalidHandler());
-
-builder.Services.AddSingleton<IReportPageHubClient, ReportPageHubClient>();
-
-#region заклинания
-// для маппинга snake_case в c# типы средствами dapper
-Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-// настройка image sharp
-Configuration.Default.MaxDegreeOfParallelism = Environment.ProcessorCount; // multi-threaded encode
-Configuration.Default.PreferContiguousImageBuffers = true; // меньше аллокаций в обработке
-#endregion
-
-var app = builder.Build();
-
-app.UseSwaggerConfiguration();
-
-// регистрируем до авторизации
-app.MapHealthChecks("/_internal/ping");
-
-app.MapControllers();
-
-app.UseCors("CorsPolicy");
-
-app.UseMiddleware<ResultExceptionHandlerMiddleware>();
-
-app.MapHub<ReportPageHub>("/v1/report-page-hub"); // Подключаем хаб
-
-app.Run();
+    Log.Fatal(ex, "Fatal host error");
+}
+finally
+{
+    await Log.CloseAndFlushAsync();
+}
 
 
 public class SnakeCaseNamingPolicy : JsonNamingPolicy
