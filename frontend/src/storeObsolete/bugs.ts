@@ -1,8 +1,8 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { createBugFx } from "./newBug";
 import { $initialReportForm, clearReport } from "./report";
-import { updateBugApi } from "@/api/reports/bug";
-import { Bug, UpdateBugParameters } from "@/types/bug";
+import { updateBugApi } from "@/apiObsolete/reports/bug";
+import { Bug, UpdateBugParameters } from "@/typesObsolete/bug";
 import { RequestStates } from "@/const";
 
 type UpdateBugParams = {

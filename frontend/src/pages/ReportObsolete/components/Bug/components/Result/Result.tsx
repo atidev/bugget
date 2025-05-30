@@ -1,4 +1,4 @@
-import { Attachment } from "@/types/attachement";
+import { Attachment } from "@/typesObsolete/attachement";
 import { ChangeEvent, Ref, useRef, ClipboardEvent } from "react";
 import ImageCarousel from "./components/ImageCarousel/ImageCarousel";
 

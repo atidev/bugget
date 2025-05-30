@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useStoreMap } from "effector-react";
-import { addCommentFx, $commentsByBugId } from "@/store/comments";
+import { addCommentFx, $commentsByBugId } from "@/storeObsolete/comments";
 import { SendHorizonal } from "lucide-react";
 
 type BugChatProps = {

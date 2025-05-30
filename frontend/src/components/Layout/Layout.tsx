@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useUnit } from "effector-react";
-import { $breadcrumbs } from "../../store/breadcrumbs";
+import { $breadcrumbs } from "../../storeObsolete/breadcrumbs";
 import Sidebar from "../Sidebar/Sidebar";
 import Header from "../Header/Header";
 

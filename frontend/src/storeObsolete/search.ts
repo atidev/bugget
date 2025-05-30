@@ -1,9 +1,8 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
-import { searchReports } from "@/api/reports/search";
-import { SearchResponse, SearchRequestQueryParams } from "@/api/reports/models";
+import { searchReports } from "@/apiObsolete/reports/search";
+import { SearchResponse, SearchRequestQueryParams, User } from "@/apiObsolete/reports/models";
 import { $user } from "@/store/user";
-import { User } from "@/types/user";
-import { Team } from "@/types/team";
+import { Team } from "@/typesObsolete/team";
 
 export const searchFx = createEffect(
   async (params: SearchRequestQueryParams) => {

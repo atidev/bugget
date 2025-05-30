@@ -1,13 +1,18 @@
-import { createStore, createEffect } from "effector";
-import { fetchAuth } from "@/api/auth";
-import { AuthUser } from "@/types/user";
+import { User } from "@/types/user";
+import { createEffect, createStore, combine } from "effector";
+import { getAuth } from "@/api/auth";
 
 export const authFx = createEffect(async () => {
-  const data = await fetchAuth();
-  return data;
+    return await getAuth();
 });
 
-export const $user = createStore<AuthUser | null>(null).on(
-  authFx.doneData,
-  (_, user) => user
+export const $user = createStore<User>({} as User).on(
+    authFx.doneData,
+    (_, user) => user
 );
+
+// Безопасный доступ к данным пользователя
+export const $userData = combine({
+    userId: $user.map(user => user.id || ""),
+    isUserLoaded: $user.map(user => Boolean(user.id))
+});

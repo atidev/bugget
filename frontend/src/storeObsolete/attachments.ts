@@ -1,8 +1,8 @@
 import { createEffect, createStore } from "effector";
-import { uploadAttachmentApi } from "@/api/reports/attachment";
+import { uploadAttachmentApi } from "@/apiObsolete/reports/attachment";
 import { $initialReportForm } from "./report";
-import { Attachment } from "@/types/attachement";
-import { Bug } from "@/types/bug";
+import { Attachment } from "@/typesObsolete/attachement";
+import { Bug } from "@/typesObsolete/bug";
 
 export const uploadAttachmentFx = createEffect(async (params: Attachment) => {
   if (!params.file) return;

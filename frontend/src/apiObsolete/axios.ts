@@ -1,5 +1,4 @@
 import axios from "axios";
-import { $connection } from "@/store/socket";
 
 import {
   convertObjectToCamel,
@@ -42,10 +41,6 @@ instance.interceptors.request.use((config) => {
   if (config.headers["Content-Type"] === "multipart/form-data") return config;
   if (config.data) {
     config.data = convertObjectToSnake(config.data);
-  }
-  const connection = $connection.getState();
-  if (connection?.connectionId) {
-    config.headers["X-Signal-R-Conntection-Id"] = connection.connectionId;
   }
   return config;
 });

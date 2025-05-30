@@ -141,14 +141,15 @@ public static class ReportMapper
         };
     }
 
-    public static PatchReportSocketView ToSocketView(this ReportPatchDto patchDto, ReportPatchResultDbModel? result)
+    public static PatchReportSocketView ToSocketView(this ReportPatchDto patchDto, ReportPatchResultDbModel result)
     {
         return new PatchReportSocketView
         {
             Title = patchDto.Title,
             Status = patchDto.Status,
             ResponsibleUserId = patchDto.ResponsibleUserId,
-            PastResponsibleUserId = patchDto.ResponsibleUserId == null ? null : result?.PastResponsibleUserId
+            PastResponsibleUserId = patchDto.ResponsibleUserId == null ? null : result.PastResponsibleUserId,
+            UpdatedAt = result.UpdatedAt
         };
     }
 }

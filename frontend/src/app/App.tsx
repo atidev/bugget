@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "@/components/Layout/Layout";
 import Home from "@/pages/Home/Home";
-import Reports from "@/pages/Report/Report";
+import Reports from "@/pages/ReportObsolete/Report";
+import NewReports from "@/pages/Report/Report";
 
 import "../styles/tailwind.css";
 import { useEffect } from "react";
@@ -19,6 +20,8 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/new-reports" element={<NewReports />} />
+          <Route path="/new-reports/:reportId" element={<NewReports />} />
           <Route path="/reports/:reportId" element={<Reports />} />
           <Route path="/search" element={<Search />} />
         </Routes>

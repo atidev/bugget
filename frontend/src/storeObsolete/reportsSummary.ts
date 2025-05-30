@@ -1,7 +1,7 @@
 import { createEffect, createStore, sample } from "effector";
-import { fetchReportsSummary } from "@/api/reports";
-import { $user } from "./user";
-import { Report } from "@/types/report";
+import { fetchReportsSummary } from "@/apiObsolete/reports";
+import { $user } from "@/store/user";
+import { Report } from "@/typesObsolete/report";
 
 export const loadReportsFx = createEffect(async () => {
   const data = await fetchReportsSummary();

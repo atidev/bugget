@@ -3,24 +3,24 @@ import {
   $newBugStore,
   updateNewBug,
   createBugEventByApi,
-} from "@/store/newBug";
+} from "@/storeObsolete/newBug";
 import {
   $bugsByBugId,
   updateBugEvent,
   resetBug,
   updateBugApiEvent,
   $bugRequestState,
-} from "@/store/bugs";
-import { $reportRequestState } from "@/store/report";
-import { $attachmentsByBugId } from "@/store/attachments";
+} from "@/storeObsolete/bugs";
+import { $reportRequestState } from "@/storeObsolete/report";
+import { $attachmentsByBugId } from "@/storeObsolete/attachments";
 import "./Bug.css";
 import CancelButton from "@/components/CancelButton/CancelButton";
 import SaveButton from "@/components/SaveButton/SaveButton";
 import Dropdown from "@/components/Dropdown/Dropdown";
 import { AttachmentTypes, BugStatuses, RequestStates } from "@/const";
 import Chat from "./components/Chat/Chat";
-import { uploadAttachmentFx } from "@/store/attachments";
-import { Bug as BugType } from "@/types/bug";
+import { uploadAttachmentFx } from "@/storeObsolete/attachments";
+import { Bug as BugType } from "@/typesObsolete/bug";
 import Result from "./components/Result/Result";
 import { ChangeEvent, useEffect, useRef } from "react";
 import Heading from "./components/Heading/Heading";
@@ -61,7 +61,7 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
         ? state[id]
         : {
             id: bugId,
-            status: Number(BugStatuses.IN_PROGRESS),
+            status: Number(BugStatuses.ACTIVE),
             reportId,
             receive: "",
             expect: "",
@@ -139,10 +139,10 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
 
   // todo: move to derived stores
   const receivedFiles = attachments?.filter(
-    (item) => item.attachType === AttachmentTypes.RECEIVED_RESULT
+    (item) => item.attachType === AttachmentTypes.FACT
   );
   const expectedFiles = attachments?.filter(
-    (item) => item.attachType === AttachmentTypes.EXPECTED_RESULT
+    (item) => item.attachType === AttachmentTypes.EXPECT
   );
 
   const handleSave = () => {
@@ -172,7 +172,7 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
   return (
     <div
       className={`card card-border grid grid-cols-2 gap-2 p-4 mb-3 shadow-lg border-gray-300 ${
-        bug.status === Number(BugStatuses.READY) ? "border-success" : ""
+        bug.status === Number(BugStatuses.ARCHIVED) ? "border-success" : ""
       }`}
     >
       <div className="flex items-center justify-between col-span-2">
@@ -193,8 +193,8 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
             }}
             value={bug.status}
             options={[
-              { label: "Исправлен", value: BugStatuses.READY },
-              { label: "Открыт", value: BugStatuses.IN_PROGRESS },
+              { label: "Исправлен", value: BugStatuses.ARCHIVED },
+              { label: "Открыт", value: BugStatuses.ACTIVE },
             ]}
           />
         )}
@@ -208,7 +208,7 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
         onChange={(event) => handleResultUpdate(event, "receive")}
         files={receivedFiles}
         onFileChange={(event) =>
-          handleFileChange(event, AttachmentTypes.RECEIVED_RESULT)
+          handleFileChange(event, AttachmentTypes.FACT)
         }
         withAttachments={!isNewBug}
         textareaRef={receivedTextareaRef}
@@ -219,7 +219,7 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
         onChange={(event) => handleResultUpdate(event, "expect")}
         files={expectedFiles}
         onFileChange={(event) =>
-          handleFileChange(event, AttachmentTypes.EXPECTED_RESULT)
+          handleFileChange(event, AttachmentTypes.EXPECT)
         }
         withAttachments={!isNewBug}
         textareaRef={expectedTextareaRef}
