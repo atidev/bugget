@@ -56,8 +56,7 @@ export const $titleStore = createStore<string>("")
 
 export const $statusStore = createStore<ReportStatuses>(ReportStatuses.BACKLOG)
     .on(getReportFx.doneData, (_, report) => report.status)
-    .on(patchReportSocketEvent, (state, report) => report.status ?? state)
-    .on(changeStatusEvent, (_, status) => status);
+    .on(patchReportSocketEvent, (state, report) => report.status ?? state);
 
 export const $responsibleUserIdStore = createStore<string>("")
     .on(getReportFx.doneData, (_, report) => report.responsibleUserId)
@@ -133,16 +132,16 @@ sample({
 
 sample({
     clock: changeStatusEvent,
-    source: {
-        id: $reportIdStore,
-        status: $statusStore
-    },
-    filter: ({ id }) => id !== null,
-    fn: ({ id, status }) => {
-        if (!id) throw new Error("Initial report not found");
-        patchReportFx({
-            id,
-            patchRequest: { status }
-        });
-    }
+    source: $reportIdStore,
+    filter: (id): id is number => id !== null,
+    fn: (id, status) => ({
+        id: id!,
+        patchRequest: { status },
+    }),
+    target: patchReportFx,
+});
+
+sample({
+    clock: changeStatusEvent,
+    target: $statusStore
 });
