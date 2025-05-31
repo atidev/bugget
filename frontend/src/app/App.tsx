@@ -1,13 +1,13 @@
+import "@/store/index";
+import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "@/components/Layout/Layout";
 import Home from "@/pages/Home/Home";
 import Reports from "@/pages/ReportObsolete/Report";
 import NewReports from "@/pages/Report/Report";
-
-import "../styles/tailwind.css";
-import { useEffect } from "react";
-import { authFx } from "../store/user";
 import Search from "@/pages/Search/Search";
+import { authFx } from "@/store/user";
+import "@/styles/tailwind.css";
 
 const App = () => {
   useEffect(() => {

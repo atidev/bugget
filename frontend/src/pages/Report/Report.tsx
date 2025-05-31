@@ -14,7 +14,7 @@ import {
     saveTitleEvent,
     changeStatusEvent,
     changeResponsibleUserIdEvent,
-    getReportFx
+    updateReportPathIdEvent
 } from "@/store/report";
 import { SocketEvent } from "@/webSocketApi/models";
 import { useUnit } from "effector-react";
@@ -37,12 +37,17 @@ const ReportPage = () => {
         patchReportSocketEvent(patch)
     );
 
+    // состояние страницы
     useEffect(() => {
         if (reportId) {
-            getReportFx(parseInt(reportId));
+            updateReportPathIdEvent(parseInt(reportId));
+        }
+        else {
+            updateReportPathIdEvent(null);
         }
     }, [reportId]);
 
+    // редирект после создания репорта
     useEffect(() => {
         if (!reportId && initialReport?.id) {
             navigate(`/new-reports/${initialReport.id}`);
