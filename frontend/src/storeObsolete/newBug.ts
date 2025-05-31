@@ -1,8 +1,8 @@
 import { createStore, createEvent, createEffect, sample } from "effector";
-import { createBugApi } from "@/api/reports/bug";
+import { createBugApi } from "@/apiObsolete/reports/bug";
 import { createReportFx, clearReport } from "./report";
-import { BugCreateRequest } from "@/api/reports/models";
-import { NewBug } from "@/types/bug";
+import { BugCreateRequest } from "@/apiObsolete/reports/models";
+import { NewBug } from "@/typesObsolete/bug";
 
 export const createBugFx = createEffect(
   ({ reportId, bug }: { reportId: number; bug: BugCreateRequest }) => {

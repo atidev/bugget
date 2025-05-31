@@ -1,5 +1,5 @@
-import { employeesAutocomplete } from "@/api/employees";
-import { teamsAutocomplete } from "@/api/teams";
+import { employeesAutocomplete } from "@/apiObsolete/employees";
+import { teamsAutocomplete } from "@/apiObsolete/teams";
 import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Dropdown from "@/components/Dropdown/Dropdown";
 import {
@@ -9,9 +9,9 @@ import {
   updateUserFilter,
   $teamFilter,
   updateTeamFilter,
-} from "@/store/search";
+} from "@/storeObsolete/search";
 import { User } from "@/types/user";
-import { Team } from "@/types/team";
+import { Team } from "@/typesObsolete/team";
 import { useUnit } from "effector-react";
 
 const autocompleteUsers = async (searchString: string) => {

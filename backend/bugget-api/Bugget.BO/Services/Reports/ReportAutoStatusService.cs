@@ -18,6 +18,7 @@ public class ReportAutoStatusService(ReportsDbClient reportsDbClient, IReportPag
             await reportPageHubClient.SendReportPatchAsync(reportId, new PatchReportSocketView
             {
                 Status = (int)ReportStatus.InProgress,
+                UpdatedAt = result.UpdatedAt
             }, null);
         }
     }

@@ -1,13 +1,16 @@
-import { StatusMeta } from "@/types/status";
+import { StatusMeta } from "@/typesObsolete/status";
 
 export enum BugStatuses {
-  IN_PROGRESS = 0,
-  READY = 1,
+  ACTIVE = 0,
+  ARCHIVED = 1,
+  REJECTED = 2,
 }
 
 export enum ReportStatuses {
-  IN_PROGRESS = 0,
-  READY = 1,
+  BACKLOG = 0,
+  RESOLVED = 1,
+  IN_PROGRESS = 2,
+  REJECTED = 3,
 }
 
 export enum RequestStates {
@@ -18,8 +21,9 @@ export enum RequestStates {
 }
 
 export enum AttachmentTypes {
-  RECEIVED_RESULT = 0,
-  EXPECTED_RESULT = 1,
+  FACT = 0,
+  EXPECT = 1,
+  COMMENT = 2,
 }
 
 export const reportStatusMap: Record<number, StatusMeta> = {

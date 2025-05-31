@@ -8,7 +8,7 @@ import {
   $reportRequestState,
   updateStatus,
   updateReportEvent,
-} from "@/store/report";
+} from "@/storeObsolete/report";
 import "./ReportHeader.css";
 import CancelButton from "@/components/CancelButton/CancelButton";
 import SaveButton from "@/components/SaveButton/SaveButton";
@@ -16,7 +16,7 @@ import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Avatar from "@/components/Avatar/Avatar";
 import { ReportStatuses, RequestStates } from "@/const";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import { employeesAutocomplete } from "@/api/employees";
+import { employeesAutocomplete } from "@/apiObsolete/employees";
 import { User } from "@/types/user";
 import ParticipantsSkeleton from "./components/ParticipantsSkeleton";
 
@@ -56,7 +56,7 @@ const ReportHeader = ({ isNewReport }: { isNewReport: boolean }) => {
   return (
     <div
       className={`report-header p-4 mb-3 card card-border shadow-lg border-gray-300 gap-2 ${
-        reportForm.status === Number(ReportStatuses.READY) &&
+        reportForm.status === Number(ReportStatuses.RESOLVED) &&
         reportRequestState === RequestStates.DONE
           ? "border-success"
           : ""
@@ -86,8 +86,8 @@ const ReportHeader = ({ isNewReport }: { isNewReport: boolean }) => {
               setUpdateStatus(Number(selected));
             }}
             options={[
-              { label: "Решён", value: ReportStatuses.READY },
-              { label: "В работе", value: ReportStatuses.IN_PROGRESS },
+              { label: "Решён", value: ReportStatuses.RESOLVED },
+              { label: "В работе", value: ReportStatuses.BACKLOG },
             ]}
           />
         )}

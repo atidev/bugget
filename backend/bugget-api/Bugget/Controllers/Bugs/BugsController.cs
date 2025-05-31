@@ -18,11 +18,11 @@ public sealed class BugsController(BugsService bugsService) : ApiController
     /// </summary>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(typeof(BugSummaryDbModel), 200)]
+    [ProducesResponseType(typeof(BugSummaryDbModel), 201)]
     public Task<IActionResult> CreateBugAsync([FromRoute] int reportId, [FromBody] BugDto createDto)
     {
         var user = User.GetIdentity();
-        return bugsService.CreateBugAsync(user, reportId, createDto).AsActionResultAsync();
+        return bugsService.CreateBugAsync(user, reportId, createDto).AsActionResultAsync(201);
     }
 
     /// <summary>

@@ -1,11 +1,12 @@
-import axios from "../axios";
+import axios from "@/api/axios";
+import { User } from "@/types/user";
 
-export const fetchAuth = async () => {
+export const getAuth = async (): Promise<User> => {
   try {
     const { data } = await axios.get(`/v1/auth`);
     return data;
   } catch (error) {
     console.error(error);
-    return null;
+    throw error;
   }
 };

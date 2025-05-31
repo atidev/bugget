@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
 import { useState, useMemo } from "react";
-import { updateQuery } from "@/store/search";
+import { updateQuery } from "@/storeObsolete/search";
 import { debounce } from "throttle-debounce";
 
 const SearchInput = () => {

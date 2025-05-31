@@ -4,7 +4,7 @@ import {
   loadReportsFx,
   $responsibleReports,
   $participantReports,
-} from "@/store/reportsSummary";
+} from "@/storeObsolete/reportsSummary";
 import Section from "./components/Section/Section";
 import "./Home.css";
 

@@ -1,5 +1,5 @@
 import { bugStatusMap, reportStatusMap } from "@/const";
-import { StatusMeta } from "@/types/status";
+import { StatusMeta } from "@/typesObsolete/status";
 
 type EntityType = "bug" | "report";
 
