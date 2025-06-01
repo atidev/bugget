@@ -4,16 +4,14 @@ import {
     $creatorUserIdStore,
     $pastResponsibleUserIdStore,
     $responsibleUserIdStore,
-    $reportPathStore
+    $reportPathStore,
+    $reportIdStore
 } from "./report";
+import { initSocketFx } from "./socket";
 
 const $src = combine({ user: $user, reportPath: $reportPathStore });
 
-/**
- * Когда И (!) $isCreateMode === true
- *            user.id !== undefined
- * передаём user.id сразу в три стора-назначения
- */
+// заполнение сторов при открытии страницы создания репорта
 sample({
   source: $src,
   filter: ({ reportPath, user }) => reportPath === null && user.id !== undefined,
@@ -24,3 +22,10 @@ sample({
     $pastResponsibleUserIdStore,
   ],
 });
+
+// автоинициализация сокета при появлении репорта
+sample({
+    clock: $reportIdStore,
+    filter: (id): id is number => id !== null,
+    target: initSocketFx,
+  });

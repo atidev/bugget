@@ -73,7 +73,10 @@ export const $updatedAtStore = createStore<string>(new Date().toISOString())
     .on(getReportFx.doneData, (_, report) => report.updatedAt)
     .on(createReportFx.doneData, (_, report) => report.updatedAt)
     .on(patchReportFx.doneData, (_, report) => report.updatedAt)
-    .on(patchReportSocketEvent, (state, report) => report.updatedAt);
+    .on(patchReportSocketEvent, (_, report) => {
+        console.log("🔄 [Report] Updated at:", report.updatedAt);
+        return report.updatedAt;
+    });
 
 export const $reportIdStore = createStore<number | null>(null)
     .on($initialReportStore, (_, report) => report?.id ?? null);
