@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { SocketEvent, SocketPayload } from "@/types/socket";
+import { SocketEvent, SocketPayload } from "@/webSocketApi/models";
 import { socketEventReceived } from "@/store/socket";
 
 /**

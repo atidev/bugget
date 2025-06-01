@@ -16,7 +16,7 @@ import {
     changeResponsibleUserIdEvent,
     updateReportPathIdEvent
 } from "@/store/report";
-import { SocketEvent } from "@/types/socket";
+import { SocketEvent } from "@/webSocketApi/models";
 import { useUnit } from "effector-react";
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";

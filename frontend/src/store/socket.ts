@@ -1,7 +1,7 @@
 import { createDomain } from "effector";
 import { buildConnection, startConnection } from "@/webSocketApi";
 import { HubConnection } from "@microsoft/signalr";
-import { SocketEvent, SocketPayload } from "@/types/socket";
+import { SocketEvent, SocketPayload } from "@/webSocketApi/models";
 
 type ConnectionReady = HubConnection & { started: true };
 
