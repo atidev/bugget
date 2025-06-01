@@ -4,7 +4,7 @@ import { ReportStatuses } from "@/const";
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { ReportPatchSocketResponse } from "@/webSocketApi/models";
 
-// эффекты
+//// эффекты
 export const getReportFx = createEffect<number, ReportResponse>(async (id) => {
     return await getReport(id);
 });
@@ -18,7 +18,7 @@ export const patchReportFx = createEffect<{ id: number, patchRequest: PatchRepor
         return await patchReport(id, patchRequest);
     });
 
-// события
+//// события
 export const changeTitleEvent = createEvent<string>();
 export const saveTitleEvent = createEvent<void>();
 export const changeStatusEvent = createEvent<ReportStatuses>();
@@ -28,7 +28,7 @@ export const updateResponsibleUserIdEvent = createEvent<string>();
 export const updateCreatorUserIdEvent = createEvent<string>();
 export const updateReportPathIdEvent = createEvent<number | null>();
 
-// сторы
+//// сторы
 export const $reportPathStore = createStore<number | null>(null)
     .on(updateReportPathIdEvent, (_, reportPath) => reportPath);
 
@@ -60,8 +60,7 @@ export const $statusStore = createStore<ReportStatuses>(ReportStatuses.BACKLOG)
 
 export const $responsibleUserIdStore = createStore<string>("")
     .on(getReportFx.doneData, (_, report) => report.responsibleUserId)
-    .on(patchReportSocketEvent, (state, report) => report.responsibleUserId ?? state)
-    .on(updateResponsibleUserIdEvent, (_, responsibleUserId) => responsibleUserId);
+    .on(patchReportSocketEvent, (state, report) => report.responsibleUserId ?? state);
 
 export const $creatorUserIdStore = createStore<string>("")
     .on(getReportFx.doneData, (_, report) => report.creatorUserId);
@@ -79,7 +78,7 @@ export const $updatedAtStore = createStore<string>(new Date().toISOString())
 export const $reportIdStore = createStore<number | null>(null)
     .on($initialReportStore, (_, report) => report?.id ?? null);
 
-// связи
+//// связи
 // загрузка открытого репорта
 sample({
     clock: updateReportPathIdEvent,
@@ -106,28 +105,12 @@ sample({
         id: $reportIdStore,
         title: $titleStore
     },
-    filter: ({ id }) => id !== null,
+    filter: ({ id }) => id !== null && $initialReportStore.getState()?.title !== $titleStore.getState(),
     fn: ({ id, title }) => ({
         id: id!,
         patchRequest: { title }
     }),
     target: patchReportFx
-});
-
-sample({
-    clock: changeResponsibleUserIdEvent,
-    source: {
-        id: $reportIdStore,
-        responsibleUserId: $responsibleUserIdStore
-    },
-    filter: ({ id }) => id !== null,
-    fn: ({ id, responsibleUserId }) => {
-        if (!id) throw new Error("Initial report not found");
-        patchReportFx({
-            id,
-            patchRequest: { responsibleUserId }
-        });
-    }
 });
 
 sample({
@@ -144,4 +127,20 @@ sample({
 sample({
     clock: changeStatusEvent,
     target: $statusStore
+});
+
+sample({
+    clock: changeResponsibleUserIdEvent,
+    source: $reportIdStore,
+    filter: (id): id is number => id !== null,
+    fn: (id, responsibleUserId) => ({
+        id: id!,
+        patchRequest: { responsibleUserId },
+    }),
+    target: patchReportFx,
+});
+
+sample({
+    clock: changeResponsibleUserIdEvent,
+    target: $responsibleUserIdStore
 });
