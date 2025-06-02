@@ -84,6 +84,10 @@ export const $creatorUserIdStore = createStore<string>("").on(
 export const $pastResponsibleUserIdStore = createStore<string>("")
   .on(getReportFx.doneData, (_, report) => report.pastResponsibleUserId)
   .on(
+    patchReportFx.doneData,
+    (state, report) => report.pastResponsibleUserId ?? state
+  )
+  .on(
     patchReportSocketEvent,
     (state, report) => report.pastResponsibleUserId ?? state
   );
