@@ -1,5 +1,5 @@
 import { AttachmentTypes } from "@/const";
-import { AttachmentView } from "./models";
+import { AttachmentResponse } from "./models";
 import axios from "../axios";
 
 export const createBugAttachment = async (
@@ -7,10 +7,10 @@ export const createBugAttachment = async (
   bugId: number,
   file: File,
   attachType: AttachmentTypes
-): Promise<AttachmentView> => {
+): Promise<AttachmentResponse> => {
   const formData = new FormData();
   formData.append("file", file);
-  const { data } = await axios.post<AttachmentView>(
+  const { data } = await axios.post<AttachmentResponse>(
     `/v2/reports/${reportId}/bugs/${bugId}/attachments?attachType=${attachType}`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } }
@@ -33,10 +33,10 @@ export const createCommentAttachment = async (
   bugId: number,
   commentId: number,
   file: File
-): Promise<AttachmentView> => {
+): Promise<AttachmentResponse> => {
   const formData = new FormData();
   formData.append("file", file);
-  const { data } = await axios.post<AttachmentView>(
+  const { data } = await axios.post<AttachmentResponse>(
     `/v2/reports/${reportId}/bugs/${bugId}/comments/${commentId}/attachments`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } }

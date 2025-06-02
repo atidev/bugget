@@ -1,8 +1,9 @@
-export interface AttachmentView {
-    id: number;
-    fileName: string;
-    fileSize: number;
-    mimeType: string;
-    attachType: number;
-    createdAt: string;
+export interface AttachmentResponse {
+  id: number;
+  entityId: number;
+  attachType: number;
+  createdAt: string;
+  creatorUserId: string;
+  fileName: string;
+  hasPreview: boolean;
 }

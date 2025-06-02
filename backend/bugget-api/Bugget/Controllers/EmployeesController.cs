@@ -18,7 +18,7 @@ public sealed class EmployeesController(IEmployeesClient employeesClient) : ApiC
     /// Поиск сотрудников по имени
     /// </summary>
     [HttpGet("autocomplete")]
-    [ProducesResponseType(typeof(FoundedEmployeesView), 200)]
+    [ProducesResponseType(typeof(AutocompleteUsersView), 200)]
     public async Task<IActionResult> AutocompleteEmployees([FromQuery] [Required] string searchString,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 10,
@@ -35,12 +35,14 @@ public sealed class EmployeesController(IEmployeesClient employeesClient) : ApiC
             take,
             depth);
 
-        return Ok(new FoundedEmployeesView
+        return Ok(new AutocompleteUsersView
         {
-            Employees = employees.Select(e => new EmployeeView
+            Employees = employees.Select(e => new UserView
             {
                 Id = e.Id,
-                Name = e.Name
+                Name = e.Name,
+                PhotoUrl = e.PhotoUrl,
+                TeamId = e.TeamId
             }),
             Total = total
         });

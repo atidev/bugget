@@ -1,4 +1,4 @@
-import { employeesAutocomplete } from "@/apiObsolete/employees";
+import { autocompleteEmployees } from "@/api/employees";
 import { teamsAutocomplete } from "@/apiObsolete/teams";
 import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Dropdown from "@/components/Dropdown/Dropdown";
@@ -10,13 +10,13 @@ import {
   $teamFilter,
   updateTeamFilter,
 } from "@/storeObsolete/search";
-import { User } from "@/types/user";
+import { UserResponse } from "@/types/user";
 import { Team } from "@/typesObsolete/team";
 import { useUnit } from "effector-react";
 
 const autocompleteUsers = async (searchString: string) => {
-  const response = await employeesAutocomplete(searchString);
-  return (response.employees ?? []).map((employee: User) => ({
+  const response = await autocompleteEmployees(searchString);
+  return (response.employees ?? []).map((employee: UserResponse) => ({
     id: employee.id,
     display: employee.name,
   }));

@@ -1,7 +1,7 @@
 import axios from "@/api/axios";
-import { User } from "@/types/user";
+import { UserResponse } from "@/types/user";
 
-export const getAuth = async (): Promise<User> => {
+export const getAuth = async (): Promise<UserResponse> => {
   try {
     const { data } = await axios.get(`/v1/auth`);
     return data;

@@ -7,7 +7,7 @@ import {
 } from "effector";
 import { fetchReport, createReport, updateReport } from "@/apiObsolete/reports";
 import { ReportStatuses, RequestStates } from "@/const";
-import { User } from "@/types/user";
+import { UserResponse } from "@/types/user";
 import { NewReport, ReportFormUIData, Report } from "@/typesObsolete/report";
 import { ReportResponse } from "@/apiObsolete/reports/models";
 
@@ -83,7 +83,7 @@ export const resetReport = createEvent();
 
 export const updateTitle = createEvent<string>();
 export const updateStatus = createEvent<number>();
-export const updateResponsible = createEvent<User | null>();
+export const updateResponsible = createEvent<UserResponse | null>();
 export const setRequestState = createEvent<RequestStates>();
 
 export const $reportRequestState = createStore(RequestStates.IDLE);
