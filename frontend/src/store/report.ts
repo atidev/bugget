@@ -7,7 +7,7 @@ import {
 } from "@/api/reports/models";
 import { ReportStatuses } from "@/const";
 import { createEffect, createEvent, createStore, sample } from "effector";
-import { ReportPatchSocketResponse } from "@/webSocketApi/models";
+import { PatchReportSocketResponse } from "@/webSocketApi/models";
 
 //// эффекты
 export const getReportFx = createEffect<number, ReportResponse>(async (id) => {
@@ -32,7 +32,7 @@ export const changeTitleEvent = createEvent<string>();
 export const saveTitleEvent = createEvent<void>();
 export const changeStatusEvent = createEvent<ReportStatuses>();
 export const changeResponsibleUserIdEvent = createEvent<string>();
-export const patchReportSocketEvent = createEvent<ReportPatchSocketResponse>();
+export const patchReportSocketEvent = createEvent<PatchReportSocketResponse>();
 export const updateResponsibleUserIdEvent = createEvent<string>();
 export const updateCreatorUserIdEvent = createEvent<string>();
 export const updateReportPathIdEvent = createEvent<number | null>();

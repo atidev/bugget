@@ -14,38 +14,48 @@ import { $initialReportStore } from "@/store/report";
 export const useReportPageSocket = () => {
   const connection = useUnit($connection);
   const initialReport = useUnit($initialReportStore);
-  const reportIdRef = useRef<number | null>(null);
+  const currentReportId = useRef<number | null>(null);
 
+  const isConnected = connection?.state === HubConnectionState.Connected;
+
+  const join = (id: number) =>
+    joinReportFx({ conn: connection!, reportId: id }).catch(console.error);
+
+  const leave = (id: number) =>
+    leaveReportFx({ conn: connection!, reportId: id }).catch(console.error);
+
+  // Повторное присоединение после восстановления соединения
   useEffect(() => {
     if (!connection) return;
-    const unsub = connectionReconnected.watch(() => {
-      if (connection.state === HubConnectionState.Connected && reportIdRef.current) {
-        joinReportFx({ conn: connection, reportId: reportIdRef.current });
+
+    const stop = connectionReconnected.watch(() => {
+      if (isConnected && currentReportId.current != null) {
+        join(currentReportId.current);
       }
     });
-    return () => unsub();
-  }, [connection]);
 
+    return stop;
+  }, [connection, isConnected]);
+
+  // Первичное присоединение, смена репорта, отключение
   useEffect(() => {
-    if (!connection || connection.state !== HubConnectionState.Connected) return;
-    const currentId = initialReport?.id;
-    if (currentId == null) return;
+    if (!isConnected) return;
 
-    if (reportIdRef.current === currentId) return;
+    const newId = initialReport?.id ?? null;
+    if (newId === currentReportId.current) return;
 
-    if (reportIdRef.current !== null) {
-      leaveReportFx({ conn: connection, reportId: reportIdRef.current }).catch(console.error);
+    if (currentReportId.current != null) leave(currentReportId.current);
+
+    if (newId != null) {
+      currentReportId.current = newId;
+      join(newId);
     }
 
-    reportIdRef.current = currentId;
-    joinReportFx({ conn: connection, reportId: currentId }).catch(console.error);
-
-    // cleanup при размонтировании страницы
     return () => {
-      if (reportIdRef.current !== null) {
-        leaveReportFx({ conn: connection, reportId: reportIdRef.current }).catch(console.error);
-        reportIdRef.current = null;
+      if (currentReportId.current != null) {
+        leave(currentReportId.current);
+        currentReportId.current = null;
       }
     };
-  }, [connection, initialReport?.id]);
+  }, [isConnected, initialReport?.id]);
 };
