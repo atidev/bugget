@@ -20,7 +20,7 @@ import { autocompleteUsers } from "@/api/employees";
 import { UserResponse } from "@/types/user";
 import ParticipantsSkeleton from "./components/ParticipantsSkeleton";
 
-const autocompleteUsers = async (searchString: string) => {
+const autocompleteUsersHandler = async (searchString: string) => {
   const response = await autocompleteUsers(searchString);
   return (response.employees ?? []).map((employee: UserResponse) => ({
     id: employee.id,
@@ -122,7 +122,7 @@ const ReportHeader = ({ isNewReport }: { isNewReport: boolean }) => {
                   )
                 }
                 externalString={reportForm.responsible?.name || ""}
-                autocompleteFn={autocompleteUsers}
+                autocompleteFn={autocompleteUsersHandler}
               />
             )}
             <div className="participants-wrapper">

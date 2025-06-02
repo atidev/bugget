@@ -1,5 +1,5 @@
 import { Bug, NewBug } from "./bug";
-import { User } from "./user";
+import { ObsoleteUserResponse } from "./user";
 import { ReportStatuses } from "../const/index";
 
 // модель стора со всеми данными по репорту
@@ -7,12 +7,12 @@ export type Report = {
   id: number | null;
   title: string;
   status: ReportStatuses;
-  responsible: User | null;
+  responsible: ObsoleteUserResponse | null;
   responsibleId: string | null;
-  creator: User | null;
+  creator: ObsoleteUserResponse | null;
   createdAt: Date | null;
   updatedAt: Date | null;
-  participants: User[] | null;
+  participants: ObsoleteUserResponse[] | null;
   bugs: Bug[];
 };
 
@@ -30,6 +30,6 @@ export type ReportFormUIData = {
   id: number | null;
   title: string;
   status: ReportStatuses;
-  responsible: User | null;
-  participants: User[] | null;
+  responsible: ObsoleteUserResponse | null;
+  participants: ObsoleteUserResponse[] | null;
 };

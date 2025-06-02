@@ -7,7 +7,7 @@ import {
 } from "effector";
 import { fetchReport, createReport, updateReport } from "@/apiObsolete/reports";
 import { ReportStatuses, RequestStates } from "@/const";
-import { UserResponse } from "@/types/user";
+import { ObsoleteUserResponse } from "@/typesObsolete/user";
 import { NewReport, ReportFormUIData, Report } from "@/typesObsolete/report";
 import { ReportResponse } from "@/apiObsolete/reports/models";
 
@@ -28,19 +28,21 @@ const convertBackResponseToStoreModel = (reportResponse: ReportResponse) => ({
   id: reportResponse.id,
   title: reportResponse.title || "",
   status: reportResponse.status,
-  responsible: reportResponse.responsible,
-  creator: reportResponse.creator,
+  responsible: reportResponse.responsible as ObsoleteUserResponse,
+  creator: reportResponse.creator as ObsoleteUserResponse,
   createdAt: new Date(reportResponse.createdAt),
   updatedAt: new Date(reportResponse.updatedAt),
-  participants: reportResponse.participants,
+  participants: reportResponse.participants as ObsoleteUserResponse[] | null,
   bugs:
     reportResponse.bugs?.map((bug) => {
       return {
         ...bug,
+        creator: bug.creator as ObsoleteUserResponse,
         createdAt: new Date(bug.createdAt),
         updatedAt: new Date(bug.updatedAt),
         comments: bug.comments.map((comment) => ({
           ...comment,
+          creator: comment.creator as ObsoleteUserResponse,
           createdAt: new Date(comment.createdAt),
           updatedAt: new Date(comment.updatedAt),
         })),
@@ -83,7 +85,7 @@ export const resetReport = createEvent();
 
 export const updateTitle = createEvent<string>();
 export const updateStatus = createEvent<number>();
-export const updateResponsible = createEvent<UserResponse | null>();
+export const updateResponsible = createEvent<ObsoleteUserResponse | null>();
 export const setRequestState = createEvent<RequestStates>();
 
 export const $reportRequestState = createStore(RequestStates.IDLE);

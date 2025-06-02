@@ -14,7 +14,7 @@ import { UserResponse } from "@/types/user";
 import { Team } from "@/typesObsolete/team";
 import { useUnit } from "effector-react";
 
-const autocompleteUsers = async (searchString: string) => {
+const autocompleteUsersHandler = async (searchString: string) => {
   const response = await autocompleteUsers(searchString);
   return (response.employees ?? []).map((employee: UserResponse) => ({
     id: employee.id,
@@ -64,7 +64,7 @@ const SearchFilters = () => {
             )
           }
           externalString={userFilter?.name || ""}
-          autocompleteFn={autocompleteUsers}
+          autocompleteFn={autocompleteUsersHandler}
         />
       </div>
       <div>
