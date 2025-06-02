@@ -1,4 +1,4 @@
-import { autocompleteEmployees } from "@/api/employees";
+import { autocompleteUsers } from "@/api/employees";
 import { teamsAutocomplete } from "@/apiObsolete/teams";
 import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Dropdown from "@/components/Dropdown/Dropdown";
@@ -15,7 +15,7 @@ import { Team } from "@/typesObsolete/team";
 import { useUnit } from "effector-react";
 
 const autocompleteUsers = async (searchString: string) => {
-  const response = await autocompleteEmployees(searchString);
+  const response = await autocompleteUsers(searchString);
   return (response.employees ?? []).map((employee: UserResponse) => ({
     id: employee.id,
     display: employee.name,

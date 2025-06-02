@@ -1,21 +1,19 @@
 using System.ComponentModel.DataAnnotations;
-using Bugget.BO.Services;
 using Bugget.DA.Interfaces;
 using Bugget.Entities.Authentication;
-using Bugget.Entities.Views;
 using Bugget.Entities.Views.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bugget.Controllers;
 
 /// <summary>
-/// Api для работы с сотрудниками
+/// Api для работы с пользователями
 /// </summary>
-[Route("/v1/employees")]
-public sealed class EmployeesController(IEmployeesClient employeesClient) : ApiController
+[Route("/v1/users")]
+public sealed class UsersController(IEmployeesClient employeesClient) : ApiController
 {
     /// <summary>
-    /// Поиск сотрудников по имени
+    /// Поиск пользователей по имени
     /// </summary>
     [HttpGet("autocomplete")]
     [ProducesResponseType(typeof(AutocompleteUsersView), 200)]
@@ -51,7 +49,7 @@ public sealed class EmployeesController(IEmployeesClient employeesClient) : ApiC
     /// <summary>
     /// Получить информацию о пользователях по их идентификаторам
     /// </summary>
-    [HttpPost("users")]
+    [HttpPost("batch/list")]
     [ProducesResponseType(typeof(IEnumerable<UserView>), 200)]
     public async Task<IActionResult> GetUserViewsAsync([FromBody] string[] userIds)
     {

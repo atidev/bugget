@@ -3,13 +3,13 @@ export interface CreateBugRequest {
   expect?: string | null; // required, min length 1, max length 512
 }
 
-export interface UpdateBugRequest {
+export interface PatchBugRequest {
   receive?: string | null; // required, min length 1, max length 512
   expect?: string | null; // required, min length 1, max length 512
   status?: number | null;
 }
 
-export interface BugResponse {
+export interface CreateBugResponse {
   id: number;
   receive: string | null;
   expect: string | null;

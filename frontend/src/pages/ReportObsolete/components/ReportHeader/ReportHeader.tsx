@@ -16,12 +16,12 @@ import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Avatar from "@/components/Avatar/Avatar";
 import { ReportStatuses, RequestStates } from "@/const";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import { autocompleteEmployees } from "@/api/employees";
+import { autocompleteUsers } from "@/api/employees";
 import { UserResponse } from "@/types/user";
 import ParticipantsSkeleton from "./components/ParticipantsSkeleton";
 
 const autocompleteUsers = async (searchString: string) => {
-  const response = await autocompleteEmployees(searchString);
+  const response = await autocompleteUsers(searchString);
   return (response.employees ?? []).map((employee: UserResponse) => ({
     id: employee.id,
     display: employee.name,
