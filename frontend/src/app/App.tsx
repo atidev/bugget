@@ -1,4 +1,4 @@
-import "@/store/index";
+import "@/store";
 import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "@/components/Layout/Layout";

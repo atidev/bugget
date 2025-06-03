@@ -1,20 +1,20 @@
 import { ReportStatuses } from "@/const";
 
-export interface PatchReportSocketResponse {
+export type PatchReportSocketResponse = {
   title?: string | null;
   status?: ReportStatuses | null;
   responsibleUserId?: string | null;
   pastResponsibleUserId?: string | null;
   updatedAt: string;
-}
+};
 
-export interface PatchBugSocketResponse {
+export type PatchBugSocketResponse = {
   receive?: string | null;
   expect?: string | null;
   status?: number | null;
-}
+};
 
-export interface CreateBugSocketResponse {
+export type CreateBugSocketResponse = {
   id: number;
   receive: string | null;
   expect: string | null;
@@ -22,18 +22,18 @@ export interface CreateBugSocketResponse {
   updatedAt: string;
   creatorUserId: string;
   status: number;
-}
+};
 
-export interface CommentSocketResponse {
+export type CommentSocketResponse = {
   id: number;
   bugId: number;
   text: string;
   creatorUserId: string;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export interface AttachmentSocketResponse {
+export type AttachmentSocketResponse = {
   id: number;
   entityId: number;
   attachType: number;
@@ -41,7 +41,7 @@ export interface AttachmentSocketResponse {
   creatorUserId: string;
   fileName: string;
   hasPreview: boolean;
-}
+};
 
 export enum SocketEvent {
   ReportParticipant = "ReceiveReportParticipant",

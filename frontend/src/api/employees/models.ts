@@ -1,6 +1,6 @@
 import { UserResponse } from "@/types/user";
 
-export interface AutocompleteUsersResponse {
+export type AutocompleteUsersResponse = {
   employees: UserResponse[];
   total: number;
-}
+};

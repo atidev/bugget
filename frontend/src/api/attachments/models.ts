@@ -1,4 +1,4 @@
-export interface AttachmentResponse {
+export type AttachmentResponse = {
   id: number;
   entityId: number;
   attachType: number;
@@ -6,4 +6,4 @@ export interface AttachmentResponse {
   creatorUserId: string;
   fileName: string;
   hasPreview: boolean;
-}
+};

@@ -2,6 +2,7 @@ import { createDomain } from "effector";
 import { buildConnection, startConnection } from "@/webSocketApi";
 import { HubConnection } from "@microsoft/signalr";
 import { SocketEvent, SocketPayload } from "@/webSocketApi/models";
+import { setSignalRConnectionId } from "@/api/axios";
 
 type ConnectionReady = HubConnection & { started: true };
 
@@ -30,7 +31,10 @@ export const leaveReportFx = socket.createEffect(
 
 export const $connection = socket
   .createStore<ConnectionReady | null>(null)
-  .on(connectionStarted, (_, conn) => conn)
+  .on(connectionStarted, (_, conn) => {
+    setSignalRConnectionId(conn.connectionId ?? null);
+    return conn;
+  })
   .reset(connectionClosed);
 
 export const $isConnected = $connection.map(Boolean);
@@ -51,10 +55,16 @@ export const initSocketFx = socket.createEffect(async () => {
   });
 
   // системные события соединения
-  conn.onreconnected(() => connectionReconnected());
+  conn.onreconnected(() => {
+    connectionReconnected();
+    const conn = $connection.getState();
+    setSignalRConnectionId(conn?.connectionId ?? null);
+  });
+
   conn.onclose((e) => {
     handlers.forEach((h, ev) => conn.off(ev, h)); // clean-up
     connectionClosed(e);
+    setSignalRConnectionId(null);
   });
 
   try {

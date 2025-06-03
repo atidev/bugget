@@ -1,15 +1,15 @@
-export interface CreateBugRequest {
+export type CreateBugRequest = {
   receive?: string | null; // required, min length 1, max length 512
   expect?: string | null; // required, min length 1, max length 512
-}
+};
 
-export interface PatchBugRequest {
+export type PatchBugRequest = {
   receive?: string | null; // required, min length 1, max length 512
   expect?: string | null; // required, min length 1, max length 512
   status?: number | null;
-}
+};
 
-export interface CreateBugResponse {
+export type CreateBugResponse = {
   id: number;
   receive: string | null;
   expect: string | null;
@@ -17,12 +17,12 @@ export interface CreateBugResponse {
   updatedAt: string;
   creatorUserId: string;
   status: number;
-}
+};
 
-export interface PatchBugResponse {
+export type PatchBugResponse = {
   id: number;
   receive: string | null;
   expect: string | null;
   updatedAt: string;
   status: number;
-}
+};

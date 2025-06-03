@@ -1,4 +1,4 @@
-import { createReport, getReport, patchReport } from "@/api/reports";
+import { createReport, fetchReport, patchReport } from "@/api/reports";
 import {
   PatchReportRequest,
   PatchReportResponse,
@@ -11,7 +11,7 @@ import { PatchReportSocketResponse } from "@/webSocketApi/models";
 
 //// эффекты
 export const getReportFx = createEffect<number, ReportResponse>(async (id) => {
-  return await getReport(id);
+  return await fetchReport(id);
 });
 
 export const createReportFx = createEffect<string, CreateReportResponse>(

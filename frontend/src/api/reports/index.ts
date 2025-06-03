@@ -7,7 +7,7 @@ import {
   CreateReportResponse,
 } from "./models";
 
-export const getReport = async (id: number): Promise<ReportResponse> => {
+export const fetchReport = async (id: number): Promise<ReportResponse> => {
   try {
     const { data } = await axios.get(`/v2/reports/${id}`);
     return data;

@@ -24,7 +24,9 @@ export const autocompleteUsers = async (
   }
 };
 
-export const listUsers = async (userIds: string[]): Promise<UserResponse[]> => {
+export const fetchUsers = async (
+  userIds: string[]
+): Promise<UserResponse[]> => {
   try {
     const { data } = await axios.post(`/v1/users/batch/list`, userIds);
     return data;

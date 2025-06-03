@@ -20,7 +20,7 @@ public class UserAuthHandler(
     private readonly string? TeamIdHeader = authHeadersOptions.CurrentValue.TeamIdHeaderName;
     private readonly string? OrganizationIdHeader = authHeadersOptions.CurrentValue.OrganizationIdHeaderName;
 
-    private const string SignalRConnectionIdHeader = "X-Signal-R-Conntection-Id";
+    private const string SignalRConnectionIdHeader = "X-Signal-R-Connection-Id";
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
