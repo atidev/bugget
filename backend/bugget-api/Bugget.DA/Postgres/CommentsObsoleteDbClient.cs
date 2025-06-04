@@ -40,6 +40,7 @@ public sealed class CommentsObsoleteDbClient: PostgresClient
         return jsonResults
             .Where(json => json != null)
             .Select(json => Deserialize<CommentDbModel>(json)!)
+            .OrderBy(c => c.CreatedAt)
             .ToArray();
     }
     
