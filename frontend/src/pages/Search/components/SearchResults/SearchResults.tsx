@@ -1,10 +1,10 @@
 import { useUnit } from "effector-react";
-import { $searchResult } from "@/store/search";
+import { $searchResult } from "@/storeObsolete/search";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import getStatusMeta from "@/utils/getStatusMeta";
 import { useNavigate } from "react-router-dom";
-import { ReportResponse } from "@/api/reports/models";
+import { ReportResponse } from "@/apiObsolete/reports/models";
 
 const getLatestUpdateDate = (report: ReportResponse) => {
   let latestTime: number = new Date(report.updatedAt).getTime();

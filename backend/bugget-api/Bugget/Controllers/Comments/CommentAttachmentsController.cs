@@ -21,7 +21,7 @@ public sealed class CommentAttachmentsController(AttachmentService attachmentSer
 
 
     [HttpPost]
-    [ProducesResponseType(typeof(AttachmentView), 200)]
+    [ProducesResponseType(typeof(AttachmentView), 201)]
     public async Task<IActionResult> CreateAttachment(
         [FromRoute] int reportId,
         [FromRoute] int bugId,
@@ -57,7 +57,7 @@ public sealed class CommentAttachmentsController(AttachmentService attachmentSer
             fileStream,
             new FileMeta(file.FileName, file.Length, mimeType),
             ct)
-            .AsActionResultAsync((attachmentDbModel) => AttachmentMapper.ToView(attachmentDbModel, reportId), 202);
+            .AsActionResultAsync((attachmentDbModel) => AttachmentMapper.ToView(attachmentDbModel, reportId), 201);
     }
 
     [HttpGet("{id}/content")]

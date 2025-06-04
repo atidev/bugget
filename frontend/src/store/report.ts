@@ -1,177 +1,176 @@
+import { createReport, fetchReport, patchReport } from "@/api/reports";
 import {
-  combine,
-  createEffect,
-  createEvent,
-  createStore,
-  sample,
-} from "effector";
-import { fetchReport, createReport, updateReport } from "@/api/reports";
-import { ReportStatuses, RequestStates } from "@/const";
-import { User } from "@/types/user";
-import { NewReport, ReportFormUIData, Report } from "@/types/report";
-import { ReportResponse } from "@/api/reports/models";
+  PatchReportRequest,
+  PatchReportResponse,
+  ReportResponse,
+  CreateReportResponse,
+} from "@/api/reports/models";
+import { ReportStatuses } from "@/const";
+import { createEffect, createEvent, createStore, sample } from "effector";
+import { PatchReportSocketResponse } from "@/webSocketApi/models";
 
-const defaultFormData = {
-  id: null,
-  title: "",
-  status: ReportStatuses.IN_PROGRESS,
-  responsible: null,
-  participants: [],
-  responsibleId: "",
-  creator: null,
-  createdAt: null,
-  updatedAt: null,
-  bugs: [],
-};
-
-const convertBackResponseToStoreModel = (reportResponse: ReportResponse) => ({
-  id: reportResponse.id,
-  title: reportResponse.title || "",
-  status: reportResponse.status,
-  responsible: reportResponse.responsible,
-  creator: reportResponse.creator,
-  createdAt: new Date(reportResponse.createdAt),
-  updatedAt: new Date(reportResponse.updatedAt),
-  participants: reportResponse.participants,
-  bugs:
-    reportResponse.bugs?.map((bug) => {
-      return {
-        ...bug,
-        createdAt: new Date(bug.createdAt),
-        updatedAt: new Date(bug.updatedAt),
-        comments: bug.comments.map((comment) => ({
-          ...comment,
-          createdAt: new Date(comment.createdAt),
-          updatedAt: new Date(comment.updatedAt),
-        })),
-        isChanged: false,
-      };
-    }) || [],
-  responsibleId: reportResponse.responsible.id,
+//// эффекты
+export const getReportFx = createEffect<number, ReportResponse>(async (id) => {
+  return await fetchReport(id);
 });
 
-export const fetchReportFx = createEffect(async (id: number) => {
-  const data = await fetchReport(id);
-  return data;
-});
-
-export const createReportFx = createEffect(async (newReport: NewReport) => {
-  const data = await createReport(newReport);
-  return data;
-});
-
-export const updateReportFx = createEffect(
-  async (report: {
-    id: number | null;
-    title: string | null;
-    status: ReportStatuses | null;
-    responsibleId: string | null;
-  }) => {
-    if (!report.id) return;
-    const payload = {
-      title: report.title,
-      status: report.status,
-      responsibleUserId: report.responsibleId,
-    };
-    return await updateReport(payload, report.id);
+export const createReportFx = createEffect<string, CreateReportResponse>(
+  async (title) => {
+    return await createReport({ title });
   }
 );
 
-export const updateReportEvent = createEvent();
-export const clearReport = createEvent();
-export const resetReport = createEvent();
+export const patchReportFx = createEffect<
+  { id: number; patchRequest: PatchReportRequest },
+  PatchReportResponse
+>(async ({ id, patchRequest }) => {
+  return await patchReport(id, patchRequest);
+});
 
-export const updateTitle = createEvent<string>();
-export const updateStatus = createEvent<number>();
-export const updateResponsible = createEvent<User | null>();
-export const setRequestState = createEvent<RequestStates>();
+//// события
+export const changeTitleEvent = createEvent<string>();
+export const saveTitleEvent = createEvent<void>();
+export const changeStatusEvent = createEvent<ReportStatuses>();
+export const changeResponsibleUserIdEvent = createEvent<string>();
+export const patchReportSocketEvent = createEvent<PatchReportSocketResponse>();
+export const updateResponsibleUserIdEvent = createEvent<string>();
+export const updateCreatorUserIdEvent = createEvent<string>();
+export const updateReportPathIdEvent = createEvent<number | null>();
 
-export const $reportRequestState = createStore(RequestStates.IDLE);
-$reportRequestState
-  .on(fetchReportFx.pending, (_, state) => {
-    return state ? RequestStates.PENDING : RequestStates.DONE;
-  })
-  .on(fetchReportFx.doneData, () => {
-    return RequestStates.DONE;
-  })
-  .on(setRequestState, (state, status) => status);
+//// сторы
+export const $reportPathStore = createStore<number | null>(null).on(
+  updateReportPathIdEvent,
+  (_, reportPath) => reportPath
+);
 
-export const $isReportChanged = createStore(false).reset(clearReport);
+// источник данных для других сторов
+export const $initialReportStore = createStore<ReportResponse | null>(null)
+  .on(getReportFx.doneData, (_, report) => report)
+  .on(createReportFx.doneData, (state, report) => ({
+    ...state,
+    id: report.id,
+    title: report.title,
+    status: report.status,
+    responsibleUserId: report.responsibleUserId,
+    pastResponsibleUserId: report.responsibleUserId,
+    creatorUserId: report.creatorUserId,
+    createdAt: report.createdAt,
+    updatedAt: report.updatedAt,
+    participantsUserIds: [],
+    bugs: [],
+  }));
 
-export const $initialReportForm = createStore<Report>(defaultFormData)
-  .on(fetchReportFx.doneData, (_, report) =>
-    convertBackResponseToStoreModel(report)
+export const $titleStore = createStore<string>("")
+  .on(getReportFx.doneData, (_, report) => report.title)
+  .on(patchReportSocketEvent, (state, report) => report.title ?? state)
+  .on(changeTitleEvent, (_, title) => title);
+
+export const $statusStore = createStore<ReportStatuses>(ReportStatuses.BACKLOG)
+  .on(getReportFx.doneData, (_, report) => report.status)
+  .on(patchReportSocketEvent, (state, report) => report.status ?? state);
+
+export const $responsibleUserIdStore = createStore<string>("")
+  .on(getReportFx.doneData, (_, report) => report.responsibleUserId)
+  .on(
+    patchReportSocketEvent,
+    (state, report) => report.responsibleUserId ?? state
+  );
+
+export const $creatorUserIdStore = createStore<string>("").on(
+  getReportFx.doneData,
+  (_, report) => report.creatorUserId
+);
+
+export const $pastResponsibleUserIdStore = createStore<string>("")
+  .on(getReportFx.doneData, (_, report) => report.pastResponsibleUserId)
+  .on(
+    patchReportFx.doneData,
+    (state, report) => report.pastResponsibleUserId ?? state
   )
-  .reset(clearReport);
+  .on(
+    patchReportSocketEvent,
+    (state, report) => report.pastResponsibleUserId ?? state
+  );
 
-// Текущее состояние репорта (изменяемые данные)
-export const $reportForm = createStore<ReportFormUIData>(defaultFormData)
-  .on(fetchReportFx.doneData, (_, report) => {
-    return {
-      id: report.id,
-      title: report.title || "",
-      status: report.status || 0,
-      responsible: report.responsible || {},
-      participants: report.participants || [],
-    };
-  })
-  .on(updateTitle, (state, title) => ({ ...state, title }))
-  .on(updateResponsible, (state, responsible) => ({ ...state, responsible }))
-  .on(updateStatus, (state, status) => ({ ...state, status }))
-  .reset(clearReport);
+export const $updatedAtStore = createStore<string>(new Date().toISOString())
+  .on(getReportFx.doneData, (_, report) => report.updatedAt)
+  .on(createReportFx.doneData, (_, report) => report.updatedAt)
+  .on(patchReportFx.doneData, (_, report) => report.updatedAt)
+  .on(patchReportSocketEvent, (_, report) => {
+    console.log("🔄 [Report] Updated at:", report.updatedAt);
+    return report.updatedAt;
+  });
 
-const $combinedForm = combine({
-  reportForm: $reportForm,
-  initialForm: $initialReportForm,
+export const $reportIdStore = createStore<number | null>(null).on(
+  $initialReportStore,
+  (_, report) => report?.id ?? null
+);
+
+//// связи
+// загрузка открытого репорта
+sample({
+  clock: updateReportPathIdEvent,
+  filter: (pathId) => pathId !== null,
+  target: getReportFx,
 });
 
-// Проверяем изменения, когда $reportForm или $initialReportForm обновляются
+// создание репорта
 sample({
-  source: { form: $reportForm, initial: $initialReportForm },
-  fn: ({ form, initial }) => {
-    if (!initial) return false; // Если начальные данные отсутствуют, считаем, что изменений нет
-    return (
-      form.title !== initial.title ||
-      form.status !== initial.status ||
-      form.responsible?.id !== initial.responsible?.id
-    );
+  clock: saveTitleEvent,
+  source: {
+    id: $reportIdStore,
+    title: $titleStore,
   },
-  target: $isReportChanged, // Записываем в стор
+  filter: ({ id }) => id === null,
+  fn: ({ title }) => title,
+  target: createReportFx,
 });
 
-// сбрасываем report при сбросе
+// изменение названия репорта
 sample({
-  source: $initialReportForm, // Берём данные из исходного стейта (загруженного с сервера)
-  clock: resetReport, // Ждём, когда сработает resetReport
-  target: $reportForm, // Копируем данные в редактируемый стор
-});
-
-sample({
-  source: $combinedForm, // { reportForm, initialForm }
-  clock: updateReportEvent,
-  fn: ({ reportForm, initialForm }) => {
-    const responsibleId = reportForm.responsible?.id || null;
-    const initialResponsibleId = initialForm.responsible?.id || null;
-
-    const diff = {
-      id: reportForm.id,
-      title: reportForm.title !== initialForm.title ? reportForm.title : null,
-      status:
-        reportForm.status !== initialForm.status ? reportForm.status : null,
-      responsibleId:
-        responsibleId &&
-        initialResponsibleId &&
-        initialResponsibleId !== responsibleId
-          ? responsibleId
-          : null,
-    };
-
-    return diff;
+  clock: saveTitleEvent,
+  source: {
+    id: $reportIdStore,
+    title: $titleStore,
   },
-  target: updateReportFx,
+  filter: ({ id }) =>
+    id !== null &&
+    $initialReportStore.getState()?.title !== $titleStore.getState(),
+  fn: ({ id, title }) => ({
+    id: id!,
+    patchRequest: { title },
+  }),
+  target: patchReportFx,
 });
 
 sample({
-  source: updateReportFx.doneData, // После успешного обновления отчета
-  target: [$reportForm, $initialReportForm], // Обновляем оба стора
+  clock: changeStatusEvent,
+  source: $reportIdStore,
+  filter: (id): id is number => id !== null,
+  fn: (id, status) => ({
+    id: id!,
+    patchRequest: { status },
+  }),
+  target: patchReportFx,
+});
+
+sample({
+  clock: changeStatusEvent,
+  target: $statusStore,
+});
+
+sample({
+  clock: changeResponsibleUserIdEvent,
+  source: $reportIdStore,
+  filter: (id): id is number => id !== null,
+  fn: (id, responsibleUserId) => ({
+    id: id!,
+    patchRequest: { responsibleUserId },
+  }),
+  target: patchReportFx,
+});
+
+sample({
+  clock: changeResponsibleUserIdEvent,
+  target: $responsibleUserIdStore,
 });

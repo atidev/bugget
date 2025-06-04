@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { clearReport } from "@/store/report";
+import { clearReport } from "@/storeObsolete/report";
 import { Search } from "lucide-react";
 
 const HIDDEN_BUTTONS = {

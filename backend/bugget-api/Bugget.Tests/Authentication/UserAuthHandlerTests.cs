@@ -58,7 +58,7 @@ public class UserAuthHandlerTests
         context.Request.Headers[headersOptions.UserIdHeaderName] = "user-123";
         context.Request.Headers[headersOptions.TeamIdHeaderName] = "team-456";
         context.Request.Headers[headersOptions.OrganizationIdHeaderName] = "org-789";
-        context.Request.Headers["X-Signal-R-Conntection-Id"] = "conn-abc";
+        context.Request.Headers["X-Signal-R-Connection-Id"] = "conn-abc";
 
         var employeesClient = new Mock<IEmployeesClient>();
         var handler = CreateHandler(context, employeesClient, headersOptions);

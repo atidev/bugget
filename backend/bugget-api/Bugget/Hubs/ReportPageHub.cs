@@ -22,21 +22,21 @@ public sealed class ReportPageHub(
             throw new HubException("отчет не найден");
         }
 
-        logger.LogInformation("Клиент {@ConnectionId} подключился к группе {@ReportId}", Context.ConnectionId, reportId);
+        logger.LogWarning("Клиент {@ConnectionId} подключился к группе {@ReportId}", Context.ConnectionId, reportId);
         await Groups.AddToGroupAsync(Context.ConnectionId, $"{reportId}");
     }
 
     // Отключение от группы
     public async Task LeaveReportGroupAsync(int reportId)
     {
-        logger.LogInformation("Клиент {@ConnectionId} покинул группу {@ReportId}", Context.ConnectionId, reportId);
+        logger.LogWarning("Клиент {@ConnectionId} покинул группу {@ReportId}", Context.ConnectionId, reportId);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"{reportId}");
     }
 
     // Логирование разрыва соединения
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        logger.LogInformation("Клиент {@ConnectionId} отключился. Причина: {@Reason}", Context.ConnectionId, exception?.Message ?? "неизвестно");
+        logger.LogWarning("Клиент {@ConnectionId} отключился. Причина: {@Reason}", Context.ConnectionId, exception?.Message ?? "неизвестно");
         await base.OnDisconnectedAsync(exception);
     }
 }

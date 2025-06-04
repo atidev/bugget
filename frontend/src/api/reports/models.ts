@@ -1,21 +1,31 @@
-import { BugStatuses, ReportStatuses } from "@/const";
+import { AttachmentTypes, BugStatuses, ReportStatuses } from "@/const";
 
-export type User = {
-  id: string | null;
-  name: string | null;
+export type CreateReportRequest = {
+  title: string; // required, min length 1, max length 128
 };
 
-export type AttachmentRequest = {
-  file: File;
-};
-
-export type AttachmentResponse = {
+export type CreateReportResponse = {
   id: number;
-  bugId: number;
-  reportId: number;
-  path: string | null;
+  title: string;
+  status: ReportStatuses;
+  responsibleUserId: string;
+  pastResponsibleUserId: string;
+  creatorUserId: string;
   createdAt: string;
-  attachType: number;
+  updatedAt: string;
+};
+
+export type ReportResponse = {
+  id: number;
+  title: string;
+  status: ReportStatuses;
+  responsibleUserId: string;
+  pastResponsibleUserId: string;
+  creatorUserId: string;
+  createdAt: string;
+  updatedAt: string;
+  participantsUserIds: string[];
+  bugs: BugResponse[] | null;
 };
 
 export type BugResponse = {
@@ -23,74 +33,45 @@ export type BugResponse = {
   reportId: number;
   receive: string | null;
   expect: string | null;
-  creator: User;
+  creatorUserId: string;
   createdAt: string;
   updatedAt: string;
   status: BugStatuses;
-  attachments: AttachmentResponse[];
-  comments: CommentResponse[];
+  attachments: AttachmentResponse[] | null;
+  comments: CommentResponse[] | null;
 };
 
-export type BugCreateRequest = {
-  receive: string | null;
-  expect: string | null;
-};
-
-export type BugUpdateRequest = {
-  receive: string | null;
-  expect: string | null;
-  status: BugStatuses | null;
+export type AttachmentResponse = {
+  id: number;
+  entityId: number;
+  attachType: AttachmentTypes;
+  createdAt: string;
+  creatorUserId: string;
+  fileName: string;
+  hasPreview: boolean;
 };
 
 export type CommentResponse = {
   id: number;
   bugId: number;
-  text: string | null;
-  creator: User;
+  text: string;
+  creatorUserId: string;
   createdAt: string;
   updatedAt: string;
+  attachments: AttachmentResponse[] | null;
 };
 
-export type ReportResponse = {
+export type PatchReportRequest = {
+  title?: string | null;
+  status?: ReportStatuses | null;
+  responsibleUserId?: string | null;
+};
+
+export type PatchReportResponse = {
   id: number;
-  title: string | null;
+  title: string;
   status: ReportStatuses;
-  responsible: User;
-  creator: User;
-  createdAt: string;
+  responsibleUserId: string;
+  pastResponsibleUserId: string;
   updatedAt: string;
-  participants: User[] | null;
-  bugs: BugResponse[] | null;
-};
-
-export type CreateReportRequest = {
-  title: string | null;
-  responsibleId: string | null;
-  bugs:
-    | {
-        receive: string | null;
-        expect: string | null;
-      }[]
-    | null;
-};
-
-export type UpdateReportRequest = {
-  title: string | null;
-  status: ReportStatuses | null;
-  responsibleUserId: string | null;
-};
-
-export type SearchResponse = {
-  reports: ReportResponse[];
-  total: number;
-};
-
-export type SearchRequestQueryParams = {
-  query?: string;
-  reportStatuses?: number[];
-  userId?: string;
-  teamId?: string;
-  sort?: string;
-  skip?: number;
-  take?: number;
 };

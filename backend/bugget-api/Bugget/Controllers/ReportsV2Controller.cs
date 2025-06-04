@@ -18,14 +18,14 @@ public sealed class ReportsV2Controller(ReportsService reportsService) : ApiCont
     /// Создать репорт
     /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(ReportSummaryDbModel), 200)]
-    public Task<ReportSummaryDbModel> CreateReportAsync([FromBody] ReportV2CreateDto createDto)
+    [ProducesResponseType(typeof(ReportSummaryDbModel), 201)]
+    public async Task<IActionResult> CreateReportAsync([FromBody] ReportV2CreateDto createDto)
     {
         var user = User.GetIdentity();
-        return reportsService.CreateReportAsync(user.Id, user.TeamId, user.OrganizationId, createDto);
+        return Accepted(await reportsService.CreateReportAsync(user.Id, user.TeamId, user.OrganizationId, createDto));
     }
 
-    /// <summary>
+    /// <summary>   
     /// Получить репорт
     /// </summary>
     /// <param name="reportId"></param>

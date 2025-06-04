@@ -12,6 +12,11 @@ const instance = axios.create({
   timeout: 10000,
 });
 
+let signalRConnectionId: string | null = null;
+export const setSignalRConnectionId = (id: string | null) => {
+  signalRConnectionId = id;
+};
+
 // Интерцептор ответа
 instance.interceptors.response.use(
   (response) => {
@@ -38,10 +43,14 @@ instance.interceptors.response.use((response) => {
 
 // Интерцептор запроса: преобразуем camelCase → snake_case
 instance.interceptors.request.use((config) => {
-  if (config.headers["Content-Type"] === "multipart/form-data") return config;
-  if (config.data) {
-    config.data = convertObjectToSnake(config.data);
+  if (config.headers["Content-Type"] !== "multipart/form-data") {
+    config.data && (config.data = convertObjectToSnake(config.data));
   }
+
+  if (signalRConnectionId) {
+    config.headers["X-Signal-R-Connection-Id"] = signalRConnectionId;
+  }
+
   return config;
 });
 

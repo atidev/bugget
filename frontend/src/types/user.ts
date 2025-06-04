@@ -1,10 +1,6 @@
-export type User = {
-  name: string | null;
-  id: string | null;
-};
-
-export type AuthUser = {
-  name: string;
+export type UserResponse = {
   id: string;
-  teamId: string;
+  name: string;
+  teamId?: string | null;
+  photoUrl?: string | null;
 };

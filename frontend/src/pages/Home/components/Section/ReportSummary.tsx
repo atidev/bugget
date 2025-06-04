@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Report } from "@/types/report";
+import { Report } from "@/typesObsolete/report";
 
 type ReportProps = {
   report: Report;

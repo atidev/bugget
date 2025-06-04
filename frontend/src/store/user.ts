@@ -1,13 +1,12 @@
-import { createStore, createEffect } from "effector";
+import { UserResponse } from "@/types/user";
+import { createEffect, createStore } from "effector";
 import { fetchAuth } from "@/api/auth";
-import { AuthUser } from "@/types/user";
 
 export const authFx = createEffect(async () => {
-  const data = await fetchAuth();
-  return data;
+  return await fetchAuth();
 });
 
-export const $user = createStore<AuthUser | null>(null).on(
+export const $user = createStore<UserResponse>({} as UserResponse).on(
   authFx.doneData,
   (_, user) => user
 );

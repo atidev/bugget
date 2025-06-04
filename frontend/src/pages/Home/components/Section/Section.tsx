@@ -1,4 +1,4 @@
-import { Report } from "@/types/report";
+import { Report } from "@/typesObsolete/report";
 import ReportSummary from "./ReportSummary";
 
 type Props = {

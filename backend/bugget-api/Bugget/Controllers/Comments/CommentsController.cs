@@ -22,11 +22,11 @@ public sealed class CommentsController(
     /// <param name="createDto"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(typeof(CommentSummaryDbModel), 200)]
-    public Task<CommentSummaryDbModel> CreateCommentAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromBody] CommentDto createDto)
+    [ProducesResponseType(typeof(CommentSummaryDbModel), 201)]
+    public async Task<IActionResult> CreateCommentAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromBody] CommentDto createDto)
     {
         var user = User.GetIdentity();
-        return commentsService.CreateCommentAsync(user, reportId, bugId, createDto);
+        return Accepted(await commentsService.CreateCommentAsync(user, reportId, bugId, createDto));
     }
 
     /// <summary>
