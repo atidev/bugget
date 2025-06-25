@@ -5,9 +5,17 @@ import {
   ReportResponse,
   CreateReportResponse,
 } from "@/api/reports/models";
+
 import { ReportStatuses } from "@/const";
-import { createEffect, createEvent, createStore, sample } from "effector";
+import {
+  createEffect,
+  createEvent,
+  createStore,
+  sample,
+  combine,
+} from "effector";
 import { PatchReportSocketResponse } from "@/webSocketApi/models";
+import { $searchResult } from "@/storeObsolete/search";
 
 //// эффекты
 export const getReportFx = createEffect<number, ReportResponse>(async (id) => {
@@ -104,6 +112,39 @@ export const $updatedAtStore = createStore<string>(new Date().toISOString())
 export const $reportIdStore = createStore<number | null>(null).on(
   $initialReportStore,
   (_, report) => report?.id ?? null
+);
+
+export const $participantsUserIds = createStore<string[]>([]).on(
+  getReportFx.doneData,
+  (_, report) => report.participantsUserIds
+);
+
+// получаем имя ответственного из результатов поиска отчетов
+export const $responsibleUserNameStore = combine(
+  $reportIdStore,
+  $searchResult,
+  (reportId, searchResult) => {
+    if (!reportId || !searchResult.reports) return "";
+
+    const currentReport = searchResult.reports.find(
+      (report) => report.id === reportId
+    );
+    return currentReport?.responsible?.name || "";
+  }
+);
+
+// получаем участников из результатов поиска отчетов
+export const $participantsWithNamesStore = combine(
+  $reportIdStore,
+  $searchResult,
+  (reportId, searchResult) => {
+    if (!reportId || !searchResult.reports) return [];
+
+    const currentReport = searchResult.reports.find(
+      (report) => report.id === reportId
+    );
+    return currentReport?.participants || [];
+  }
 );
 
 //// связи

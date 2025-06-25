@@ -8,6 +8,7 @@ type Props = {
   externalString?: string;
   onSelect: (entity: AutocompleteEntity | null) => void;
   autocompleteFn: (searchString: string) => Promise<AutocompleteEntity[]>;
+  width?: number;
 };
 
 type AutocompleteEntity = {
@@ -15,7 +16,12 @@ type AutocompleteEntity = {
   id: string;
 };
 
-const Autosuggest = ({ externalString, onSelect, autocompleteFn }: Props) => {
+const Autosuggest = ({
+  externalString,
+  onSelect,
+  autocompleteFn,
+  width,
+}: Props) => {
   const [searchString, setSearchString] = useState(externalString);
   const [filteredItems, setFilteredItems] = useState<
     AutocompleteEntity[] | never[]
@@ -79,7 +85,7 @@ const Autosuggest = ({ externalString, onSelect, autocompleteFn }: Props) => {
   return (
     <div className="dropdown">
       <input
-        className="input input-bordered w-72"
+        className={`input input-bordered ${width ? `w-${width}` : ""}`}
         value={searchString ?? externalString}
         placeholder="Начните вводить"
         onChange={handleChange}

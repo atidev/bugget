@@ -11,7 +11,7 @@ const Avatar = ({ src = defaultAvaSrc, width = 8 }: Props) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <div className="avatar">
+    <div className="avatar block">
       {!isLoaded && (
         <div className="absolute inset-0">
           <RoundedSkeleton />
