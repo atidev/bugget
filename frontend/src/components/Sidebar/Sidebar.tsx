@@ -4,12 +4,11 @@ import { autocompleteUsers } from "@/api/employees";
 import { UserResponse } from "@/types/user";
 import { useUnit } from "effector-react";
 import {
-  $responsibleUserIdStore,
   $responsibleUserNameStore,
   $participantsWithNamesStore,
   changeResponsibleUserIdEvent,
 } from "@/store/report";
-import { StatusSelect } from "./StatusSelect";
+import StatusSelect from "./components/StatusSelect";
 
 const autocompleteUsersHandler = async (searchString: string) => {
   const response = await autocompleteUsers(searchString);
@@ -20,7 +19,6 @@ const autocompleteUsersHandler = async (searchString: string) => {
 };
 
 const Sidebar = () => {
-  const responsibleUserId = useUnit($responsibleUserIdStore);
   const responsibleUserName = useUnit($responsibleUserNameStore);
   const participantsWithNames = useUnit($participantsWithNamesStore);
 
@@ -35,7 +33,7 @@ const Sidebar = () => {
         <div className="text-sm text-base-content/70">Ответственный</div>
         <Autosuggest
           onSelect={(entity) => changeResponsibleUserIdEvent(entity?.id || "")}
-          externalString={responsibleUserName || responsibleUserId}
+          externalString={responsibleUserName}
           autocompleteFn={autocompleteUsersHandler}
         />
       </div>

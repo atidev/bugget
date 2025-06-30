@@ -10,7 +10,6 @@ import { Team } from "@/typesObsolete/team";
 
 export const searchFx = createEffect(
   async (params: SearchRequestQueryParams) => {
-    console.log("start search");
     const searchParams = new URLSearchParams();
     if (params.query) searchParams.append("query", params.query);
     if (params.sort) searchParams.append("sort", params.sort);
@@ -23,7 +22,6 @@ export const searchFx = createEffect(
         searchParams.append("reportStatuses", String(status));
       }
     }
-
     return await searchReports(searchParams.toString());
   }
 );
@@ -64,8 +62,6 @@ export const $teamFilter = createStore<Team | null>(null).on(
 export const $searchResult = createStore<SearchResponse>({} as SearchResponse)
   .on(searchFx.doneData, (_, payload) => payload)
   .reset(searchStarted);
-
-export const $currentResponsibleUserName = createStore<string>("").on;
 
 sample({
   clock: searchStarted,

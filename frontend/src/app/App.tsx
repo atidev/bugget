@@ -16,14 +16,14 @@ import { authFx } from "@/store/user";
 import "@/styles/tailwind.css";
 
 // Компонент-обертка для старого Layout
-const OldLayoutWrapper = () => (
+const LayoutWrapperObsolete = () => (
   <Layout>
     <Outlet />
   </Layout>
 );
 
 // Компонент-обертка для нового Layout
-const NewLayoutWrapper = () => (
+const LayoutWrapper = () => (
   <LayoutNew>
     <Outlet />
   </LayoutNew>
@@ -38,7 +38,7 @@ const App = () => {
     <Router>
       <Routes>
         {/* Роуты со старым Layout */}
-        <Route path="/" element={<OldLayoutWrapper />}>
+        <Route path="/" element={<LayoutWrapperObsolete />}>
           <Route index element={<Home />} />
           <Route path="reports" element={<Reports />} />
           <Route path="reports/:reportId" element={<Reports />} />
@@ -46,7 +46,7 @@ const App = () => {
         </Route>
 
         {/* Роуты с новым Layout */}
-        <Route path="/new-reports" element={<NewLayoutWrapper />}>
+        <Route path="/new-reports" element={<LayoutWrapper />}>
           <Route index element={<NewReports />} />
           <Route path=":reportId" element={<NewReports />} />
         </Route>

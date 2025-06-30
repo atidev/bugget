@@ -5,15 +5,6 @@ import "./Layout.css";
 import Sidebar from "../Sidebar/Sidebar";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  // const [isSidebarOpen, setSidebarOpen] = useState(isMainPage);
-
-  // useEffect(() => {
-  //   if (!isMainPage) {
-  //     setSidebarOpen(false);
-  //   } else {
-  //     setSidebarOpen(true);
-  //   }
-  // }, [isMainPage]);
   return (
     <div className="flex flex-col h-full">
       <Header />
@@ -22,15 +13,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         <Sidebar />
       </div>
     </div>
-
-    // <div className="drawer">
-    //   <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-    //   <div className="drawer-content">
-    //     <Header />
-    //     <main className="flex flex-col gap-4">{children}</main>
-    //   </div>
-    //   {/* <Sidebar isOpen={isSidebarOpen} /> */}
-    // </div>
   );
 };
 

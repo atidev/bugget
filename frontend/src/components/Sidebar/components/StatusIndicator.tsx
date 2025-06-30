@@ -1,42 +1,41 @@
 import { CircleDashed, Clock, CheckCircle, XCircle } from "lucide-react";
-
-export type Status = "backlog" | "inProgress" | "done" | "rejected";
+import { ReportStatuses } from "@/const";
 
 type Props = {
-  status: Status;
+  status: ReportStatuses;
 };
 
 const statusConfig: Record<
-  Status,
+  ReportStatuses,
   {
     label: string;
     icon: React.ElementType;
     iconColor: string; // цвет для иконки
   }
 > = {
-  backlog: {
+  [ReportStatuses.BACKLOG]: {
     label: "Backlog",
     icon: CircleDashed,
     iconColor: "text-base-content",
   },
-  inProgress: {
+  [ReportStatuses.IN_PROGRESS]: {
     label: "In Progress",
     icon: Clock,
     iconColor: "text-warning",
   },
-  done: {
+  [ReportStatuses.RESOLVED]: {
     label: "Done",
     icon: CheckCircle,
     iconColor: "text-success",
   },
-  rejected: {
+  [ReportStatuses.REJECTED]: {
     label: "Rejected",
     icon: XCircle,
     iconColor: "text-error",
   },
 };
 
-export const StatusIndicator = ({ status }: Props) => {
+const StatusIndicator = ({ status }: Props) => {
   const { label, icon: Icon, iconColor } = statusConfig[status];
 
   return (
@@ -46,3 +45,5 @@ export const StatusIndicator = ({ status }: Props) => {
     </div>
   );
 };
+
+export default StatusIndicator;

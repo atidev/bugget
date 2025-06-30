@@ -18,7 +18,9 @@ import {
 } from "effector";
 import { PatchReportSocketResponse } from "@/webSocketApi/models";
 
-//// эффекты
+/**
+ * Эффекты
+ */
 export const getReportFx = createEffect<number, ReportResponse>(async (id) => {
   return await fetchReport(id);
 });
@@ -43,7 +45,9 @@ export const fetchUsersFx = createEffect<string[], UserResponse[]>(
   }
 );
 
-//// события
+/**
+ * События
+ */
 export const changeTitleEvent = createEvent<string>();
 export const saveTitleEvent = createEvent<void>();
 export const changeStatusEvent = createEvent<ReportStatuses>();
@@ -53,7 +57,9 @@ export const updateResponsibleUserIdEvent = createEvent<string>();
 export const updateCreatorUserIdEvent = createEvent<string>();
 export const updateReportPathIdEvent = createEvent<number | null>();
 
-//// сторы
+/**
+ * Сторы
+ */
 export const $reportPathStore = createStore<number | null>(null).on(
   updateReportPathIdEvent,
   (_, reportPath) => reportPath
@@ -122,7 +128,7 @@ export const $reportIdStore = createStore<number | null>(null).on(
   (_, report) => report?.id ?? null
 );
 
-export const $participantsUserIds = createStore<string[]>([]).on(
+export const $participantsUserIdsStore = createStore<string[]>([]).on(
   getReportFx.doneData,
   (_, report) => report.participantsUserIds
 );
@@ -161,7 +167,7 @@ export const $creatorUserNameStore = combine(
 
 // получаем участников с именами
 export const $participantsWithNamesStore = combine(
-  $participantsUserIds,
+  $participantsUserIdsStore,
   $usersStore,
   (participantsIds, users) => {
     return participantsIds
@@ -174,11 +180,11 @@ export const $participantsWithNamesStore = combine(
   }
 );
 
-// получаем все уникальные ID пользователей для загрузки
+// получаем все уникальные id пользователей для загрузки
 export const $allUserIdsStore = combine(
   $responsibleUserIdStore,
   $creatorUserIdStore,
-  $participantsUserIds,
+  $participantsUserIdsStore,
   (responsibleUserId, creatorUserId, participantsIds) => {
     const allIds = [
       responsibleUserId,
@@ -189,7 +195,9 @@ export const $allUserIdsStore = combine(
   }
 );
 
-//// связи
+/**
+ * Связи
+ */
 // загрузка открытого репорта
 sample({
   clock: updateReportPathIdEvent,
