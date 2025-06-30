@@ -3,13 +3,15 @@ import { useSocketEvent } from "@/hooks/useSocketEvent";
 import {
   $initialReportStore,
   $titleStore,
-  $creatorUserIdStore,
+  $creatorUserNameStore,
   patchReportSocketEvent,
   changeTitleEvent,
   saveTitleEvent,
   updateReportPathIdEvent,
 } from "@/store/report";
 import { SocketEvent } from "@/webSocketApi/models";
+import { formatDistanceToNow } from "date-fns";
+import { ru } from "date-fns/locale";
 import { useUnit } from "effector-react";
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -19,7 +21,7 @@ const ReportPage = () => {
   const { reportId } = useParams();
   const initialReport = useUnit($initialReportStore);
   const title = useUnit($titleStore);
-  const creatorUserId = useUnit($creatorUserIdStore);
+  const creatorUserName = useUnit($creatorUserNameStore);
 
   useReportPageSocket();
   useSocketEvent(SocketEvent.ReportPatch, (patch) =>
@@ -58,8 +60,14 @@ const ReportPage = () => {
           className="input-lg text-2xl"
         />
         <div>
-          Создан {initialReport?.createdAt} пользователем{" "}
-          <strong>{creatorUserId}</strong>
+          Создан{" "}
+          {initialReport?.createdAt
+            ? formatDistanceToNow(new Date(initialReport.createdAt), {
+                addSuffix: true,
+                locale: ru,
+              })
+            : ""}{" "}
+          пользователем <strong>{creatorUserName || "Загрузка..."}</strong>
         </div>
         <div className="flex flex-col gap-2">
           {/* баг */}

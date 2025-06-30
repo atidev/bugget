@@ -5,6 +5,8 @@ import {
   ReportResponse,
   CreateReportResponse,
 } from "@/api/reports/models";
+import { fetchUsers } from "@/api/employees";
+import { UserResponse } from "@/types/user";
 
 import { ReportStatuses } from "@/const";
 import {
@@ -15,7 +17,6 @@ import {
   combine,
 } from "effector";
 import { PatchReportSocketResponse } from "@/webSocketApi/models";
-import { $searchResult } from "@/storeObsolete/search";
 
 //// эффекты
 export const getReportFx = createEffect<number, ReportResponse>(async (id) => {
@@ -34,6 +35,13 @@ export const patchReportFx = createEffect<
 >(async ({ id, patchRequest }) => {
   return await patchReport(id, patchRequest);
 });
+
+export const fetchUsersFx = createEffect<string[], UserResponse[]>(
+  async (userIds) => {
+    if (userIds.length === 0) return [];
+    return await fetchUsers(userIds);
+  }
+);
 
 //// события
 export const changeTitleEvent = createEvent<string>();
@@ -119,31 +127,65 @@ export const $participantsUserIds = createStore<string[]>([]).on(
   (_, report) => report.participantsUserIds
 );
 
-// получаем имя ответственного из результатов поиска отчетов
-export const $responsibleUserNameStore = combine(
-  $reportIdStore,
-  $searchResult,
-  (reportId, searchResult) => {
-    if (!reportId || !searchResult.reports) return "";
-
-    const currentReport = searchResult.reports.find(
-      (report) => report.id === reportId
-    );
-    return currentReport?.responsible?.name || "";
+// стор для хранения пользователей по ID
+export const $usersStore = createStore<Record<string, UserResponse>>({}).on(
+  fetchUsersFx.doneData,
+  (state, users) => {
+    const usersById = users.reduce((acc, user) => {
+      acc[user.id] = user;
+      return acc;
+    }, {} as Record<string, UserResponse>);
+    return { ...state, ...usersById };
   }
 );
 
-// получаем участников из результатов поиска отчетов
-export const $participantsWithNamesStore = combine(
-  $reportIdStore,
-  $searchResult,
-  (reportId, searchResult) => {
-    if (!reportId || !searchResult.reports) return [];
+// получаем имя ответственного пользователя
+export const $responsibleUserNameStore = combine(
+  $responsibleUserIdStore,
+  $usersStore,
+  (responsibleUserId, users) => {
+    if (!responsibleUserId) return "";
+    return users[responsibleUserId]?.name || "";
+  }
+);
 
-    const currentReport = searchResult.reports.find(
-      (report) => report.id === reportId
-    );
-    return currentReport?.participants || [];
+// получаем имя создателя отчета
+export const $creatorUserNameStore = combine(
+  $creatorUserIdStore,
+  $usersStore,
+  (creatorUserId, users) => {
+    if (!creatorUserId) return "";
+    return users[creatorUserId]?.name || "";
+  }
+);
+
+// получаем участников с именами
+export const $participantsWithNamesStore = combine(
+  $participantsUserIds,
+  $usersStore,
+  (participantsIds, users) => {
+    return participantsIds
+      .map((id) => users[id])
+      .filter(Boolean)
+      .map((user) => ({
+        id: user.id,
+        name: user.name,
+      }));
+  }
+);
+
+// получаем все уникальные ID пользователей для загрузки
+export const $allUserIdsStore = combine(
+  $responsibleUserIdStore,
+  $creatorUserIdStore,
+  $participantsUserIds,
+  (responsibleUserId, creatorUserId, participantsIds) => {
+    const allIds = [
+      responsibleUserId,
+      creatorUserId,
+      ...participantsIds,
+    ].filter(Boolean);
+    return [...new Set(allIds)];
   }
 );
 
@@ -153,6 +195,22 @@ sample({
   clock: updateReportPathIdEvent,
   filter: (pathId) => pathId !== null,
   target: getReportFx,
+});
+
+// загрузка пользователей после загрузки репорта
+sample({
+  clock: getReportFx.doneData,
+  source: $allUserIdsStore,
+  filter: (userIds) => userIds.length > 0,
+  target: fetchUsersFx,
+});
+
+// загрузка пользователей при изменении списка участников через сокет
+sample({
+  clock: patchReportSocketEvent,
+  source: $allUserIdsStore,
+  filter: (userIds) => userIds.length > 0,
+  target: fetchUsersFx,
 });
 
 // создание репорта

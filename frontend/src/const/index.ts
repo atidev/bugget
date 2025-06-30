@@ -8,8 +8,8 @@ export enum BugStatuses {
 
 export enum ReportStatuses {
   BACKLOG = 0,
-  RESOLVED = 1,
-  IN_PROGRESS = 2,
+  IN_PROGRESS = 1,
+  RESOLVED = 2,
   REJECTED = 3,
 }
 
