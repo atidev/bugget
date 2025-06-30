@@ -1,6 +1,11 @@
 import "@/store";
 import { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Outlet,
+} from "react-router-dom";
 import Layout from "@/components/LayoutObsolette/Layout";
 import LayoutNew from "@/components/Layout/Layout";
 import Home from "@/pages/Home/Home";
@@ -10,6 +15,20 @@ import Search from "@/pages/Search/Search";
 import { authFx } from "@/store/user";
 import "@/styles/tailwind.css";
 
+// Компонент-обертка для старого Layout
+const OldLayoutWrapper = () => (
+  <Layout>
+    <Outlet />
+  </Layout>
+);
+
+// Компонент-обертка для нового Layout
+const NewLayoutWrapper = () => (
+  <LayoutNew>
+    <Outlet />
+  </LayoutNew>
+);
+
 const App = () => {
   useEffect(() => {
     authFx();
@@ -18,54 +37,19 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <Layout>
-              <Home />
-            </Layout>
-          }
-        />
-        <Route
-          path="/reports"
-          element={
-            <Layout>
-              <Reports />
-              <Route
-                path="/reports/:reportId"
-                element={
-                  <Layout>
-                    <Reports />
-                  </Layout>
-                }
-              />
-              <Route
-                path="/search"
-                element={
-                  <Layout>
-                    <Search />
-                  </Layout>
-                }
-              />
-            </Layout>
-          }
-        />
-        <Route
-          path="/new-reports"
-          element={
-            <LayoutNew>
-              <NewReports />
-            </LayoutNew>
-          }
-        />
-        <Route
-          path="/new-reports/:reportId"
-          element={
-            <LayoutNew>
-              <NewReports />
-            </LayoutNew>
-          }
-        />
+        {/* Роуты со старым Layout */}
+        <Route path="/" element={<OldLayoutWrapper />}>
+          <Route index element={<Home />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="reports/:reportId" element={<Reports />} />
+          <Route path="search" element={<Search />} />
+        </Route>
+
+        {/* Роуты с новым Layout */}
+        <Route path="/new-reports" element={<NewLayoutWrapper />}>
+          <Route index element={<NewReports />} />
+          <Route path=":reportId" element={<NewReports />} />
+        </Route>
       </Routes>
     </Router>
   );

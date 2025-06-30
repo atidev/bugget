@@ -25,7 +25,7 @@ const Sidebar = () => {
   const participantsWithNames = useUnit($participantsWithNamesStore);
 
   return (
-    <div className="flex flex-col gap-4 px-6 py-8">
+    <div className="flex flex-col gap-4 px-6 py-8 border-l border-base-content/30 rounded-l-sm">
       <div className="flex flex-col gap-2">
         <div className="text-sm text-base-content/70">Статус</div>
         <StatusSelect />
