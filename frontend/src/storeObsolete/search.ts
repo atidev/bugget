@@ -1,6 +1,10 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { searchReports } from "@/apiObsolete/reports/search";
-import { SearchResponse, SearchRequestQueryParams, User } from "@/apiObsolete/reports/models";
+import {
+  SearchResponse,
+  SearchRequestQueryParams,
+  User,
+} from "@/apiObsolete/reports/models";
 import { $user } from "@/store/user";
 import { Team } from "@/typesObsolete/team";
 
@@ -18,7 +22,6 @@ export const searchFx = createEffect(
         searchParams.append("reportStatuses", String(status));
       }
     }
-
     return await searchReports(searchParams.toString());
   }
 );

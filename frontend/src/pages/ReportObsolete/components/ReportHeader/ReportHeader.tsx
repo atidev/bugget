@@ -123,6 +123,7 @@ const ReportHeader = ({ isNewReport }: { isNewReport: boolean }) => {
                 }
                 externalString={reportForm.responsible?.name || ""}
                 autocompleteFn={autocompleteUsersHandler}
+                width={72}
               />
             )}
             <div className="participants-wrapper">

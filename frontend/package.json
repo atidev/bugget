@@ -6,7 +6,7 @@
   "scripts": {
     "prepare": "npx simple-git-hooks",
     "start": "npm run start-backend && npm run dev",
-    "start-backend": "docker compose -f ../devops/components/postgres/docker-compose.yml -f ../devops/components/backend/docker-compose.yml up -d",
+    "start-backend": "docker compose -f ../docker-compose.yml --profile back up",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint .",
@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@microsoft/signalr": "^8.0.7",
+    "@tailwindcss/typography": "^0.5.16",
     "axios": "1.8.2",
     "daisyui": "^5.0.9",
     "date-fns": "^4.1.0",

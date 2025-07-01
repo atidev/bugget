@@ -70,3 +70,5 @@
   --depth: 1;
   --noise: 0;
 }
+
+@plugin "@tailwindcss/typography";

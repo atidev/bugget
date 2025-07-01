@@ -1,13 +1,36 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { clearReport } from "@/storeObsolete/report";
+import { setBreadcrumbs } from "@/storeObsolete/breadcrumbs";
+import { useUnit } from "effector-react";
+import { $breadcrumbs } from "../../storeObsolete/breadcrumbs";
 import { Search } from "lucide-react";
+import Avatar from "../Avatar/Avatar";
+import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
+import { useEffect } from "react";
 
 const HIDDEN_BUTTONS = {
   createReport: ["/reports"],
   search: ["/search"],
 };
 
+const reportsPageBreadcrumb = { label: "Репорты", path: "/" };
+
 const Header = () => {
+  const breadcrumbs = useUnit($breadcrumbs);
+  const { reportId } = useParams();
+
+  useEffect(() => {
+    setBreadcrumbs([
+      reportsPageBreadcrumb,
+      !reportId
+        ? { label: "Новый репорт", path: `/reports` }
+        : {
+            label: `Репорт #${reportId}`,
+            path: `/reports/${reportId}`,
+          },
+    ]);
+  }, [reportId]);
+
   const isVisible = (button: keyof typeof HIDDEN_BUTTONS) =>
     !HIDDEN_BUTTONS[button].includes(location.pathname);
 
@@ -15,23 +38,11 @@ const Header = () => {
   const location = useLocation();
 
   return (
-    <header className="h-16 justify-between bg-base-200 shadow-sm px-3 flex items-center">
-      <label htmlFor="my-drawer" className="btn bg-base-200 drawer-button ">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          className="inline-block h-5 w-5 stroke-current sidebar-button"
-        >
-          {" "}
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M4 6h16M4 12h16M4 18h16"
-          ></path>{" "}
-        </svg>
-      </label>
+    <header className="h-16 justify-between bg-base-200 shadow-sm px-4 flex items-center">
+      <div className="flex items-center">
+        <Avatar />
+        <Breadcrumbs breadcrumbs={breadcrumbs} />
+      </div>
       <div>
         {isVisible("search") && (
           <button

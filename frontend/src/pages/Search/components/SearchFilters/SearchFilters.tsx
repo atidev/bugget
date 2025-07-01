@@ -65,6 +65,7 @@ const SearchFilters = () => {
           }
           externalString={userFilter?.name || ""}
           autocompleteFn={autocompleteUsersHandler}
+          width={72}
         />
       </div>
       <div>
@@ -77,6 +78,7 @@ const SearchFilters = () => {
           }
           externalString={teamFilter?.name || ""}
           autocompleteFn={autocompleteTeams}
+          width={72}
         />
       </div>
     </div>
