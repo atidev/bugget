@@ -8,7 +8,7 @@ import {
   $participantsWithNamesStore,
   changeResponsibleUserIdEvent,
 } from "@/store/report";
-import StatusSelect from "./components/StatusSelect";
+import ReportStatusSelect from "./components/ReportStatusSelect";
 
 const autocompleteUsersHandler = async (searchString: string) => {
   const response = await autocompleteUsers(searchString);
@@ -26,7 +26,7 @@ const Sidebar = () => {
     <div className="flex flex-col gap-4 px-6 py-8 border-l border-base-content/30 rounded-l-sm">
       <div className="flex flex-col gap-2">
         <div className="text-sm text-base-content/70">Статус</div>
-        <StatusSelect />
+        <ReportStatusSelect />
       </div>
 
       <div className="flex flex-col gap-2">
