@@ -15,6 +15,10 @@ import {
 } from "effector";
 import { $reportIdStore, getReportFx } from "./report";
 import { BugEntity, BugFormData, BugUpdateData } from "@/types/bug";
+import {
+  CreateBugSocketResponse,
+  PatchBugSocketResponse,
+} from "@/webSocketApi/models";
 
 /**
  * Эффекты для API
@@ -46,8 +50,10 @@ export const updateBugFx = createEffect<
 });
 
 /**
- * События для пользовательских действий
+ * События
  */
+
+// пользовательские действия
 export const setBugsEvent =
   createEvent<{ reportId: number; bugs: BugEntity[] }>();
 export const addBugEvent =
@@ -56,6 +62,11 @@ export const updateBugDataEvent = createEvent<BugUpdateData>();
 export const changeBugStatusEvent =
   createEvent<{ bugId: number; status: BugStatuses }>();
 export const clearBugsEvent = createEvent<void>();
+
+// события сокетов
+export const createBugSocketEvent = createEvent<CreateBugSocketResponse>();
+export const patchBugSocketEvent =
+  createEvent<{ bugId: number; patch: PatchBugSocketResponse }>();
 
 /**
  * Основные сторы
@@ -91,6 +102,20 @@ export const $bugsStore = createStore<Record<number, BugEntity>>({})
         expect: updatedBug.expect,
         status: updatedBug.status,
         updatedAt: updatedBug.updatedAt,
+      },
+    };
+  })
+  .on(patchBugSocketEvent, (state, { bugId, patch }) => {
+    const existingBug = state[bugId];
+    if (!existingBug) return state;
+
+    return {
+      ...state,
+      [bugId]: {
+        ...existingBug,
+        receive: patch.receive || existingBug.receive,
+        expect: patch.expect || existingBug.expect,
+        status: patch.status || existingBug.status,
       },
     };
   })

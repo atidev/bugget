@@ -16,7 +16,7 @@ import { useUnit } from "effector-react";
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Bug from "./components/Bug/Bug";
-import { useBugActions } from "@/hooks/useBugActions";
+import { getBugsForReport } from "@/store/bugs";
 
 const ReportPage = () => {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const ReportPage = () => {
   const title = useUnit($titleStore);
   const creatorUserName = useUnit($creatorUserNameStore);
 
-  const { bugs } = useBugActions();
+  const bugs = useUnit(getBugsForReport(Number(reportId)));
 
   useReportPageSocket();
   useSocketEvent(SocketEvent.ReportPatch, (patch) =>

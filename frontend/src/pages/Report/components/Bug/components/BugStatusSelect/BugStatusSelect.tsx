@@ -1,7 +1,7 @@
 import { BugStatuses } from "@/const";
 import StatusIndicator from "@/components/StatusIndicator/StatusIndicator";
 import StatusSelect from "@/components/StatusSelect/StatusSelect";
-import { CircleX, CheckCircle, XCircle } from "lucide-react";
+import { CircleX, CircleCheck, XCircle } from "lucide-react";
 
 type Props = {
   status: BugStatuses;
@@ -17,7 +17,7 @@ const bugStatusConfig = {
   },
   [BugStatuses.ARCHIVED]: {
     label: "Исправлен",
-    icon: CheckCircle,
+    icon: CircleCheck,
     iconColor: "text-success",
   },
   [BugStatuses.REJECTED]: {

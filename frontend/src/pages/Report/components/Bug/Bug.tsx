@@ -4,23 +4,40 @@ import BugStatusSelect from "./components/BugStatusSelect/BugStatusSelect";
 import Result from "./components/Result/Result";
 
 import { BugStatuses } from "@/const";
-import { BugEntity } from "@/types/bug";
-import { changeBugStatusEvent } from "@/store/bugs";
-import { useBugActions } from "@/hooks/useBugActions";
+import { BugEntity, BugFormData } from "@/types/bug";
+import {
+  changeBugStatusEvent,
+  patchBugSocketEvent,
+  updateBugDataEvent,
+} from "@/store/bugs";
+import { useUnit } from "effector-react";
+import { $reportIdStore } from "@/store/report";
+import { CircleSmall } from "lucide-react";
+import { SocketEvent } from "@/webSocketApi/models";
+import { useSocketEvent } from "@/hooks/useSocketEvent";
 
 type Props = {
   bug: BugEntity;
 };
 
 const Bug = ({ bug }: Props) => {
-  const { updateReceive, updateExpect } = useBugActions();
+  const reportId = useUnit($reportIdStore);
+
+  useSocketEvent(SocketEvent.BugPatch, (patch) => {
+    patchBugSocketEvent({ bugId: patch.bugId, patch: patch.patch });
+  });
+
+  const updateBugFields = (bugId: number, data: Partial<BugFormData>) => {
+    if (!reportId) return;
+    updateBugDataEvent({ bugId, reportId, data });
+  };
 
   const handleReceiveChange = (newReceive: string) => {
-    updateReceive(bug.id, newReceive);
+    updateBugFields(bug.id, { receive: newReceive });
   };
 
   const handleExpectChange = (newExpect: string) => {
-    updateExpect(bug.id, newExpect);
+    updateBugFields(bug.id, { expect: newExpect });
   };
 
   const handleStatusChange = (status: BugStatuses) => {
@@ -54,14 +71,32 @@ const Bug = ({ bug }: Props) => {
       </div>
 
       <Result
-        title="🔴 фактический результат"
+        title={
+          <span className="inline-flex items-center">
+            <CircleSmall
+              size={20}
+              color="var(--color-error)"
+              fill="var(--color-error)"
+            />{" "}
+            фактический результат
+          </span>
+        }
         value={bug.receive || ""}
         onSave={handleReceiveChange}
         colorType="error"
       />
 
       <Result
-        title="🟢 ожидаемый результат"
+        title={
+          <span className="inline-flex items-center">
+            <CircleSmall
+              size={20}
+              color="var(--color-success)"
+              fill="var(--color-success)"
+            />{" "}
+            ожидаемый результат
+          </span>
+        }
         value={bug.expect || ""}
         onSave={handleExpectChange}
         colorType="success"

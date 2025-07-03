@@ -1,8 +1,9 @@
+import { ReactNode } from "react";
 import BugTextarea from "./components/BugTextarea/BugTextarea";
 import { FileText, Paperclip, Trash2 } from "lucide-react";
 
 type Props = {
-  title: string;
+  title: ReactNode;
   value: string;
   onSave: (value: string) => void;
   colorType: "success" | "error";

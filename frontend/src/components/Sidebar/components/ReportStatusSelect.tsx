@@ -5,7 +5,7 @@ import StatusIndicator, {
   StatusConfig,
 } from "@/components/StatusIndicator/StatusIndicator";
 import StatusSelect from "@/components/StatusSelect/StatusSelect";
-import { CheckCircle, Clock, XCircle } from "lucide-react";
+import { CircleCheck, Clock, XCircle } from "lucide-react";
 import { CircleDashed } from "lucide-react";
 
 const reportStatusConfig: StatusConfig<ReportStatuses> = {
@@ -21,7 +21,7 @@ const reportStatusConfig: StatusConfig<ReportStatuses> = {
   },
   [ReportStatuses.RESOLVED]: {
     label: "Готово",
-    icon: CheckCircle,
+    icon: CircleCheck,
     iconColor: "text-success",
   },
   [ReportStatuses.REJECTED]: {
