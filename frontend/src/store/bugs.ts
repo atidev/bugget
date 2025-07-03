@@ -133,19 +133,12 @@ export const $reportBugsStore = createStore<Record<number, number[]>>({})
  * Computed сторы
  */
 
-// Получение багов для конкретного репорта
-export const getBugsForReport = (reportId: number | null) =>
-  combine($bugsStore, $reportBugsStore, (bugs, reportBugs) => {
-    if (!reportId) return [];
-    const bugIds = reportBugs[reportId] || [];
-    return bugIds
-      .map((id) => bugs[id])
-      .filter(Boolean)
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-  });
+// Combined store из всех багов и id багов для каждого репорта
+export const $bugsData = combine(
+  $bugsStore,
+  $reportBugsStore,
+  (bugs, reportBugs) => ({ bugs, reportBugs })
+);
 
 /**
  * Связи между сторами (Sample)

@@ -12,11 +12,16 @@ import {
 import { SocketEvent } from "@/webSocketApi/models";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
-import { useUnit } from "effector-react";
+import { useUnit, useStoreMap } from "effector-react";
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Bug from "./components/Bug/Bug";
-import { getBugsForReport } from "@/store/bugs";
+import { $bugsData } from "@/store/bugs";
+import { BugEntity } from "@/types/bug";
+
+function sortBugsByDate(a: BugEntity, b: BugEntity) {
+  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+}
 
 const ReportPage = () => {
   const navigate = useNavigate();
@@ -25,7 +30,18 @@ const ReportPage = () => {
   const title = useUnit($titleStore);
   const creatorUserName = useUnit($creatorUserNameStore);
 
-  const bugs = useUnit(getBugsForReport(Number(reportId)));
+  const bugs = useStoreMap({
+    store: $bugsData,
+    keys: [reportId],
+    fn: ({ bugs, reportBugs }, [currentReportId]) => {
+      if (!currentReportId) return [];
+      const bugIds = reportBugs[Number(currentReportId)] || [];
+      return bugIds
+        .map((id) => bugs[id])
+        .filter(Boolean)
+        .sort(sortBugsByDate);
+    },
+  });
 
   useReportPageSocket();
   useSocketEvent(SocketEvent.ReportPatch, (patch) =>
