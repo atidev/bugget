@@ -47,7 +47,7 @@ export const initSocketFx = socket.createEffect(async () => {
 
   // регистрируем единый набор хендлеров
   Object.values(SocketEvent).forEach((event) => {
-    // todo: переделать на обычную обработку
+    // todo: переделать на универсальную обработку массива аргументов в событии
     if (event === SocketEvent.BugPatch) {
       // Специальная обработка для ReceiveBugPatch - получаем bugId и patch отдельно
       const handler = (...args: unknown[]) => {

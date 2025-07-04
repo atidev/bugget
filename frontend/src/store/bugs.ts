@@ -13,7 +13,6 @@ import {
   sample,
   combine,
 } from "effector";
-import { $reportIdStore, getReportFx } from "./report";
 import { BugEntity, BugFormData, BugUpdateData } from "@/types/bug";
 import {
   CreateBugSocketResponse,
@@ -140,9 +139,6 @@ export const $bugsData = combine(
   (bugs, reportBugs) => ({ bugs, reportBugs })
 );
 
-/**
- * Связи между сторами (Sample)
- */
 // Обновление бага
 sample({
   clock: updateBugDataEvent,
@@ -152,27 +148,4 @@ sample({
     data,
   }),
   target: updateBugFx,
-});
-
-// Изменение статуса бага
-sample({
-  clock: changeBugStatusEvent,
-  source: $reportIdStore,
-  filter: (reportId) => reportId !== null,
-  fn: (reportId, { bugId, status }) => ({
-    bugId,
-    reportId: reportId!,
-    data: { status },
-  }),
-  target: updateBugDataEvent,
-});
-
-// Загрузка багов при загрузке репорта
-sample({
-  clock: getReportFx.doneData,
-  fn: (report) => ({
-    reportId: report.id,
-    bugs: report.bugs || [],
-  }),
-  target: setBugsEvent,
 });
