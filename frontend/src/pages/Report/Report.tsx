@@ -12,9 +12,16 @@ import {
 import { SocketEvent } from "@/webSocketApi/models";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
-import { useUnit } from "effector-react";
+import { useUnit, useStoreMap } from "effector-react";
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import Bug from "./components/Bug/Bug";
+import { $bugsData } from "@/store/bugs";
+import { BugEntity } from "@/types/bug";
+
+function sortBugsByDate(a: BugEntity, b: BugEntity) {
+  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+}
 
 const ReportPage = () => {
   const navigate = useNavigate();
@@ -22,6 +29,19 @@ const ReportPage = () => {
   const initialReport = useUnit($initialReportStore);
   const title = useUnit($titleStore);
   const creatorUserName = useUnit($creatorUserNameStore);
+
+  const bugs = useStoreMap({
+    store: $bugsData,
+    keys: [reportId],
+    fn: ({ bugs, reportBugs }, [currentReportId]) => {
+      if (!currentReportId) return [];
+      const bugIds = reportBugs[Number(currentReportId)] || [];
+      return bugIds
+        .map((id) => bugs[id])
+        .filter(Boolean)
+        .sort(sortBugsByDate);
+    },
+  });
 
   useReportPageSocket();
   useSocketEvent(SocketEvent.ReportPatch, (patch) =>
@@ -46,33 +66,28 @@ const ReportPage = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-4 px-6 py-8">
-        {/* <div className="flex flex-row gap-2">
-                    <p className="font-bold">ID:</p>
-                    <p>{initialReport?.id ?? "New Report"}</p>
-                </div> */}
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => changeTitleEvent(e.target.value)}
-          onBlur={() => saveTitleEvent()}
-          placeholder="Заголовок репорта"
-          className="input-lg text-2xl"
-        />
-        <div>
-          Создан{" "}
-          {initialReport?.createdAt
-            ? formatDistanceToNow(new Date(initialReport.createdAt), {
-                addSuffix: true,
-                locale: ru,
-              })
-            : ""}{" "}
-          пользователем <strong>{creatorUserName || "Загрузка..."}</strong>
-        </div>
-        <div className="flex flex-col gap-2">
-          {/* баг */}
-          <div className="grid grid-cols-2"></div>
-        </div>
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => changeTitleEvent(e.target.value)}
+        onBlur={() => saveTitleEvent()}
+        placeholder="Заголовок репорта"
+        className="input-lg text-2xl"
+      />
+      <div>
+        Создан{" "}
+        {initialReport?.createdAt
+          ? formatDistanceToNow(new Date(initialReport.createdAt), {
+              addSuffix: true,
+              locale: ru,
+            })
+          : ""}{" "}
+        пользователем <strong>{creatorUserName || "Загрузка..."}</strong>
+      </div>
+      <div className="flex flex-col gap-2">
+        {bugs?.map((bug) => (
+          <Bug key={bug.id} bug={bug} />
+        ))}
       </div>
     </>
   );

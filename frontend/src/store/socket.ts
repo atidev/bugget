@@ -47,11 +47,39 @@ export const initSocketFx = socket.createEffect(async () => {
 
   // регистрируем единый набор хендлеров
   Object.values(SocketEvent).forEach((event) => {
-    const handler = (payload: unknown) => {
-      socketEventReceived({ type: event, payload } as any);
-    };
-    conn.on(event, handler);
-    handlers.set(event, handler);
+    // todo: переделать на универсальную обработку массива аргументов в событии
+    if (event === SocketEvent.BugPatch) {
+      // Специальная обработка для ReceiveBugPatch - получаем bugId и patch отдельно
+      const handler = (...args: unknown[]) => {
+        const bugId = args[0] as number;
+        const patch = args[1] as {
+          receive?: string;
+          expect?: string;
+          status?: number;
+        };
+        console.log(`🔄 [Socket] Received event:`, event, { bugId, patch });
+        socketEventReceived({ type: event, payload: { bugId, patch } } as {
+          type: SocketEvent;
+          payload: {
+            bugId: number;
+            patch: { receive?: string; expect?: string; status?: number };
+          };
+        });
+      };
+      conn.on(event, handler);
+      handlers.set(event, handler as (p: unknown) => void);
+    } else {
+      // Обычная обработка для событий с одним параметром
+      const handler = (payload: unknown) => {
+        console.log(`🔄 [Socket] Received event:`, event, payload);
+        socketEventReceived({ type: event, payload } as {
+          type: SocketEvent;
+          payload: SocketPayload[SocketEvent];
+        });
+      };
+      conn.on(event, handler);
+      handlers.set(event, handler);
+    }
   });
 
   // системные события соединения
