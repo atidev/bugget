@@ -5,11 +5,7 @@ import Result from "./components/Result/Result";
 
 import { BugStatuses } from "@/const";
 import { BugEntity, BugFormData } from "@/types/bug";
-import {
-  changeBugStatusEvent,
-  patchBugSocketEvent,
-  updateBugDataEvent,
-} from "@/store/bugs";
+import { patchBugSocketEvent, updateBugDataEvent } from "@/store/bugs";
 import { useUnit } from "effector-react";
 import { $reportIdStore } from "@/store/report";
 import { CircleSmall } from "lucide-react";
@@ -41,7 +37,7 @@ const Bug = ({ bug }: Props) => {
   };
 
   const handleStatusChange = (status: BugStatuses) => {
-    changeBugStatusEvent({ bugId: bug.id, status });
+    updateBugFields(bug.id, { status });
   };
 
   return (

@@ -18,6 +18,7 @@ export type BugEntity = {
 export type BugFormData = {
   receive?: string;
   expect?: string;
+  status?: BugStatuses;
 };
 
 export type BugUpdateData = {
