@@ -4,8 +4,7 @@ import {
   convertObjectToCamel,
   convertObjectToSnake,
 } from "@/utils/convertCases";
-
-const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
+import { API_URL } from "@/const";
 
 const instance = axios.create({
   baseURL: API_URL,

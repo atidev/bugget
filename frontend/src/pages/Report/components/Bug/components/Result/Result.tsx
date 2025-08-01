@@ -1,15 +1,35 @@
 import { ReactNode } from "react";
 import BugTextarea from "./components/BugTextarea/BugTextarea";
-import { FileText, Paperclip, Trash2 } from "lucide-react";
+import FilePreview from "./components/FilePreview/FilePreview";
+import { Attachment } from "@/types/attachment";
 
 type Props = {
   title: ReactNode;
   value: string;
-  onSave: (value: string) => void;
   colorType: "success" | "error";
+  onSave: (value: string) => void;
+  onFileUpload: (file: File) => void;
+  onDeleteAttachment: (attachmentId: number) => void;
+  autoFocus?: boolean;
+  attachments?: Attachment[];
+  reportId?: number | null;
+  bugId?: number;
+  attachType?: number;
 };
 
-const Result = ({ title, value, onSave, colorType }: Props) => {
+const Result = ({
+  title,
+  value,
+  onSave,
+  colorType,
+  autoFocus = false,
+  attachments = [],
+  reportId,
+  bugId,
+  attachType,
+  onFileUpload,
+  onDeleteAttachment,
+}: Props) => {
   return (
     <div
       className={`border-l-4 border-${colorType} pl-4 bg-${colorType}/5 rounded-r-lg p-3`}
@@ -22,19 +42,18 @@ const Result = ({ title, value, onSave, colorType }: Props) => {
         value={value}
         onSave={onSave}
         rows={3}
+        autoFocus={autoFocus}
       />
-      {/* Иконки прикреплений для ожидаемого результата */}
-      <div className="flex gap-2 mt-2">
-        <button className="btn btn-ghost btn-xs p-1">
-          <Paperclip className="w-4 h-4 text-base-content/60" />
-        </button>
-        <button className="btn btn-ghost btn-xs p-1">
-          <FileText className="w-4 h-4 text-info" />
-        </button>
-        <button className="btn btn-ghost btn-xs p-1">
-          <Trash2 className="w-4 h-4 text-error" />
-        </button>
-      </div>
+      {reportId && bugId && (
+        <FilePreview
+          attachments={attachments}
+          reportId={reportId}
+          bugId={bugId}
+          attachType={attachType || 0}
+          onFileUpload={onFileUpload}
+          onDeleteAttachment={onDeleteAttachment}
+        />
+      )}
     </div>
   );
 };

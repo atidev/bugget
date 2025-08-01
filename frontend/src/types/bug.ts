@@ -13,6 +13,7 @@ export type BugEntity = {
   status: BugStatuses;
   attachments: Attachment[] | null;
   comments: Comment[] | null;
+  isLocalOnly?: boolean;
 };
 
 export type BugFormData = {
@@ -26,3 +27,5 @@ export type BugUpdateData = {
   reportId: number;
   data: Partial<BugFormData & { status: BugStatuses }>;
 };
+
+export type ResultFieldTypes = "receive" | "expect";

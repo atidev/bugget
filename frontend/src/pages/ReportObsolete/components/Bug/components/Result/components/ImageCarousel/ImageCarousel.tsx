@@ -2,8 +2,7 @@ import { useState } from "react";
 
 import "./ImageCarousel.css";
 import { Attachment } from "@/typesObsolete/attachement";
-
-const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
+import { API_URL } from "@/const";
 
 type Props = {
   attachments: Attachment[];

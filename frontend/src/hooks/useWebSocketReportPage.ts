@@ -5,8 +5,7 @@ import {
   LogLevel,
   HubConnectionState,
 } from "@microsoft/signalr";
-
-const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
+import { API_URL } from "@/const";
 
 const useWebSocketReportPage = (
   reportId: number,

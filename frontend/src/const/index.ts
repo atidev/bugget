@@ -51,3 +51,10 @@ export const bugStatusMap: Record<number, StatusMeta> = {
     border: "border-success",
   },
 };
+
+export const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
+
+export enum BugResultTypes {
+  RECEIVE = "receive",
+  EXPECT = "expect",
+}
