@@ -5,9 +5,16 @@ type Props = {
   placeholder?: string;
   onSave: (value: string) => void;
   rows?: number;
+  autoFocus?: boolean;
 };
 
-const ResultTextarea = ({ value, placeholder, onSave, rows = 3 }: Props) => {
+const ResultTextarea = ({
+  value,
+  placeholder,
+  onSave,
+  rows = 3,
+  autoFocus = false,
+}: Props) => {
   const [editValue, setEditValue] = useState(value || "");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -16,7 +23,7 @@ const ResultTextarea = ({ value, placeholder, onSave, rows = 3 }: Props) => {
   }, [value]);
 
   useEffect(() => {
-    if (textareaRef.current) {
+    if (autoFocus && textareaRef.current) {
       textareaRef.current.focus();
       const len = textareaRef.current.value.length;
       textareaRef.current.setSelectionRange(len, len);

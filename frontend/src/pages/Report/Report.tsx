@@ -1,3 +1,9 @@
+import { useState, useEffect } from "react";
+import { useUnit, useStoreMap } from "effector-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
+import { ru } from "date-fns/locale";
+
 import { useReportPageSocket } from "@/hooks/useReportPageSocket";
 import { useSocketEvent } from "@/hooks/useSocketEvent";
 import {
@@ -9,19 +15,12 @@ import {
   saveTitleEvent,
   updateReportPathIdEvent,
 } from "@/store/report";
-import { SocketEvent } from "@/webSocketApi/models";
-import { formatDistanceToNow } from "date-fns";
-import { ru } from "date-fns/locale";
-import { useUnit, useStoreMap } from "effector-react";
-import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import Bug from "./components/Bug/Bug";
 import { $bugsData } from "@/store/bugs";
+import { SocketEvent } from "@/webSocketApi/models";
 import { BugEntity } from "@/types/bug";
+import { BugStatuses } from "@/const";
 
-function sortBugsByDate(a: BugEntity, b: BugEntity) {
-  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-}
+import Bug from "./components/Bug/Bug";
 
 const ReportPage = () => {
   const navigate = useNavigate();
@@ -30,23 +29,30 @@ const ReportPage = () => {
   const title = useUnit($titleStore);
   const creatorUserName = useUnit($creatorUserNameStore);
 
-  const bugs = useStoreMap({
+  // баги существующие только на фронте
+  const [onlyUIBugs, setOnlyUIBugs] = useState<BugEntity[]>([]);
+
+  const bugsFromStore = useStoreMap({
     store: $bugsData,
     keys: [reportId],
     fn: ({ bugs, reportBugs }, [currentReportId]) => {
       if (!currentReportId) return [];
       const bugIds = reportBugs[Number(currentReportId)] || [];
-      return bugIds
-        .map((id) => bugs[id])
-        .filter(Boolean)
-        .sort(sortBugsByDate);
+      return bugIds.map((id) => bugs[id]).filter(Boolean);
     },
   });
+
+  const allBugs = [...bugsFromStore, ...onlyUIBugs];
 
   useReportPageSocket();
   useSocketEvent(SocketEvent.ReportPatch, (patch) =>
     patchReportSocketEvent(patch)
   );
+
+  const handleRemoveTemporaryBug = (bugId: number) => {
+    // удаляем с ui фронтовый баг и обновляем тем, что с бэкенда
+    setOnlyUIBugs((prev) => prev.filter((bug) => bug.id !== bugId));
+  };
 
   // состояние страницы
   useEffect(() => {
@@ -63,6 +69,29 @@ const ReportPage = () => {
       navigate(`/new-reports/${initialReport.id}`);
     }
   }, [initialReport?.id, reportId, navigate]);
+
+  const handleAddBugClick = () => {
+    if (!reportId) return;
+
+    const currentISODate = new Date().toISOString();
+
+    // Создаем локальный новый баг на фронте
+    const newLocalBug: BugEntity = {
+      id: Date.now(),
+      receive: "",
+      expect: "",
+      status: BugStatuses.ACTIVE,
+      createdAt: currentISODate,
+      updatedAt: currentISODate,
+      creatorUserId: "",
+      reportId: Number(reportId),
+      attachments: null,
+      comments: null,
+      isLocalOnly: true,
+    };
+
+    setOnlyUIBugs((prev) => [...prev, newLocalBug]);
+  };
 
   return (
     <>
@@ -85,9 +114,21 @@ const ReportPage = () => {
         пользователем <strong>{creatorUserName || "Загрузка..."}</strong>
       </div>
       <div className="flex flex-col gap-2">
-        {bugs?.map((bug) => (
-          <Bug key={bug.id} bug={bug} />
+        {allBugs?.map((bug: BugEntity) => (
+          <Bug
+            key={bug.id}
+            bug={bug}
+            onRemoveTemporary={
+              bug.isLocalOnly ? handleRemoveTemporaryBug : undefined
+            }
+          />
         ))}
+        <button
+          className="btn btn-outline btn-primary font-normal ml-auto"
+          onClick={handleAddBugClick}
+        >
+          Добавить баг
+        </button>
       </div>
     </>
   );

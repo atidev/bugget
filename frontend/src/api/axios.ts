@@ -4,8 +4,7 @@ import {
   convertObjectToCamel,
   convertObjectToSnake,
 } from "@/utils/convertCases";
-
-const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
+import { API_URL } from "@/const";
 
 const instance = axios.create({
   baseURL: API_URL,
@@ -43,8 +42,8 @@ instance.interceptors.response.use((response) => {
 
 // Интерцептор запроса: преобразуем camelCase → snake_case
 instance.interceptors.request.use((config) => {
-  if (config.headers["Content-Type"] !== "multipart/form-data") {
-    config.data && (config.data = convertObjectToSnake(config.data));
+  if (config.headers["Content-Type"] !== "multipart/form-data" && config.data) {
+    config.data = convertObjectToSnake(config.data);
   }
 
   if (signalRConnectionId) {
