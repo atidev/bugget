@@ -12,7 +12,7 @@ type Props = {
   onDeleteAttachment?: (attachmentId: number) => void;
 };
 
-const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
+const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
 
 const isImage = (fileName: string): boolean => {
   const extension = fileName.toLowerCase().substring(fileName.lastIndexOf("."));
@@ -78,9 +78,8 @@ function FilePreview({
     }
   };
 
-  // Получаем URL для превью
   const getPreviewUrl = (attachment: Attachment): string => {
-    return `${API_URL}v2/reports/${reportId}/bugs/${bugId}/attachments/${attachment.id}/content`;
+    return `${API_URL}v2/reports/${reportId}/bugs/${bugId}/attachments/${attachment.id}/content/preview`;
   };
 
   return (
@@ -116,7 +115,9 @@ function FilePreview({
 
               <button
                 className="absolute -top-1 -right-1 bg-error text-error-content rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-error-focus"
-                onClick={(e) => handleDeleteAttachment(e, attachment.id)}
+                onClick={(event) =>
+                  handleDeleteAttachment(event, attachment.id)
+                }
                 title="Удалить файл"
               >
                 <Trash2 className="w-3 h-3" />

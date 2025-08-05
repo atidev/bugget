@@ -10,7 +10,7 @@ import { deleteBugAttachment, uploadAttachment } from "@/api/attachments";
 import { AttachmentResponse } from "@/api/attachments/models";
 import { Attachment } from "@/types/attachment";
 
-import { setBugsEvent } from "./bugs"; // To populate attachments when bugs are set
+import { setBugsEvent } from "./";
 
 /**
  * Сторы
@@ -57,7 +57,9 @@ export const deleteAttachmentFx = createEffect<
   }
 });
 
-// --- Ивенты ---
+/**
+ * События
+ */
 
 export const uploadAttachmentEvent = createEvent<{
   reportId: number;
@@ -71,7 +73,9 @@ export const deleteAttachmentEvent = createEvent<{
   attachmentId: number;
 }>();
 
-// --- Логика ---
+/**
+ * Логика
+ */
 
 // заполняем attachments при загрузке багов из основного репорта
 $attachmentsStore.on(setBugsEvent, (state, { bugs }) => {

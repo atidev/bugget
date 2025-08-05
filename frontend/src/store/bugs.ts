@@ -20,6 +20,8 @@ import {
   PatchBugSocketResponse,
 } from "@/webSocketApi/models";
 
+import { setBugsEvent } from "./index";
+
 /**
  * Эффекты для API
  */
@@ -54,8 +56,6 @@ export const updateBugFx = createEffect<
  */
 
 // внутренние события
-export const setBugsEvent =
-  createEvent<{ reportId: number; bugs: BugClientEntity[] }>();
 export const createBugEvent =
   createEvent<{ reportId: number; data: BugFormData }>();
 export const clearBugsEvent = createEvent<void>();

@@ -1,6 +1,6 @@
-import { sample, combine } from "effector";
+import { sample, combine, createEvent } from "effector";
 
-import { $bugsData, setBugsEvent } from "./bugs";
+import { $bugsData } from "./bugs";
 import { $localBugsStore, clearLocalBugEvent } from "./localBugs";
 import {
   $creatorUserIdStore,
@@ -12,10 +12,14 @@ import {
 } from "./report";
 import { initSocketFx } from "./socket";
 import { $user } from "./user";
+import { BugClientEntity } from "@/types/bug";
 
 const $src = combine({ user: $user, reportPath: $reportPathStore });
 
 export const $allBugsStore = combine($bugsData, $localBugsStore);
+
+export const setBugsEvent =
+  createEvent<{ reportId: number; bugs: BugClientEntity[] }>();
 
 // заполнение сторов при открытии страницы создания репорта
 sample({
@@ -46,7 +50,11 @@ sample({
   clock: getReportFx.doneData,
   fn: (report) => ({
     reportId: report.id,
-    bugs: report.bugs || [],
+    bugs: (report.bugs || []).map((bug) => ({
+      ...bug,
+      clientId: bug.id,
+      isLocalOnly: false,
+    })),
   }),
   target: setBugsEvent,
 });
