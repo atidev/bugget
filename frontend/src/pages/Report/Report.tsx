@@ -2,12 +2,12 @@ import { useEffect } from "react";
 
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
-import { useUnit, useStoreMap } from "effector-react";
+import { useUnit } from "effector-react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { useReportPageSocket } from "@/hooks/useReportPageSocket";
 import { useSocketEvent } from "@/hooks/useSocketEvent";
-import { $allBugsStore } from "@/store";
+import { $combinedBugsStore } from "@/store";
 import { createLocalBugEvent } from "@/store/localBugs";
 import {
   $initialReportStore,
@@ -18,7 +18,6 @@ import {
   saveTitleEvent,
   updateReportPathIdEvent,
 } from "@/store/report";
-import { BugClientEntity } from "@/types/bug";
 import { SocketEvent } from "@/webSocketApi/models";
 
 import Bug from "./components/Bug/Bug";
@@ -29,40 +28,7 @@ const ReportPage = () => {
   const initialReport = useUnit($initialReportStore);
   const title = useUnit($titleStore);
   const creatorUserName = useUnit($creatorUserNameStore);
-
-  const allBugs = useStoreMap({
-    store: $allBugsStore,
-    keys: [reportId],
-    fn: ([bugsData, localBugs], [currentReportId]) => {
-      if (!currentReportId) return [];
-
-      const { bugs, reportBugs } = bugsData;
-      const bugIds = reportBugs[Number(currentReportId)] || [];
-
-      // 1) Собираем мапу bug.id → clientId для любого локального багa
-      const clientIdMap: Record<number, number> = {};
-      localBugs.forEach((bug) => {
-        // у вас в store и локальный, и промоушн лежат, нам нужна обоих запись
-        clientIdMap[bug.id] = bug.clientId;
-      });
-
-      // 2) Берём бекендовые баги и подставляем правильный clientId
-      const bugsFromStore = bugIds
-        .map((id: number) => bugs[id])
-        .filter(Boolean)
-        .map((bug) => ({
-          ...bug,
-          clientId: clientIdMap[bug.id] ?? bug.id, // ← вот здесь ключ сохраняется прежним
-        }));
-
-      // 3) К этим добавляем только ещё непромоушненные локальные
-      const pendingLocals = localBugs.filter(
-        (bug) => bug.reportId === Number(currentReportId) && bug.isLocalOnly
-      );
-
-      return [...bugsFromStore, ...pendingLocals];
-    },
-  });
+  const allBugs = useUnit($combinedBugsStore);
 
   useReportPageSocket();
   useSocketEvent(SocketEvent.ReportPatch, (patch) =>
@@ -110,7 +76,7 @@ const ReportPage = () => {
         пользователем <strong>{creatorUserName || "Загрузка..."}</strong>
       </div>
       <div className="flex flex-col gap-2">
-        {allBugs.map((bug: BugClientEntity) => (
+        {allBugs.map((bug) => (
           <Bug key={bug.clientId} bug={bug} />
         ))}
         <button

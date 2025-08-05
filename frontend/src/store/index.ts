@@ -1,7 +1,11 @@
-import { sample, combine } from "effector";
+import { sample, combine, createStore } from "effector";
 
 import { $bugsData } from "./bugs";
-import { $localBugsStore, clearLocalBugEvent } from "./localBugs";
+import {
+  $localBugsStore,
+  clearLocalBugEvent,
+  promoteLocalBugToBackendEvent,
+} from "./localBugs";
 import {
   $creatorUserIdStore,
   $pastResponsibleUserIdStore,
@@ -16,7 +20,45 @@ import { $user } from "./user";
 import { setBugsEvent } from "./commonEvents";
 
 const $src = combine({ user: $user, reportPath: $reportPathStore });
-export const $allBugsStore = combine($bugsData, $localBugsStore);
+
+// Мапа для сопоставления id c с бэка с clientId для промотированных багов
+// Нужна, чтобы запоминать clientId бага, который был только на фронтенде, но появился на бэке
+// clientId используем на ui как react key, чтобы не перерисовывать полностью компонент Bug
+export const $clientIdMapStore = createStore<Record<number, number>>({})
+  .on(promoteLocalBugToBackendEvent, (state, { tempClientId, backendBug }) => ({
+    ...state,
+    [backendBug.id]: tempClientId,
+  }))
+  .reset(clearLocalBugEvent);
+
+// Стор для багов с бэка и локальных
+export const $combinedBugsStore = combine(
+  $bugsData,
+  $localBugsStore,
+  $clientIdMapStore,
+  (bugsData, localBugs, clientIdMap) => {
+    const { bugs, reportBugIds } = bugsData;
+
+    const allBugIds = Object.values(reportBugIds).flat();
+
+    // Обрабатываем backend баги
+    const bugsFromStore = allBugIds.map((id: number) => {
+      const bug = bugs[id];
+
+      return bug.clientId
+        ? bug
+        : {
+            ...bug,
+            clientId: clientIdMap[bug.id] || bug.id,
+          };
+    });
+
+    // Добавляем только локальные фронтовые баги
+    const pendingLocals = localBugs.filter((bug) => bug.isLocalOnly);
+
+    return bugsFromStore.concat(pendingLocals);
+  }
+);
 
 // заполнение сторов при открытии страницы создания репорта
 sample({

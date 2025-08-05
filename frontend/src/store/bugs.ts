@@ -125,7 +125,7 @@ export const $bugsStore = createStore<Record<number, BugClientEntity>>({})
   .reset(clearBugsEvent);
 
 // Список id багов для каждого репорта
-export const $reportBugsStore = createStore<Record<number, number[]>>({})
+export const $reportBugIdsStore = createStore<Record<number, number[]>>({})
   .on(setBugsEvent, (state, { reportId, bugs }) => ({
     ...state,
     [reportId]: bugs.map((bug) => bug.id),
@@ -146,8 +146,8 @@ export const $reportBugsStore = createStore<Record<number, number[]>>({})
 // Combined store из всех багов и id багов для каждого репорта
 export const $bugsData = combine(
   $bugsStore,
-  $reportBugsStore,
-  (bugs, reportBugs) => ({ bugs, reportBugs })
+  $reportBugIdsStore,
+  (bugs, reportBugIds) => ({ bugs, reportBugIds })
 );
 
 /** Сэмплы */
