@@ -1,8 +1,9 @@
 import { BugStatuses } from "@/const";
+
 import { Attachment } from "./attachment";
 import { Comment } from "./comment";
 
-export type BugEntity = {
+export type BugClientEntity = {
   id: number;
   reportId: number;
   receive: string | null;
@@ -13,6 +14,8 @@ export type BugEntity = {
   status: BugStatuses;
   attachments: Attachment[] | null;
   comments: Comment[] | null;
+  clientId: number;
+  isLocalOnly: boolean;
 };
 
 export type BugFormData = {
@@ -24,5 +27,7 @@ export type BugFormData = {
 export type BugUpdateData = {
   bugId: number;
   reportId: number;
-  data: Partial<BugFormData & { status: BugStatuses }>;
+  data: BugFormData;
 };
+
+export type ResultFieldTypes = "receive" | "expect";

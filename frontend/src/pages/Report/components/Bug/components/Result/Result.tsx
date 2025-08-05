@@ -1,40 +1,63 @@
-import { ReactNode } from "react";
-import BugTextarea from "./components/BugTextarea/BugTextarea";
-import { FileText, Paperclip, Trash2 } from "lucide-react";
+import { Attachment } from "@/types/attachment";
+
+import Title from "./components/Title/Title";
+import FilePreview from "./components/FilePreview/FilePreview";
+import ResultTextarea from "./components/ResultTextarea/ResultTextarea";
 
 type Props = {
-  title: ReactNode;
+  reportId: number | null;
+  bugId: number;
+  title: string;
   value: string;
-  onSave: (value: string) => void;
   colorType: "success" | "error";
+  attachments: Attachment[];
+  attachType: number;
+  autoFocus: boolean;
+  onSave: (value: string) => void;
+  onBlur: (value: string) => void;
+  onAttachmentUpload: (file: File) => void;
+  onAttachmentDelete: (attachmentId: number) => void;
 };
 
-const Result = ({ title, value, onSave, colorType }: Props) => {
+const Result = ({
+  title,
+  value,
+  onSave,
+  onBlur,
+  colorType,
+  autoFocus = false,
+  attachments = [],
+  reportId,
+  bugId,
+  attachType,
+  onAttachmentUpload,
+  onAttachmentDelete,
+}: Props) => {
   return (
     <div
       className={`border-l-4 border-${colorType} pl-4 bg-${colorType}/5 rounded-r-lg p-3`}
     >
       <div className="flex items-center gap-2 mb-2">
-        <span className="font-semibold">{title}</span>
+        <Title text={title} color={`var(--color-${colorType})`} />
       </div>
-      <BugTextarea
-        placeholder="Опишите ожидаемый результат..."
-        value={value}
+      <ResultTextarea
+        placeholder={`Опишите ${title}...`}
+        value={value || ""}
         onSave={onSave}
+        onBlur={onBlur}
         rows={3}
+        autoFocus={autoFocus}
       />
-      {/* Иконки прикреплений для ожидаемого результата */}
-      <div className="flex gap-2 mt-2">
-        <button className="btn btn-ghost btn-xs p-1">
-          <Paperclip className="w-4 h-4 text-base-content/60" />
-        </button>
-        <button className="btn btn-ghost btn-xs p-1">
-          <FileText className="w-4 h-4 text-info" />
-        </button>
-        <button className="btn btn-ghost btn-xs p-1">
-          <Trash2 className="w-4 h-4 text-error" />
-        </button>
-      </div>
+      {reportId && bugId && (
+        <FilePreview
+          attachments={attachments}
+          reportId={reportId}
+          bugId={bugId}
+          attachType={attachType || 0}
+          onAttachmentUpload={onAttachmentUpload}
+          onAttachmentDelete={onAttachmentDelete}
+        />
+      )}
     </div>
   );
 };

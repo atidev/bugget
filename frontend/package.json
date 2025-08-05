@@ -6,7 +6,7 @@
   "scripts": {
     "prepare": "npx simple-git-hooks",
     "start": "npm run start-backend && npm run dev",
-    "start-backend": "docker compose -f ../docker-compose.yml --profile back up",
+    "start-backend": "docker compose -f ../docker-compose.yml --profile back up -d",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint .",

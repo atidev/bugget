@@ -1,3 +1,11 @@
+import {
+  createEffect,
+  createEvent,
+  createStore,
+  sample,
+  combine,
+} from "effector";
+
 import { createBug, updateBug } from "@/api/bugs";
 import {
   CreateBugRequest,
@@ -6,29 +14,24 @@ import {
   PatchBugResponse,
 } from "@/api/bugs/models";
 import { BugStatuses } from "@/const";
-import {
-  createEffect,
-  createEvent,
-  createStore,
-  sample,
-  combine,
-} from "effector";
-import { BugEntity, BugFormData, BugUpdateData } from "@/types/bug";
+import { BugClientEntity, BugFormData, BugUpdateData } from "@/types/bug";
 import {
   CreateBugSocketResponse,
   PatchBugSocketResponse,
 } from "@/webSocketApi/models";
+
+import { setBugsEvent } from "./commonEvents";
 
 /**
  * Эффекты для API
  */
 export const createBugFx = createEffect<
   { reportId: number; data: CreateBugRequest },
-  CreateBugResponse
+  CreateBugResponse & { reportId: number }
 >(async ({ reportId, data }) => {
   try {
     const result = await createBug(reportId, data);
-    return result;
+    return { ...result, reportId };
   } catch (error) {
     console.error("❌ createBugFx error:", error);
     throw error;
@@ -52,15 +55,15 @@ export const updateBugFx = createEffect<
  * События
  */
 
-// пользовательские действия
-export const setBugsEvent =
-  createEvent<{ reportId: number; bugs: BugEntity[] }>();
-export const addBugEvent =
+// внутренние события
+export const createBugEvent =
   createEvent<{ reportId: number; data: BugFormData }>();
+export const clearBugsEvent = createEvent<void>();
+
+// пользовательские действия
 export const updateBugDataEvent = createEvent<BugUpdateData>();
 export const changeBugStatusEvent =
   createEvent<{ bugId: number; status: BugStatuses }>();
-export const clearBugsEvent = createEvent<void>();
 
 // события сокетов
 export const createBugSocketEvent = createEvent<CreateBugSocketResponse>();
@@ -72,22 +75,22 @@ export const patchBugSocketEvent =
  */
 
 // Стор для всех багов по id репорта
-export const $bugsStore = createStore<Record<number, BugEntity>>({})
+export const $bugsStore = createStore<Record<number, BugClientEntity>>({})
   .on(setBugsEvent, (state, { bugs }) => {
     const bugsById = bugs.reduce((acc, bug) => {
       acc[bug.id] = bug;
       return acc;
-    }, {} as Record<number, BugEntity>);
+    }, {} as Record<number, BugClientEntity>);
     return { ...state, ...bugsById };
   })
   .on(createBugFx.doneData, (state, newBug) => ({
     ...state,
     [newBug.id]: {
       ...newBug,
-      reportId: newBug.id, // будет переопределено в setBugsEvent
+      reportId: newBug.reportId,
       attachments: null,
       comments: null,
-    } as BugEntity,
+    } as BugClientEntity,
   }))
   .on(updateBugFx.doneData, (state, updatedBug) => {
     const existingBug = state[updatedBug.id];
@@ -118,26 +121,46 @@ export const $bugsStore = createStore<Record<number, BugEntity>>({})
       },
     };
   })
+
   .reset(clearBugsEvent);
 
 // Список id багов для каждого репорта
-export const $reportBugsStore = createStore<Record<number, number[]>>({})
+export const $reportBugIdsStore = createStore<Record<number, number[]>>({})
   .on(setBugsEvent, (state, { reportId, bugs }) => ({
     ...state,
     [reportId]: bugs.map((bug) => bug.id),
   }))
+  .on(createBugFx.doneData, (state, newBug) => {
+    const bugIds = state[newBug.reportId] || [];
+    return {
+      ...state,
+      [newBug.reportId]: [...bugIds, newBug.id],
+    };
+  })
   .reset(clearBugsEvent);
 
 /**
- * Computed сторы
+ * Combined-сторы
  */
 
 // Combined store из всех багов и id багов для каждого репорта
 export const $bugsData = combine(
   $bugsStore,
-  $reportBugsStore,
-  (bugs, reportBugs) => ({ bugs, reportBugs })
+  $reportBugIdsStore,
+  (bugs, reportBugIds) => ({ bugs, reportBugIds })
 );
+
+/** Сэмплы */
+
+// Создание бага
+sample({
+  clock: createBugEvent,
+  fn: ({ reportId, data }) => ({
+    reportId,
+    data,
+  }),
+  target: createBugFx,
+});
 
 // Обновление бага
 sample({

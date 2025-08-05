@@ -17,7 +17,12 @@ import "./Bug.css";
 import CancelButton from "@/components/CancelButton/CancelButton";
 import SaveButton from "@/components/SaveButton/SaveButton";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import { AttachmentTypes, BugStatuses, RequestStates } from "@/const";
+import {
+  AttachmentTypes,
+  BugResultTypes,
+  BugStatuses,
+  RequestStates,
+} from "@/const";
 import Chat from "./components/Chat/Chat";
 import { uploadAttachmentFx } from "@/storeObsolete/attachments";
 import { Bug as BugType } from "@/typesObsolete/bug";
@@ -107,17 +112,19 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
 
   // 3. Обработчик выбора файла
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement> | React.ClipboardEvent<HTMLTextAreaElement>,
+    event:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ClipboardEvent<HTMLTextAreaElement>,
     attachmentType: number
   ) => {
     let file: File | null = null;
 
-    if ('target' in event && event.target instanceof HTMLInputElement) {
+    if ("target" in event && event.target instanceof HTMLInputElement) {
       file = event.target.files?.[0] || null;
-    } else if ('clipboardData' in event) {
+    } else if ("clipboardData" in event) {
       file = event.clipboardData?.items[0]?.getAsFile() || null;
     }
-    
+
     if (!file || !bug.reportId || !bug.id) return;
 
     try {
@@ -131,7 +138,7 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
       console.error(err);
       alert("Ошибка при загрузке файла");
     } finally {
-      if ('target' in event && event.target instanceof HTMLInputElement) {
+      if ("target" in event && event.target instanceof HTMLInputElement) {
         event.target.value = "";
       }
     }
@@ -205,18 +212,16 @@ const Bug = ({ reportId, isNewReport, bugId }: BugProps) => {
       <Result
         title="Фактический результат"
         value={isNewBug ? newBugData.receive : bug?.receive || ""}
-        onChange={(event) => handleResultUpdate(event, "receive")}
+        onChange={(event) => handleResultUpdate(event, BugResultTypes.RECEIVE)}
         files={receivedFiles}
-        onFileChange={(event) =>
-          handleFileChange(event, AttachmentTypes.FACT)
-        }
+        onFileChange={(event) => handleFileChange(event, AttachmentTypes.FACT)}
         withAttachments={!isNewBug}
         textareaRef={receivedTextareaRef}
       />
       <Result
         title="Ожидаемый результат"
         value={isNewBug ? newBugData.expect : bug?.expect || ""}
-        onChange={(event) => handleResultUpdate(event, "expect")}
+        onChange={(event) => handleResultUpdate(event, BugResultTypes.EXPECT)}
         files={expectedFiles}
         onFileChange={(event) =>
           handleFileChange(event, AttachmentTypes.EXPECT)
