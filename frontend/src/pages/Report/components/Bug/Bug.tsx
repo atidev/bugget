@@ -101,6 +101,8 @@ const Bug = ({ bug }: Props) => {
         field: BugResultTypes.RECEIVE,
         value,
       });
+    } else {
+      handleExistingBugChange(BugResultTypes.RECEIVE, value);
     }
   };
 
@@ -111,6 +113,8 @@ const Bug = ({ bug }: Props) => {
         field: BugResultTypes.EXPECT,
         value,
       });
+    } else {
+      handleExistingBugChange(BugResultTypes.EXPECT, value);
     }
   };
 
