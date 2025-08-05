@@ -1,10 +1,12 @@
-import { ReactNode } from "react";
-import BugTextarea from "./components/BugTextarea/BugTextarea";
-import FilePreview from "./components/FilePreview/FilePreview";
+import { CircleSmall } from "lucide-react";
+
 import { Attachment } from "@/types/attachment";
 
+import FilePreview from "./components/FilePreview/FilePreview";
+import BugTextarea from "./components/ResultTextarea/ResultTextarea";
+
 type Props = {
-  title: ReactNode;
+  title: string;
   value: string;
   colorType: "success" | "error";
   onSave: (value: string) => void;
@@ -15,6 +17,14 @@ type Props = {
   reportId?: number | null;
   bugId?: number;
   attachType?: number;
+};
+
+const Title = ({ text, color }: { text: string; color: string }) => {
+  return (
+    <span className="inline-flex items-center">
+      <CircleSmall size={20} color={color} fill={color} /> {text}
+    </span>
+  );
 };
 
 const Result = ({
@@ -35,10 +45,10 @@ const Result = ({
       className={`border-l-4 border-${colorType} pl-4 bg-${colorType}/5 rounded-r-lg p-3`}
     >
       <div className="flex items-center gap-2 mb-2">
-        <span className="font-semibold">{title}</span>
+        <Title text={title} color={`var(--color-${colorType})`} />
       </div>
       <BugTextarea
-        placeholder="Опишите ожидаемый результат..."
+        placeholder={`Опишите ${title}...`}
         value={value}
         onSave={onSave}
         rows={3}

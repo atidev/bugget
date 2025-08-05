@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
-import { useUnit, useStoreMap } from "effector-react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
+import { useUnit, useStoreMap } from "effector-react";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { useReportPageSocket } from "@/hooks/useReportPageSocket";
 import { useSocketEvent } from "@/hooks/useSocketEvent";
+import { $allBugsStore } from "@/store";
+import { createLocalBugEvent } from "@/store/localBugs";
 import {
   $initialReportStore,
   $titleStore,
@@ -15,10 +18,8 @@ import {
   saveTitleEvent,
   updateReportPathIdEvent,
 } from "@/store/report";
-import { $bugsData } from "@/store/bugs";
+import { BugClientEntity } from "@/types/bug";
 import { SocketEvent } from "@/webSocketApi/models";
-import { BugEntity } from "@/types/bug";
-import { BugStatuses } from "@/const";
 
 import Bug from "./components/Bug/Bug";
 
@@ -29,35 +30,49 @@ const ReportPage = () => {
   const title = useUnit($titleStore);
   const creatorUserName = useUnit($creatorUserNameStore);
 
-  // баги существующие только на фронте
-  const [onlyUIBugs, setOnlyUIBugs] = useState<BugEntity[]>([]);
-
-  const bugsFromStore = useStoreMap({
-    store: $bugsData,
+  const allBugs = useStoreMap({
+    store: $allBugsStore,
     keys: [reportId],
-    fn: ({ bugs, reportBugs }, [currentReportId]) => {
+    fn: ([bugsData, localBugs], [currentReportId]) => {
       if (!currentReportId) return [];
+
+      const { bugs, reportBugs } = bugsData;
       const bugIds = reportBugs[Number(currentReportId)] || [];
-      return bugIds.map((id) => bugs[id]).filter(Boolean);
+
+      // 1) Собираем мапу bug.id → clientId для любого локального багa
+      const clientIdMap: Record<number, number> = {};
+      localBugs.forEach((bug) => {
+        // у вас в store и локальный, и промоушн лежат, нам нужна обоих запись
+        clientIdMap[bug.id] = bug.clientId;
+      });
+
+      // 2) Берём бекендовые баги и подставляем правильный clientId
+      const bugsFromStore = bugIds
+        .map((id: number) => bugs[id])
+        .filter(Boolean)
+        .map((bug) => ({
+          ...bug,
+          clientId: clientIdMap[bug.id] ?? bug.id, // ← вот здесь ключ сохраняется прежним
+        }));
+
+      // 3) К этим добавляем только ещё непромоушненные локальные
+      const pendingLocals = localBugs.filter(
+        (bug) => bug.reportId === Number(currentReportId) && bug.isLocalOnly
+      );
+
+      return [...bugsFromStore, ...pendingLocals];
     },
   });
-
-  const allBugs = [...bugsFromStore, ...onlyUIBugs];
 
   useReportPageSocket();
   useSocketEvent(SocketEvent.ReportPatch, (patch) =>
     patchReportSocketEvent(patch)
   );
 
-  const handleRemoveTemporaryBug = (bugId: number) => {
-    // удаляем с ui фронтовый баг и обновляем тем, что с бэкенда
-    setOnlyUIBugs((prev) => prev.filter((bug) => bug.id !== bugId));
-  };
-
   // состояние страницы
   useEffect(() => {
     if (reportId) {
-      updateReportPathIdEvent(parseInt(reportId));
+      updateReportPathIdEvent(Number(reportId));
     } else {
       updateReportPathIdEvent(null);
     }
@@ -71,26 +86,7 @@ const ReportPage = () => {
   }, [initialReport?.id, reportId, navigate]);
 
   const handleAddBugClick = () => {
-    if (!reportId) return;
-
-    const currentISODate = new Date().toISOString();
-
-    // Создаем локальный новый баг на фронте
-    const newLocalBug: BugEntity = {
-      id: Date.now(),
-      receive: "",
-      expect: "",
-      status: BugStatuses.ACTIVE,
-      createdAt: currentISODate,
-      updatedAt: currentISODate,
-      creatorUserId: "",
-      reportId: Number(reportId),
-      attachments: null,
-      comments: null,
-      isLocalOnly: true,
-    };
-
-    setOnlyUIBugs((prev) => [...prev, newLocalBug]);
+    createLocalBugEvent({ reportId: Number(reportId) });
   };
 
   return (
@@ -114,14 +110,8 @@ const ReportPage = () => {
         пользователем <strong>{creatorUserName || "Загрузка..."}</strong>
       </div>
       <div className="flex flex-col gap-2">
-        {allBugs?.map((bug: BugEntity) => (
-          <Bug
-            key={bug.id}
-            bug={bug}
-            onRemoveTemporary={
-              bug.isLocalOnly ? handleRemoveTemporaryBug : undefined
-            }
-          />
+        {allBugs.map((bug: BugClientEntity) => (
+          <Bug key={bug.clientId} bug={bug} />
         ))}
         <button
           className="btn btn-outline btn-primary font-normal ml-auto"

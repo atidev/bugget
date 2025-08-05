@@ -1,5 +1,7 @@
 import { sample, combine } from "effector";
-import { $user } from "./user";
+
+import { $bugsData, setBugsEvent } from "./bugs";
+import { $localBugsStore, clearLocalBugEvent } from "./localBugs";
 import {
   $creatorUserIdStore,
   $pastResponsibleUserIdStore,
@@ -9,9 +11,11 @@ import {
   getReportFx,
 } from "./report";
 import { initSocketFx } from "./socket";
-import { setBugsEvent } from "./bugs";
+import { $user } from "./user";
 
 const $src = combine({ user: $user, reportPath: $reportPathStore });
+
+export const $allBugsStore = combine($bugsData, $localBugsStore);
 
 // заполнение сторов при открытии страницы создания репорта
 sample({
@@ -45,4 +49,10 @@ sample({
     bugs: report.bugs || [],
   }),
   target: setBugsEvent,
+});
+
+// очистка стора новых багов при смене репорта
+sample({
+  clock: $reportIdStore,
+  target: clearLocalBugEvent,
 });

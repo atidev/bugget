@@ -5,20 +5,26 @@ import {
   sample,
   combine,
 } from "effector";
+
 import { deleteBugAttachment, uploadAttachment } from "@/api/attachments";
 import { AttachmentResponse } from "@/api/attachments/models";
 import { Attachment } from "@/types/attachment";
+
 import { setBugsEvent } from "./bugs"; // To populate attachments when bugs are set
 
-// --- Сторы ---
+/**
+ * Сторы
+ */
 
-// Стор для всех сущностей attachment, ключём по ID
+// Стор для всех сущностей attachment c ключём по ID
 export const $attachmentsStore = createStore<Record<number, Attachment>>({});
 
 // Стор для маппинга id багов с attachment id
 export const $bugAttachmentsStore = createStore<Record<number, number[]>>({});
 
-// --- Эффекты ---
+/**
+ * Эффекты
+ */
 
 export const uploadAttachmentFx = createEffect<
   { reportId: number; bugId: number; attachType: number; file: File },
@@ -126,7 +132,9 @@ $bugAttachmentsStore.on(
   }
 );
 
-// --- Samples ---
+/**
+ * Сэмплы
+ */
 
 sample({
   clock: uploadAttachmentEvent,
@@ -138,7 +146,9 @@ sample({
   target: deleteAttachmentFx,
 });
 
-// --- Combined-сторы ---
+/**
+ * Combined-сторы
+ */
 
 export const $attachmentsData = combine(
   $attachmentsStore,
