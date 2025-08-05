@@ -1,30 +1,25 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 
 type Props = {
-  value: string | null;
-  placeholder?: string;
-  rows?: number;
-  autoFocus?: boolean;
+  value: string;
+  placeholder: string;
+  autoFocus: boolean;
+  rows: number;
   onSave: (value: string) => void;
-  onFocus?: () => void;
+  onBlur: (value: string) => void;
 };
 
 const ResultTextarea = ({
   value,
-  onSave,
   placeholder,
-  rows = 3,
-  autoFocus = false,
+  rows,
+  autoFocus,
+  onSave,
+  onBlur,
 }: Props) => {
-  const [localValue, setEditValue] = useState(value || "");
+  const [localValue, setLocalValue] = useState(value);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const focusedRef = useRef(false);
-
-  useEffect(() => {
-    if (!focusedRef.current) {
-      setEditValue(value || "");
-    }
-  }, [value]);
 
   useEffect(() => {
     if (autoFocus && textareaRef.current) {
@@ -43,22 +38,21 @@ const ResultTextarea = ({
 
   const handleBlur = () => {
     focusedRef.current = false;
-    // ОТЛОЖИМ сохранение на следующий тик:
-    setTimeout(handleSave, 0);
+    onBlur(localValue);
   };
 
   const handleFocus = () => {
     focusedRef.current = true;
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
       handleSave();
     }
-    if (e.key === "Escape") {
-      e.preventDefault();
-      setEditValue(value || "");
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setLocalValue(value || "");
     }
   };
 
@@ -66,7 +60,7 @@ const ResultTextarea = ({
     <textarea
       ref={textareaRef}
       value={localValue}
-      onChange={(e) => setEditValue(e.target.value)}
+      onChange={(event) => setLocalValue(event.target.value)}
       onBlur={handleBlur}
       onFocus={handleFocus}
       onKeyDown={handleKeyDown}

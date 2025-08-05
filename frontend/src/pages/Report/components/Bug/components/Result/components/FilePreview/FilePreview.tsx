@@ -8,8 +8,8 @@ type Props = {
   reportId: number;
   bugId: number;
   attachType: number;
-  onFileUpload?: (file: File) => void;
-  onDeleteAttachment?: (attachmentId: number) => void;
+  onAttachmentUpload?: (file: File) => void;
+  onAttachmentDelete?: (attachmentId: number) => void;
 };
 
 const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
@@ -23,8 +23,8 @@ function FilePreview({
   attachments,
   reportId,
   bugId,
-  onFileUpload,
-  onDeleteAttachment,
+  onAttachmentUpload,
+  onAttachmentDelete,
 }: Props) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -57,8 +57,8 @@ function FilePreview({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && onFileUpload) {
-      onFileUpload(file);
+    if (file && onAttachmentUpload) {
+      onAttachmentUpload(file);
     }
     // Сбрасываем значение input для возможности загрузки того же файла
     event.target.value = "";
@@ -73,8 +73,8 @@ function FilePreview({
     attachmentId: number
   ) => {
     event.stopPropagation(); // Предотвращаем открытие карусели
-    if (onDeleteAttachment) {
-      onDeleteAttachment(attachmentId);
+    if (onAttachmentDelete) {
+      onAttachmentDelete(attachmentId);
     }
   };
 

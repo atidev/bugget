@@ -1,44 +1,37 @@
-import { CircleSmall } from "lucide-react";
-
 import { Attachment } from "@/types/attachment";
 
+import Title from "./components/Title/Title";
 import FilePreview from "./components/FilePreview/FilePreview";
-import BugTextarea from "./components/ResultTextarea/ResultTextarea";
+import ResultTextarea from "./components/ResultTextarea/ResultTextarea";
 
 type Props = {
+  reportId: number | null;
+  bugId: number;
   title: string;
   value: string;
   colorType: "success" | "error";
+  attachments: Attachment[];
+  attachType: number;
+  autoFocus: boolean;
   onSave: (value: string) => void;
-  onFileUpload: (file: File) => void;
-  onDeleteAttachment: (attachmentId: number) => void;
-  autoFocus?: boolean;
-  attachments?: Attachment[];
-  reportId?: number | null;
-  bugId?: number;
-  attachType?: number;
-};
-
-const Title = ({ text, color }: { text: string; color: string }) => {
-  return (
-    <span className="inline-flex items-center">
-      <CircleSmall size={20} color={color} fill={color} /> {text}
-    </span>
-  );
+  onBlur: (value: string) => void;
+  onAttachmentUpload: (file: File) => void;
+  onAttachmentDelete: (attachmentId: number) => void;
 };
 
 const Result = ({
   title,
   value,
   onSave,
+  onBlur,
   colorType,
   autoFocus = false,
   attachments = [],
   reportId,
   bugId,
   attachType,
-  onFileUpload,
-  onDeleteAttachment,
+  onAttachmentUpload,
+  onAttachmentDelete,
 }: Props) => {
   return (
     <div
@@ -47,10 +40,11 @@ const Result = ({
       <div className="flex items-center gap-2 mb-2">
         <Title text={title} color={`var(--color-${colorType})`} />
       </div>
-      <BugTextarea
+      <ResultTextarea
         placeholder={`Опишите ${title}...`}
-        value={value}
+        value={value || ""}
         onSave={onSave}
+        onBlur={onBlur}
         rows={3}
         autoFocus={autoFocus}
       />
@@ -60,8 +54,8 @@ const Result = ({
           reportId={reportId}
           bugId={bugId}
           attachType={attachType || 0}
-          onFileUpload={onFileUpload}
-          onDeleteAttachment={onDeleteAttachment}
+          onAttachmentUpload={onAttachmentUpload}
+          onAttachmentDelete={onAttachmentDelete}
         />
       )}
     </div>

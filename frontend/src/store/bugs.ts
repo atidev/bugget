@@ -20,7 +20,7 @@ import {
   PatchBugSocketResponse,
 } from "@/webSocketApi/models";
 
-import { setBugsEvent } from "./index";
+import { setBugsEvent } from "./commonEvents";
 
 /**
  * Эффекты для API

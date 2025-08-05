@@ -32,6 +32,13 @@ export const createBugOnServerEvent = createEvent<{
   receive: string;
   expect: string;
 }>();
+
+// Событие для создания бага по расфокусу
+export const createBugOnBlurEvent = createEvent<{
+  clientId: number;
+  field: ResultFieldTypes;
+  value: string;
+}>();
 export const promoteLocalBugToBackendEvent = createEvent<{
   tempClientId: number;
   backendBug: CreateBugResponse & { reportId: number };
@@ -132,26 +139,6 @@ export const $focusedBugClientId = createStore<number | null>(null).on(
 
 /** Сэмплы */
 
-const $readyToCreateBug = sample({
-  clock: updateLocalBugFieldEvent,
-  source: $newLocalBugStore,
-  filter: (state, { value }) =>
-    !state.hasCreatedOnBackend &&
-    state.reportId !== null &&
-    !!value.trim().length,
-  fn: (state, { field, value }) => ({
-    reportId: state.reportId!,
-    receive: field === BugResultTypes.RECEIVE ? value : state.receive,
-    expect: field === BugResultTypes.EXPECT ? value : state.expect,
-  }),
-});
-
-sample({
-  clock: $readyToCreateBug,
-  filter: (payload): payload is NonNullable<typeof payload> => payload !== null,
-  target: createBugOnServerEvent,
-});
-
 sample({
   source: $user,
   clock: createBugOnServerEvent,
@@ -181,6 +168,37 @@ sample({
   filter: (state) => state.clientId != null,
   fn: (state) => state.clientId!,
   target: setFocusedBugEvent,
+});
+
+// Подготовка данных для создания бага по расфокусу
+const $readyToCreateBugOnBlur = sample({
+  clock: createBugOnBlurEvent,
+  source: $newLocalBugStore,
+  filter: (state, { clientId }) =>
+    state.clientId === clientId &&
+    !state.hasCreatedOnBackend &&
+    state.reportId !== null,
+  fn: (state, { field, value }) => {
+    const newReceive = field === BugResultTypes.RECEIVE ? value : state.receive;
+    const newExpect = field === BugResultTypes.EXPECT ? value : state.expect;
+
+    // Создаем баг только если есть хотя бы одно заполненное поле
+    if (newReceive.trim() || newExpect.trim()) {
+      return {
+        reportId: state.reportId!,
+        receive: newReceive,
+        expect: newExpect,
+      };
+    }
+    return null;
+  },
+});
+
+// Создание бага по расфокусу
+sample({
+  clock: $readyToCreateBugOnBlur,
+  filter: (payload): payload is NonNullable<typeof payload> => payload !== null,
+  target: createBugOnServerEvent,
 });
 
 sample({

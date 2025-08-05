@@ -10,7 +10,7 @@ import { deleteBugAttachment, uploadAttachment } from "@/api/attachments";
 import { AttachmentResponse } from "@/api/attachments/models";
 import { Attachment } from "@/types/attachment";
 
-import { setBugsEvent } from "./";
+import { setBugsEvent } from "./commonEvents";
 
 /**
  * Сторы

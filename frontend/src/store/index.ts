@@ -1,4 +1,4 @@
-import { sample, combine, createEvent } from "effector";
+import { sample, combine } from "effector";
 
 import { $bugsData } from "./bugs";
 import { $localBugsStore, clearLocalBugEvent } from "./localBugs";
@@ -12,14 +12,11 @@ import {
 } from "./report";
 import { initSocketFx } from "./socket";
 import { $user } from "./user";
-import { BugClientEntity } from "@/types/bug";
+
+import { setBugsEvent } from "./commonEvents";
 
 const $src = combine({ user: $user, reportPath: $reportPathStore });
-
 export const $allBugsStore = combine($bugsData, $localBugsStore);
-
-export const setBugsEvent =
-  createEvent<{ reportId: number; bugs: BugClientEntity[] }>();
 
 // заполнение сторов при открытии страницы создания репорта
 sample({

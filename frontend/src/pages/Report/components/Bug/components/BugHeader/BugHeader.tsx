@@ -1,26 +1,21 @@
-import { memo } from "react";
-
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 
 import { BugStatuses } from "@/const";
 import { BugClientEntity } from "@/types/bug";
 
-import BugStatusSelect from "../BugStatusSelect/BugStatusSelect";
+import BugStatusSelect from "./components/BugStatusSelect/BugStatusSelect";
 
 type Props = {
   bug: BugClientEntity;
   onStatusChange?: (status: BugStatuses) => void;
 };
 
-const BugHeader = memo(({ bug, onStatusChange }: Props) => {
+const BugHeader = ({ bug, onStatusChange }: Props) => {
   return (
     <div className="col-span-2 flex justify-between items-center mb-4">
       <div className="flex items-center gap-2">
-        <span
-          id={bug.id?.toString()}
-          className="text-lg font-bold min-h-[28px] flex items-center"
-        >
+        <span className="text-lg font-bold min-h-[28px] flex items-center">
           {bug.isLocalOnly ? "Новый баг" : `Баг #${bug.id}`}
         </span>
         {!bug.isLocalOnly && bug.createdAt && (
@@ -38,8 +33,6 @@ const BugHeader = memo(({ bug, onStatusChange }: Props) => {
       )}
     </div>
   );
-});
-
-BugHeader.displayName = "BugHeader";
+};
 
 export default BugHeader;

@@ -15,6 +15,7 @@ import {
   $newLocalBugStore,
   setLocalBugReportEvent,
   updateLocalBugFieldEvent,
+  createBugOnBlurEvent,
 } from "@/store/localBugs";
 import { $reportIdStore } from "@/store/report";
 import { BugClientEntity, BugFormData, ResultFieldTypes } from "@/types/bug";
@@ -93,6 +94,26 @@ const Bug = ({ bug }: Props) => {
     }
   };
 
+  const handleReceiveBlur = (value: string) => {
+    if (bug.isLocalOnly) {
+      createBugOnBlurEvent({
+        clientId: bug.clientId,
+        field: BugResultTypes.RECEIVE,
+        value,
+      });
+    }
+  };
+
+  const handleExpectBlur = (value: string) => {
+    if (bug.isLocalOnly) {
+      createBugOnBlurEvent({
+        clientId: bug.clientId,
+        field: BugResultTypes.EXPECT,
+        value,
+      });
+    }
+  };
+
   const handleStatusChange = (status: BugStatuses) => {
     updateBugFields(bug.id, { status });
   };
@@ -131,28 +152,32 @@ const Bug = ({ bug }: Props) => {
         title="фактический результат"
         value={bug.isLocalOnly ? newBug.receive : bug.receive || ""}
         onSave={handleReceiveChange}
+        onBlur={handleReceiveBlur}
         colorType="error"
         autoFocus={bug.clientId === focusedClientId}
         attachments={receiveAttachments}
-        reportId={reportId || undefined}
-        bugId={bug.id || undefined}
+        reportId={reportId}
+        bugId={bug.id}
         attachType={AttachmentTypes.FACT}
-        onFileUpload={() => handleAttachmentUpload(AttachmentTypes.FACT)}
-        onDeleteAttachment={handleDeleteAttachment}
+        onAttachmentUpload={() => handleAttachmentUpload(AttachmentTypes.FACT)}
+        onAttachmentDelete={handleDeleteAttachment}
       />
 
       <Result
         title="ожидаемый результат"
         value={bug.isLocalOnly ? newBug.expect : bug.expect || ""}
         onSave={handleExpectChange}
+        onBlur={handleExpectBlur}
         colorType="success"
         autoFocus={false}
         attachments={expectAttachments}
         reportId={reportId}
         bugId={bug.id}
         attachType={AttachmentTypes.EXPECT}
-        onFileUpload={() => handleAttachmentUpload(AttachmentTypes.EXPECT)}
-        onDeleteAttachment={handleDeleteAttachment}
+        onAttachmentUpload={() =>
+          handleAttachmentUpload(AttachmentTypes.EXPECT)
+        }
+        onAttachmentDelete={handleDeleteAttachment}
       />
     </div>
   );
