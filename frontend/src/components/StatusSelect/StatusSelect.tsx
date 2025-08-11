@@ -24,7 +24,7 @@ const StatusSelect = <T,>({
     <div className={`dropdown dropdown-end ${className}`}>
       <label
         tabIndex={0}
-        className="flex items-center gap-2 justify-start cursor-pointer hover:bg-base-200 p-2 rounded"
+        className="flex items-center gap-2 justify-start cursor-pointer hover:bg-base-200 p-1 rounded"
       >
         {currentOption?.indicator}
       </label>

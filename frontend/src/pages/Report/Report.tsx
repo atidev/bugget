@@ -1,5 +1,14 @@
+import { useEffect } from "react";
+
+import { formatDistanceToNow } from "date-fns";
+import { ru } from "date-fns/locale";
+import { useUnit } from "effector-react";
+import { useParams, useNavigate } from "react-router-dom";
+
 import { useReportPageSocket } from "@/hooks/useReportPageSocket";
 import { useSocketEvent } from "@/hooks/useSocketEvent";
+import { $combinedBugsStore } from "@/store";
+import { createLocalBugEvent } from "@/store/localBugs";
 import {
   $initialReportStore,
   $titleStore,
@@ -10,18 +19,8 @@ import {
   updateReportPathIdEvent,
 } from "@/store/report";
 import { SocketEvent } from "@/webSocketApi/models";
-import { formatDistanceToNow } from "date-fns";
-import { ru } from "date-fns/locale";
-import { useUnit, useStoreMap } from "effector-react";
-import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import Bug from "./components/Bug/Bug";
-import { $bugsData } from "@/store/bugs";
-import { BugEntity } from "@/types/bug";
 
-function sortBugsByDate(a: BugEntity, b: BugEntity) {
-  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-}
+import Bug from "./components/Bug/Bug";
 
 const ReportPage = () => {
   const navigate = useNavigate();
@@ -29,19 +28,7 @@ const ReportPage = () => {
   const initialReport = useUnit($initialReportStore);
   const title = useUnit($titleStore);
   const creatorUserName = useUnit($creatorUserNameStore);
-
-  const bugs = useStoreMap({
-    store: $bugsData,
-    keys: [reportId],
-    fn: ({ bugs, reportBugs }, [currentReportId]) => {
-      if (!currentReportId) return [];
-      const bugIds = reportBugs[Number(currentReportId)] || [];
-      return bugIds
-        .map((id) => bugs[id])
-        .filter(Boolean)
-        .sort(sortBugsByDate);
-    },
-  });
+  const allBugs = useUnit($combinedBugsStore);
 
   useReportPageSocket();
   useSocketEvent(SocketEvent.ReportPatch, (patch) =>
@@ -51,7 +38,7 @@ const ReportPage = () => {
   // состояние страницы
   useEffect(() => {
     if (reportId) {
-      updateReportPathIdEvent(parseInt(reportId));
+      updateReportPathIdEvent(Number(reportId));
     } else {
       updateReportPathIdEvent(null);
     }
@@ -63,6 +50,10 @@ const ReportPage = () => {
       navigate(`/new-reports/${initialReport.id}`);
     }
   }, [initialReport?.id, reportId, navigate]);
+
+  const handleAddBugClick = () => {
+    createLocalBugEvent({ reportId: Number(reportId) });
+  };
 
   return (
     <>
@@ -85,9 +76,15 @@ const ReportPage = () => {
         пользователем <strong>{creatorUserName || "Загрузка..."}</strong>
       </div>
       <div className="flex flex-col gap-2">
-        {bugs?.map((bug) => (
-          <Bug key={bug.id} bug={bug} />
+        {allBugs.map((bug) => (
+          <Bug key={bug.clientId} bug={bug} />
         ))}
+        <button
+          className="btn btn-outline btn-primary font-normal ml-auto"
+          onClick={handleAddBugClick}
+        >
+          Добавить баг
+        </button>
       </div>
     </>
   );
