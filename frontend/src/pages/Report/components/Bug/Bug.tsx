@@ -163,7 +163,7 @@ const Bug = ({ bug }: Props) => {
         reportId={reportId}
         bugId={bug.id}
         attachType={AttachmentTypes.FACT}
-        onAttachmentUpload={() => handleAttachmentUpload(AttachmentTypes.FACT)}
+        onAttachmentUpload={handleAttachmentUpload(AttachmentTypes.FACT)}
         onAttachmentDelete={handleDeleteAttachment}
       />
 
@@ -178,9 +178,7 @@ const Bug = ({ bug }: Props) => {
         reportId={reportId}
         bugId={bug.id}
         attachType={AttachmentTypes.EXPECT}
-        onAttachmentUpload={() =>
-          handleAttachmentUpload(AttachmentTypes.EXPECT)
-        }
+        onAttachmentUpload={handleAttachmentUpload(AttachmentTypes.EXPECT)}
         onAttachmentDelete={handleDeleteAttachment}
       />
     </div>

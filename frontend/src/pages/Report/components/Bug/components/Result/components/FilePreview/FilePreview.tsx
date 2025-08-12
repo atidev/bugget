@@ -78,8 +78,13 @@ function FilePreview({
     }
   };
 
-  const getPreviewUrl = (attachment: Attachment): string => {
-    return `${API_URL}v2/reports/${reportId}/bugs/${bugId}/attachments/${attachment.id}/content/preview`;
+  const getImageUrl = (
+    attachment: Attachment,
+    hasPreview?: boolean
+  ): string => {
+    return `${API_URL}v2/reports/${reportId}/bugs/${bugId}/attachments/${
+      attachment.id
+    }/content/${hasPreview ? "preview" : ""}`;
   };
 
   return (
@@ -104,7 +109,7 @@ function FilePreview({
               >
                 {isImageFile && attachment.hasPreview ? (
                   <img
-                    src={getPreviewUrl(attachment)}
+                    src={getImageUrl(attachment, true)}
                     alt={attachment.fileName}
                     className="w-4 h-4 object-cover rounded"
                   />
@@ -139,7 +144,7 @@ function FilePreview({
           <div className="modal-box relative w-11/12 max-w-3xl">
             {isImage(attachments[activeIndex].fileName) ? (
               <img
-                src={getPreviewUrl(attachments[activeIndex])}
+                src={getImageUrl(attachments[activeIndex])}
                 alt={attachments[activeIndex].fileName}
                 className="w-full h-full object-cover"
               />
