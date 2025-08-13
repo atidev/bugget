@@ -7,5 +7,5 @@ export type Comment = {
   creatorUserId: string;
   createdAt: string;
   updatedAt: string;
-  attachments: Attachment[] | null;
+  attachments?: Attachment[] | null;
 };

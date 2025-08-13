@@ -23,6 +23,7 @@ import { SocketEvent } from "@/webSocketApi/models";
 
 import BugHeader from "./components/BugHeader/BugHeader";
 import Result from "./components/Result/Result";
+import Comments from "./components/Comments/Comments";
 
 type Props = {
   bug: BugClientEntity;
@@ -181,6 +182,8 @@ const Bug = ({ bug }: Props) => {
         onAttachmentUpload={handleAttachmentUpload(AttachmentTypes.EXPECT)}
         onAttachmentDelete={handleDeleteAttachment}
       />
+
+      <Comments reportId={reportId} bugId={bug.id} />
     </div>
   );
 };
