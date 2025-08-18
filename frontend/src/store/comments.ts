@@ -1,6 +1,12 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { createComment, updateComment, deleteComment } from "@/api/comments";
+import {
+  getCommentAttachments,
+  createCommentAttachment,
+  deleteCommentAttachment,
+} from "@/api/attachments";
 import { Comment } from "@/types/comment";
+import { Attachment } from "@/types/attachment";
 
 /**
  * Сторы
@@ -109,6 +115,53 @@ export const setCommentsByBugIdEvent = createEvent<
   }[]
 >();
 
+export const fetchCommentAttachmentsFx = createEffect<
+  { reportId: number; bugId: number; commentId: number },
+  { bugId: number; commentId: number; attachments: Attachment[] }
+>(async ({ reportId, bugId, commentId }) => {
+  const res = await getCommentAttachments(reportId, bugId, commentId);
+  const attachments: Attachment[] = res.map((attachment) => ({
+    id: attachment.id,
+    entityId: attachment.entityId,
+    attachType: attachment.attachType,
+    createdAt: attachment.createdAt,
+    creatorUserId: attachment.creatorUserId,
+    fileName: attachment.fileName,
+    hasPreview: attachment.hasPreview,
+  }));
+  return { bugId, commentId, attachments };
+});
+
+export const createCommentAttachmentFx = createEffect<
+  { reportId: number; bugId: number; commentId: number; file: File },
+  { bugId: number; commentId: number; attachment: Attachment }
+>(async ({ reportId, bugId, commentId, file }) => {
+  const result = await createCommentAttachment(
+    reportId,
+    bugId,
+    commentId,
+    file
+  );
+  const attachment: Attachment = {
+    id: result.id,
+    entityId: result.entityId,
+    attachType: result.attachType,
+    createdAt: result.createdAt,
+    creatorUserId: result.creatorUserId,
+    fileName: result.fileName,
+    hasPreview: result.hasPreview,
+  };
+  return { bugId, commentId, attachment };
+});
+
+export const deleteCommentAttachmentFx = createEffect<
+  { reportId: number; bugId: number; commentId: number; attachmentId: number },
+  { bugId: number; commentId: number; attachmentId: number }
+>(async ({ reportId, bugId, commentId, attachmentId }) => {
+  await deleteCommentAttachment(reportId, bugId, commentId, attachmentId);
+  return { bugId, commentId, attachmentId };
+});
+
 /**
  * Логика
  */
@@ -143,7 +196,55 @@ $commentsByBugId
       ...state,
       [bugId]: existingComments.filter((c) => c.id !== commentId),
     };
-  });
+  })
+  .on(
+    fetchCommentAttachmentsFx.doneData,
+    (state, { bugId, commentId, attachments }) => {
+      const existingComments = state[bugId] || [];
+      return {
+        ...state,
+        [bugId]: existingComments.map((comment) =>
+          comment.id === commentId ? { ...comment, attachments } : comment
+        ),
+      };
+    }
+  )
+  .on(
+    createCommentAttachmentFx.doneData,
+    (state, { bugId, commentId, attachment }) => {
+      const existingComments = state[bugId] || [];
+      return {
+        ...state,
+        [bugId]: existingComments.map((comment) =>
+          comment.id === commentId
+            ? {
+                ...comment,
+                attachments: [...(comment.attachments || []), attachment],
+              }
+            : comment
+        ),
+      };
+    }
+  )
+  .on(
+    deleteCommentAttachmentFx.doneData,
+    (state, { bugId, commentId, attachmentId }) => {
+      const existingComments = state[bugId] || [];
+      return {
+        ...state,
+        [bugId]: existingComments.map((comment) =>
+          comment.id === commentId
+            ? {
+                ...comment,
+                attachments: (comment.attachments || []).filter(
+                  (a) => a.id !== attachmentId
+                ),
+              }
+            : comment
+        ),
+      };
+    }
+  );
 
 /**
  * Сэмплы

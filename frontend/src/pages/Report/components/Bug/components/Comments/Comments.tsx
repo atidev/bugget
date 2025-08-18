@@ -1,22 +1,19 @@
 import { useState, useRef, useCallback } from "react";
-import {
-  Paperclip,
-  Trash2,
-  Send,
-  MoreVertical,
-  MessageCircle,
-} from "lucide-react";
+import { Trash2, Send, MoreVertical, MessageCircle } from "lucide-react";
 import { useStoreMap, useUnit } from "effector-react";
 import {
   $commentsByBugId,
   createCommentFx,
   deleteCommentEvent,
   updateCommentEvent,
+  createCommentAttachmentFx,
+  deleteCommentAttachmentFx,
 } from "@/store/comments";
 import { $usersStore } from "@/store/report";
 import { $user } from "@/store/user";
-import { deleteCommentAttachment } from "@/api/attachments";
 import Avatar from "@/components/Avatar/Avatar";
+import FilePreview from "../FilePreview/FilePreview";
+import AttachFileButton from "../AttachFileButton/AttachFileButton";
 
 type Props = {
   reportId: number;
@@ -39,6 +36,8 @@ const Comments = ({ reportId, bugId }: Props) => {
 
   const users = useUnit($usersStore);
   const currentUser = useUnit($user);
+  const addCommentAttachment = useUnit(createCommentAttachmentFx);
+  const removeCommentAttachment = useUnit(deleteCommentAttachmentFx);
 
   const handleSubmitComment = async () => {
     if (!newCommentText.trim() && commentAttachments.length === 0) return;
@@ -46,11 +45,25 @@ const Comments = ({ reportId, bugId }: Props) => {
     setIsSubmitting(true);
     try {
       // Создаем комментарий через store
-      await createCommentFx({
+      const created = await createCommentFx({
         reportId,
         bugId,
         text: newCommentText.trim() || "Файл прикреплен",
       });
+
+      // Если выбраны файлы, последовательно прикрепляем их к только что созданному комменту
+      if (created?.id && commentAttachments.length > 0) {
+        await Promise.all(
+          commentAttachments.map((file) =>
+            addCommentAttachment({
+              reportId,
+              bugId,
+              commentId: created.id,
+              file,
+            })
+          )
+        );
+      }
 
       // Очищаем форму
       setNewCommentText("");
@@ -107,7 +120,7 @@ const Comments = ({ reportId, bugId }: Props) => {
     commentId: number,
     attachmentId: number
   ) => {
-    deleteCommentAttachment(reportId, bugId, commentId, attachmentId);
+    removeCommentAttachment({ reportId, bugId, commentId, attachmentId });
   };
 
   const formatTime = (dateString: string) => {
@@ -333,30 +346,26 @@ const Comments = ({ reportId, bugId }: Props) => {
                   )}
 
                   {/* Аттачменты комментария */}
-                  {comment.attachments && comment.attachments.length > 0 && (
-                    <div className="flex gap-2">
-                      {comment.attachments.map((attachment) => (
-                        <div key={attachment.id} className="relative group">
-                          <button className="btn btn-ghost btn-xs p-1">
-                            <Paperclip className="w-4 h-4 text-info" />
-                          </button>
-
-                          <button
-                            className="absolute -top-1 -right-1 bg-error text-error-content rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-error-focus"
-                            onClick={() =>
-                              handleDeleteCommentAttachment(
-                                comment.id,
-                                attachment.id
-                              )
-                            }
-                            title="Удалить файл"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <div className="mt-2">
+                    <FilePreview
+                      attachments={comment.attachments || []}
+                      reportId={reportId}
+                      bugId={bugId}
+                      attachType={2}
+                      commentId={comment.id}
+                      onAttachmentUpload={(file: File) =>
+                        addCommentAttachment({
+                          reportId,
+                          bugId,
+                          commentId: comment.id,
+                          file,
+                        })
+                      }
+                      onAttachmentDelete={(attachmentId: number) =>
+                        handleDeleteCommentAttachment(comment.id, attachmentId)
+                      }
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -369,21 +378,45 @@ const Comments = ({ reportId, bugId }: Props) => {
         {/* Аватар */}
         <Avatar width={8} />
 
-        {/* Поле ввода */}
-        <div className="flex flex-1 gap-2 items-center">
-          <textarea
-            value={newCommentText}
-            onChange={(e) => setNewCommentText(e.target.value)}
-            onKeyDown={handleKeyDownNewComment}
-            placeholder="Оставьте сообщение..."
-            className="textarea textarea-bordered resize-none min-h-auto flex-1"
-            rows={1}
-            disabled={isSubmitting}
-          />
+        <div className="flex-1">
+          <div className="flex gap-2 items-center">
+            <textarea
+              value={newCommentText}
+              onChange={(e) => setNewCommentText(e.target.value)}
+              onKeyDown={handleKeyDownNewComment}
+              placeholder="Оставьте сообщение..."
+              className="textarea textarea-bordered resize-none min-h-auto flex-1"
+              rows={1}
+              disabled={isSubmitting}
+            />
 
-          {/* Аттачменты к новому комментарию */}
+            {/* Кнопки действий */}
+            <div className="flex flex-row gap-1 items-center">
+              <div className="p-2">
+                <AttachFileButton
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              {/* Кнопка отправки */}
+              <button
+                className="btn btn-primary btn-sm p-2 btn-circle"
+                onClick={handleSubmitComment}
+                disabled={
+                  isSubmitting ||
+                  (!newCommentText.trim() && commentAttachments.length === 0)
+                }
+                title="Отправить"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Аттачменты к новому комментарию (ниже текстового поля и кнопок) */}
           {!!commentAttachments.length && (
-            <div className="flex gap-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2">
               {commentAttachments.map((file, index) => (
                 <div key={index} className="relative group">
                   <span className="text-xs bg-base-200 px-2 py-1 rounded">
@@ -400,32 +433,6 @@ const Comments = ({ reportId, bugId }: Props) => {
               ))}
             </div>
           )}
-
-          {/* Кнопки действий */}
-          <div className="flex flex-row gap-1 items-center">
-            {/* Кнопка добавления файла */}
-            <button
-              className="p-2 rounded-full transition-colors duration-200 cursor-pointer"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isSubmitting}
-              title="Прикрепить файл"
-            >
-              <Paperclip className="w-4 h-4 text-base-content/60 hover:text-base-content transition-colors duration-200" />
-            </button>
-
-            {/* Кнопка отправки */}
-            <button
-              className="btn btn-primary btn-sm p-2 btn-circle"
-              onClick={handleSubmitComment}
-              disabled={
-                isSubmitting ||
-                (!newCommentText.trim() && commentAttachments.length === 0)
-              }
-              title="Отправить"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
         </div>
       </div>
 

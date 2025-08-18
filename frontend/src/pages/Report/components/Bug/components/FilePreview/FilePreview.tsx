@@ -1,13 +1,15 @@
 import { useState, useRef } from "react";
-import { FileText, Paperclip, Trash2 } from "lucide-react";
+import { FileText, Trash2 } from "lucide-react";
 import { Attachment } from "@/types/attachment";
 import { API_URL } from "@/const";
+import AttachFileButton from "../AttachFileButton/AttachFileButton";
 
 type Props = {
   attachments: Attachment[];
   reportId: number;
   bugId: number;
   attachType: number;
+  commentId?: number;
   onAttachmentUpload?: (file: File) => void;
   onAttachmentDelete?: (attachmentId: number) => void;
 };
@@ -23,6 +25,7 @@ function FilePreview({
   attachments,
   reportId,
   bugId,
+  commentId,
   onAttachmentUpload,
   onAttachmentDelete,
 }: Props) {
@@ -78,13 +81,16 @@ function FilePreview({
     }
   };
 
-  const getImageUrl = (
-    attachment: Attachment,
-    hasPreview?: boolean
-  ): string => {
-    return `${API_URL}v2/reports/${reportId}/bugs/${bugId}/attachments/${
-      attachment.id
-    }/content/${hasPreview ? "preview" : ""}`;
+  const getImageUrl = (attachment: Attachment, isPreview?: boolean): string => {
+    console.log(
+      "url",
+      `${API_URL}v2/reports/${reportId}/bugs/${bugId}/${
+        commentId ? `comments/${commentId}/` : ""
+      }attachments/${attachment.id}/content/${isPreview ? "preview" : ""}`
+    );
+    return `${API_URL}v2/reports/${reportId}/bugs/${bugId}/${
+      commentId ? `comments/${commentId}/` : ""
+    }attachments/${attachment.id}/content/${isPreview ? "preview" : ""}`;
   };
 
   return (
@@ -130,12 +136,7 @@ function FilePreview({
             </div>
           );
         })}
-        <button
-          className="btn btn-ghost btn-xs p-1"
-          onClick={handleUploadClick}
-        >
-          <Paperclip className="w-4 h-4 text-base-content/60" />
-        </button>
+        <AttachFileButton onClick={handleUploadClick} />
       </div>
 
       {/* Модалка с каруселью */}
