@@ -1,6 +1,6 @@
-import { Send, Trash2 } from "lucide-react";
-import AttachFileButton from "../../../AttachFileButton/AttachFileButton";
 import { memo, useRef } from "react";
+import { Send, Trash2 } from "lucide-react";
+import AttachFileButton from "@/components/AttachFileButton/AttachFileButton";
 import Avatar from "@/components/Avatar/Avatar";
 
 type NewCommentFormProps = {

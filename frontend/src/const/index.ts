@@ -58,3 +58,7 @@ export enum BugResultTypes {
   RECEIVE = "receive",
   EXPECT = "expect",
 }
+
+export const justNowString = "только что";
+export const yesterdayString = "вчера";
+export const backInTimeString = "назад";

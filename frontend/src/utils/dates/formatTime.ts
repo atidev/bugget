@@ -1,6 +1,4 @@
-const formatTime = (dateString: string) => {
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return "только что";
+const formatTime = (date: Date) => {
   return date.toLocaleTimeString("ru-RU", {
     hour: "2-digit",
     minute: "2-digit",

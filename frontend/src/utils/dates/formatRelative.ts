@@ -1,18 +1,16 @@
-const formatRelative = (dateString: string) => {
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return "только что";
-  const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
-  const diffInMinutes = diffInMs / (1000 * 60);
-  const diffInHours = diffInMinutes / 60;
-  const diffInDays = diffInHours / 24;
-  if (diffInMinutes < 1) return "только что";
+import { justNowString, yesterdayString, backInTimeString } from "@/const";
+import { getDateDiffs } from "./dateDiffs";
+
+const formatRelative = (date: Date) => {
+  const { diffInMinutes, diffInHours, diffInDays } = getDateDiffs(date);
+
+  if (diffInMinutes < 1) return justNowString;
   if (diffInDays < 1)
     return diffInHours < 1
-      ? `${Math.floor(diffInMinutes)}м назад`
-      : `${Math.floor(diffInHours)}ч назад`;
-  if (diffInDays < 2) return "вчера";
-  return `${Math.floor(diffInDays)}д назад`;
+      ? `${Math.floor(diffInMinutes)}м ${backInTimeString}`
+      : `${Math.floor(diffInHours)}ч ${backInTimeString}`;
+  if (diffInDays < 2) return yesterdayString;
+  return `${Math.floor(diffInDays)}д ${backInTimeString}`;
 };
 
 export default formatRelative;

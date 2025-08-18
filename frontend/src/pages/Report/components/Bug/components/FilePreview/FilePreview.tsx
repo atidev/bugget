@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { FileText, Trash2 } from "lucide-react";
 import { Attachment } from "@/types/attachment";
 import { API_URL } from "@/const";
-import AttachFileButton from "../AttachFileButton/AttachFileButton";
+import AttachFileButton from "@/components/AttachFileButton/AttachFileButton";
 
 type Props = {
   attachments: Attachment[];
@@ -82,12 +82,6 @@ function FilePreview({
   };
 
   const getImageUrl = (attachment: Attachment, isPreview?: boolean): string => {
-    console.log(
-      "url",
-      `${API_URL}v2/reports/${reportId}/bugs/${bugId}/${
-        commentId ? `comments/${commentId}/` : ""
-      }attachments/${attachment.id}/content/${isPreview ? "preview" : ""}`
-    );
     return `${API_URL}v2/reports/${reportId}/bugs/${bugId}/${
       commentId ? `comments/${commentId}/` : ""
     }attachments/${attachment.id}/content/${isPreview ? "preview" : ""}`;

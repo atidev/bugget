@@ -1,10 +1,10 @@
-import Avatar from "@/components/Avatar/Avatar";
-import { Attachment } from "@/types/attachment";
 import { memo, useState } from "react";
 import { MoreVertical } from "lucide-react";
-import FilePreview from "../../../FilePreview/FilePreview";
-import getCommentTimeDisplay from "../../../../../../../../utils/dates/getCommentTimeDisplay";
+import Avatar from "@/components/Avatar/Avatar";
+import { Attachment } from "@/types/attachment";
+import getCommentTimeDisplay from "@/utils/dates/getCommentTimeDisplay";
 import { useUserDisplayName } from "@/hooks/useUserDisplayName";
+import FilePreview from "../../../FilePreview/FilePreview";
 
 type CommentItemProps = {
   reportId: number;
@@ -35,7 +35,7 @@ const Comment = memo((props: CommentItemProps) => {
     onDeleteAttachment,
   } = props;
 
-  const getUserDisplayName = useUserDisplayName();
+  const userDisplayName = useUserDisplayName(creatorUserId);
 
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(text);
@@ -54,7 +54,7 @@ const Comment = memo((props: CommentItemProps) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-base-content">
-                {getUserDisplayName(creatorUserId, createdAt)}
+                {userDisplayName}
               </span>
               <span className="text-xs text-base-content/60">
                 {getCommentTimeDisplay(createdAt)}

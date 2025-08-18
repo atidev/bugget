@@ -1,19 +1,20 @@
 import formatTime from "./formatTime";
 import formatRelative from "./formatRelative";
+import { justNowString, yesterdayString } from "@/const";
+import { getDateDiffs } from "./dateDiffs";
 
 const getCommentTimeDisplay = (dateString: string) => {
   const date = new Date(dateString);
-  if (isNaN(date.getTime())) return "только что";
-  const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
-  const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+  if (isNaN(date.getTime())) return justNowString;
+
+  const { diffInMinutes, diffInDays } = getDateDiffs(date);
+
   if (diffInDays < 1) {
-    const diffInMinutes = diffInMs / (1000 * 60);
-    if (diffInMinutes < 1) return "только что";
-    return formatTime(dateString);
+    if (diffInMinutes < 1) return justNowString;
+    return formatTime(date);
   }
-  if (diffInDays < 2) return `вчера ${formatTime(dateString)}`;
-  return formatRelative(dateString);
+  if (diffInDays < 2) return `${yesterdayString} ${formatTime(date)}`;
+  return formatRelative(date);
 };
 
 export default getCommentTimeDisplay;
