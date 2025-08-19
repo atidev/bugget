@@ -1,34 +1,72 @@
-import { memo, useRef } from "react";
+import { memo, useRef, useState, useCallback } from "react";
 import { Send, Trash2 } from "lucide-react";
+import { useUnit } from "effector-react";
+import { createCommentFx, createCommentAttachmentFx } from "@/store/comments";
 import AttachFileButton from "@/components/AttachFileButton/AttachFileButton";
 import Avatar from "@/components/Avatar/Avatar";
 
 type Props = {
-  value: string;
-  attachments: File[];
-  isSubmitting: boolean;
-  onChange: (value: string) => void;
-  onSubmit: () => void;
-  onPickFiles: (files: FileList | null) => void;
-  onRemovePicked: (index: number) => void;
+  reportId: number;
+  bugId: number;
 };
 
 const NewCommentForm = memo((props: Props) => {
-  const {
-    value,
-    attachments,
-    isSubmitting,
-    onChange,
-    onSubmit,
-    onPickFiles,
-    onRemovePicked,
-  } = props;
+  const { reportId, bugId } = props;
+
+  const [text, setText] = useState("");
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const createComment = useUnit(createCommentFx);
+  const addAttachment = useUnit(createCommentAttachmentFx);
+
+  const handleSubmit = useCallback(async () => {
+    if (!text.trim() && attachments.length === 0) return;
+
+    setIsSubmitting(true);
+    try {
+      const created = await createComment({
+        reportId,
+        bugId,
+        text: text.trim() || "Файл прикреплен",
+      });
+
+      if (created?.id && attachments.length > 0) {
+        await Promise.all(
+          attachments.map((file) =>
+            addAttachment({
+              reportId,
+              bugId,
+              commentId: created.id,
+              file,
+            })
+          )
+        );
+      }
+
+      setText("");
+      setAttachments([]);
+    } catch (error) {
+      console.error("Ошибка при создании комментария:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [reportId, bugId, text, attachments, createComment, addAttachment]);
+
+  const handleFileChange = useCallback((files: FileList | null) => {
+    if (!files) return;
+    setAttachments((prev) => [...prev, ...Array.from(files)]);
+  }, []);
+
+  const handleRemoveAttachment = useCallback((index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (value.trim() || attachments.length > 0) onSubmit();
+      if (text.trim() || attachments.length > 0) handleSubmit();
     }
   };
 
@@ -38,8 +76,8 @@ const NewCommentForm = memo((props: Props) => {
       <div className="flex-1">
         <div className="flex gap-2 items-center">
           <textarea
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Оставьте сообщение..."
             className="textarea textarea-bordered resize-none min-h-auto flex-1"
@@ -55,9 +93,9 @@ const NewCommentForm = memo((props: Props) => {
             </div>
             <button
               className="btn btn-primary btn-sm p-2 btn-circle"
-              onClick={onSubmit}
+              onClick={handleSubmit}
               disabled={
-                isSubmitting || (!value.trim() && attachments.length === 0)
+                isSubmitting || (!text.trim() && attachments.length === 0)
               }
               title="Отправить"
             >
@@ -74,7 +112,7 @@ const NewCommentForm = memo((props: Props) => {
                 </span>
                 <button
                   className="absolute -top-1 -right-1 bg-error text-error-content rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-error-focus"
-                  onClick={() => onRemovePicked(index)}
+                  onClick={() => handleRemoveAttachment(index)}
                   title="Убрать файл"
                 >
                   <Trash2 className="w-3 h-3" />
@@ -88,7 +126,7 @@ const NewCommentForm = memo((props: Props) => {
           type="file"
           multiple
           style={{ display: "none" }}
-          onChange={(e) => onPickFiles(e.target.files)}
+          onChange={(e) => handleFileChange(e.target.files)}
         />
       </div>
     </div>

@@ -1,11 +1,6 @@
-import { useState, useCallback } from "react";
 import { MessageCircle } from "lucide-react";
-import { useStoreMap, useUnit } from "effector-react";
-import {
-  $commentsByBugId,
-  createCommentFx,
-  createCommentAttachmentFx,
-} from "@/store/comments";
+import { useStoreMap } from "effector-react";
+import { $commentsByBugId } from "@/store/comments";
 import Comment from "./components/Comment/Comment";
 import NewCommentForm from "./components/NewCommentForm/NewCommentForm";
 
@@ -15,59 +10,11 @@ type Props = {
 };
 
 const Comments = ({ reportId, bugId }: Props) => {
-  const [newCommentText, setNewCommentText] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [commentAttachments, setCommentAttachments] = useState<File[]>([]);
-
   const comments = useStoreMap({
     store: $commentsByBugId,
     keys: [bugId],
     fn: (state, [id]) => state[id] || [],
   });
-
-  const addAttachment = useUnit(createCommentAttachmentFx);
-
-  const handleSubmit = useCallback(async () => {
-    if (!newCommentText.trim() && commentAttachments.length === 0) return;
-
-    setIsSubmitting(true);
-    try {
-      const created = await createCommentFx({
-        reportId,
-        bugId,
-        text: newCommentText.trim() || "Файл прикреплен",
-      });
-
-      if (created?.id && commentAttachments.length > 0) {
-        await Promise.all(
-          commentAttachments.map((file) =>
-            addAttachment({
-              reportId,
-              bugId,
-              commentId: created.id,
-              file,
-            })
-          )
-        );
-      }
-
-      setNewCommentText("");
-      setCommentAttachments([]);
-    } catch (error) {
-      console.error("Ошибка при создании комментария:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [reportId, bugId, newCommentText, commentAttachments, addAttachment]);
-
-  const handleFileChange = useCallback((files: FileList | null) => {
-    if (!files) return;
-    setCommentAttachments((prev) => [...prev, ...Array.from(files)]);
-  }, []);
-
-  const handleRemoveAttachment = useCallback((index: number) => {
-    setCommentAttachments((prev) => prev.filter((_, i) => i !== index));
-  }, []);
 
   return (
     <div className="bg-base-100 border border-base-300 rounded-lg p-2 col-span-2">
@@ -103,15 +50,7 @@ const Comments = ({ reportId, bugId }: Props) => {
         </div>
       )}
 
-      <NewCommentForm
-        value={newCommentText}
-        attachments={commentAttachments}
-        isSubmitting={isSubmitting}
-        onChange={setNewCommentText}
-        onSubmit={handleSubmit}
-        onPickFiles={handleFileChange}
-        onRemovePicked={handleRemoveAttachment}
-      />
+      <NewCommentForm reportId={reportId} bugId={bugId} />
     </div>
   );
 };
