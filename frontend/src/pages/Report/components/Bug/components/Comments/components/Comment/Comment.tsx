@@ -61,13 +61,20 @@ const Comment = memo((props: Props) => {
     });
   };
 
-  const handleDeleteAttachment = (attachmentId: number) => {
+  const handleRemoveAttachment = (attachmentId: number) => {
     removeAttachment({
       reportId,
       bugId,
       commentId: id,
       attachmentId,
     });
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleUpdate();
+    }
   };
 
   return (
@@ -111,12 +118,7 @@ const Comment = memo((props: Props) => {
               <textarea
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleUpdate();
-                  }
-                }}
+                onKeyDown={handleKeyDown}
                 className="textarea textarea-bordered w-full resize-none min-h-auto"
                 placeholder="Введите текст комментария... (Enter для сохранения)"
                 rows={1}
@@ -150,7 +152,7 @@ const Comment = memo((props: Props) => {
               bugId={bugId}
               attachType={2}
               onAttachmentUpload={handleUploadAttachment}
-              onAttachmentDelete={handleDeleteAttachment}
+              onAttachmentDelete={handleRemoveAttachment}
               commentId={id}
             />
           </div>
