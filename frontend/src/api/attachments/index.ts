@@ -66,14 +66,3 @@ export const deleteCommentAttachment = async (
     `/v2/reports/${reportId}/bugs/${bugId}/comments/${commentId}/attachments/${attachmentId}`
   );
 };
-
-export const getCommentAttachments = async (
-  reportId: number,
-  bugId: number,
-  commentId: number
-): Promise<AttachmentResponse[]> => {
-  const { data } = await axios.get<AttachmentResponse[]>(
-    `/v2/reports/${reportId}/bugs/${bugId}/comments/${commentId}/`
-  );
-  return data;
-};

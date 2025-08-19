@@ -1,7 +1,6 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { createComment, updateComment, deleteComment } from "@/api/comments";
 import {
-  getCommentAttachments,
   createCommentAttachment,
   deleteCommentAttachment,
 } from "@/api/attachments";
@@ -83,23 +82,6 @@ export const deleteCommentFx = createEffect<
     console.error("deleteCommentFx error:", error);
     throw error;
   }
-});
-
-export const fetchCommentAttachmentsFx = createEffect<
-  { reportId: number; bugId: number; commentId: number },
-  { bugId: number; commentId: number; attachments: Attachment[] }
->(async ({ reportId, bugId, commentId }) => {
-  const res = await getCommentAttachments(reportId, bugId, commentId);
-  const attachments: Attachment[] = res.map((attachment) => ({
-    id: attachment.id,
-    entityId: attachment.entityId,
-    attachType: attachment.attachType,
-    createdAt: attachment.createdAt,
-    creatorUserId: attachment.creatorUserId,
-    fileName: attachment.fileName,
-    hasPreview: attachment.hasPreview,
-  }));
-  return { bugId, commentId, attachments };
 });
 
 export const createCommentAttachmentFx = createEffect<
@@ -197,18 +179,6 @@ $commentsByBugId
       [bugId]: existingComments.filter((c) => c.id !== commentId),
     };
   })
-  .on(
-    fetchCommentAttachmentsFx.doneData,
-    (state, { bugId, commentId, attachments }) => {
-      const existingComments = state[bugId] || [];
-      return {
-        ...state,
-        [bugId]: existingComments.map((comment) =>
-          comment.id === commentId ? { ...comment, attachments } : comment
-        ),
-      };
-    }
-  )
   .on(
     createCommentAttachmentFx.doneData,
     (state, { bugId, commentId, attachment }) => {
