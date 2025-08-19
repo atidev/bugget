@@ -3,17 +3,17 @@ import { Send, Trash2 } from "lucide-react";
 import AttachFileButton from "@/components/AttachFileButton/AttachFileButton";
 import Avatar from "@/components/Avatar/Avatar";
 
-type NewCommentFormProps = {
+type Props = {
   value: string;
   attachments: File[];
   isSubmitting: boolean;
-  onChange: (v: string) => void;
+  onChange: (value: string) => void;
   onSubmit: () => void;
   onPickFiles: (files: FileList | null) => void;
   onRemovePicked: (index: number) => void;
 };
 
-const NewCommentForm = memo((props: NewCommentFormProps) => {
+const NewCommentForm = memo((props: Props) => {
   const {
     value,
     attachments,

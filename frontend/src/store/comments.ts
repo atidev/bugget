@@ -85,36 +85,6 @@ export const deleteCommentFx = createEffect<
   }
 });
 
-/**
- * События
- */
-
-export const createCommentEvent = createEvent<{
-  reportId: number;
-  bugId: number;
-  text: string;
-}>();
-
-export const updateCommentEvent = createEvent<{
-  reportId: number;
-  bugId: number;
-  commentId: number;
-  text: string;
-}>();
-
-export const deleteCommentEvent = createEvent<{
-  reportId: number;
-  bugId: number;
-  commentId: number;
-}>();
-
-export const setCommentsByBugIdEvent = createEvent<
-  {
-    bugId: number;
-    comments: Comment[];
-  }[]
->();
-
 export const fetchCommentAttachmentsFx = createEffect<
   { reportId: number; bugId: number; commentId: number },
   { bugId: number; commentId: number; attachments: Attachment[] }
@@ -161,6 +131,36 @@ export const deleteCommentAttachmentFx = createEffect<
   await deleteCommentAttachment(reportId, bugId, commentId, attachmentId);
   return { bugId, commentId, attachmentId };
 });
+
+/**
+ * События
+ */
+
+export const createCommentEvent = createEvent<{
+  reportId: number;
+  bugId: number;
+  text: string;
+}>();
+
+export const updateCommentEvent = createEvent<{
+  reportId: number;
+  bugId: number;
+  commentId: number;
+  text: string;
+}>();
+
+export const deleteCommentEvent = createEvent<{
+  reportId: number;
+  bugId: number;
+  commentId: number;
+}>();
+
+export const setCommentsByBugIdEvent = createEvent<
+  {
+    bugId: number;
+    comments: Comment[];
+  }[]
+>();
 
 /**
  * Логика

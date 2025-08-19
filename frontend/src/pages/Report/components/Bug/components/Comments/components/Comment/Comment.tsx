@@ -1,12 +1,19 @@
 import { memo, useState } from "react";
 import { MoreVertical } from "lucide-react";
+import { useUnit } from "effector-react";
+import {
+  deleteCommentEvent,
+  updateCommentEvent,
+  createCommentAttachmentFx,
+  deleteCommentAttachmentFx,
+} from "@/store/comments";
 import Avatar from "@/components/Avatar/Avatar";
 import { Attachment } from "@/types/attachment";
 import getCommentTimeDisplay from "@/utils/dates/getCommentTimeDisplay";
 import { useUserDisplayName } from "@/hooks/useUserDisplayName";
 import FilePreview from "../../../FilePreview/FilePreview";
 
-type CommentItemProps = {
+type Props = {
   reportId: number;
   bugId: number;
   id: number;
@@ -14,36 +21,53 @@ type CommentItemProps = {
   creatorUserId: string;
   createdAt: string;
   attachments?: Attachment[] | null;
-  onDeleteComment: (commentId: number) => void;
-  onUpdateComment: (commentId: number, text: string) => void;
-  onUploadAttachment: (commentId: number, file: File) => void;
-  onDeleteAttachment: (commentId: number, attachmentId: number) => void;
 };
 
-const Comment = memo((props: CommentItemProps) => {
-  const {
-    reportId,
-    bugId,
-    id,
-    text,
-    creatorUserId,
-    createdAt,
-    attachments,
-    onDeleteComment,
-    onUpdateComment,
-    onUploadAttachment,
-    onDeleteAttachment,
-  } = props;
+const Comment = memo((props: Props) => {
+  const { reportId, bugId, id, text, creatorUserId, createdAt, attachments } =
+    props;
+
+  const updateComment = useUnit(updateCommentEvent);
+  const deleteComment = useUnit(deleteCommentEvent);
+  const addAttachment = useUnit(createCommentAttachmentFx);
+  const removeAttachment = useUnit(deleteCommentAttachmentFx);
 
   const userDisplayName = useUserDisplayName(creatorUserId);
 
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(text);
 
-  const saveEdit = () => {
+  const handleUpdate = () => {
     if (!draft.trim()) return;
-    onUpdateComment(id, draft.trim());
+    updateComment({
+      reportId,
+      bugId,
+      commentId: id,
+      text: draft.trim(),
+    });
     setIsEditing(false);
+  };
+
+  const handleDelete = () => {
+    deleteComment({ reportId, bugId, commentId: id });
+  };
+
+  const handleUploadAttachment = (file: File) => {
+    addAttachment({
+      reportId,
+      bugId,
+      commentId: id,
+      file,
+    });
+  };
+
+  const handleDeleteAttachment = (attachmentId: number) => {
+    removeAttachment({
+      reportId,
+      bugId,
+      commentId: id,
+      attachmentId,
+    });
   };
 
   return (
@@ -74,10 +98,7 @@ const Comment = memo((props: CommentItemProps) => {
                   </button>
                 </li>
                 <li>
-                  <button
-                    className="text-error"
-                    onClick={() => onDeleteComment(id)}
-                  >
+                  <button className="text-error" onClick={handleDelete}>
                     Удалить
                   </button>
                 </li>
@@ -93,7 +114,7 @@ const Comment = memo((props: CommentItemProps) => {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    saveEdit();
+                    handleUpdate();
                   }
                 }}
                 className="textarea textarea-bordered w-full resize-none min-h-auto"
@@ -101,7 +122,10 @@ const Comment = memo((props: CommentItemProps) => {
                 rows={1}
               />
               <div className="flex gap-2">
-                <button className="btn btn-sm btn-primary" onClick={saveEdit}>
+                <button
+                  className="btn btn-sm btn-primary"
+                  onClick={handleUpdate}
+                >
                   Сохранить
                 </button>
                 <button
@@ -125,10 +149,8 @@ const Comment = memo((props: CommentItemProps) => {
               reportId={reportId}
               bugId={bugId}
               attachType={2}
-              onAttachmentUpload={(file: File) => onUploadAttachment(id, file)}
-              onAttachmentDelete={(attachmentId: number) =>
-                onDeleteAttachment(id, attachmentId)
-              }
+              onAttachmentUpload={handleUploadAttachment}
+              onAttachmentDelete={handleDeleteAttachment}
               commentId={id}
             />
           </div>

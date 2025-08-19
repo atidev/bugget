@@ -99,7 +99,7 @@ sample({
   target: setBugsEvent,
 });
 
-// загрузка комментариев при загрузке репорта
+// формирование хранилища комментариев при загрузке репорта
 sample({
   clock: getReportFx.doneData,
   fn: (report) => {
@@ -107,9 +107,7 @@ sample({
 
     const allComments = [];
     for (const bug of report.bugs) {
-      console.log("bug comments", bug.comments);
       if (bug.comments && !!bug.comments.length) {
-        console.log("setCommentsByBugIdEvent");
         allComments.push({
           bugId: bug.id,
           comments: bug.comments.map((comment) => ({
