@@ -94,9 +94,7 @@ CREATE OR REPLACE FUNCTION public.list_attachments_internal(_report_id int)
         file_name text,
         mime_type text,
         has_preview boolean,
-        is_gzip_compressed boolean,
-        bug_id int,
-        path text
+        is_gzip_compressed boolean
     )
     AS $$
 DECLARE
@@ -118,12 +116,10 @@ BEGIN
         a.file_name,
         a.mime_type,
         a.has_preview,
-        a.is_gzip_compressed,
-        a.bug_id,
-        a.path
+        a.is_gzip_compressed
     FROM
         public.attachments a
-        JOIN public.bugs b ON (a.entity_id = b.id or a.bug_id = b.id)
+        JOIN public.bugs b ON a.entity_id = b.id
     WHERE (a.attach_type = _fact_attach_type
         OR a.attach_type = _expected_attach_type)
         AND b.report_id = _report_id
@@ -141,9 +137,7 @@ BEGIN
         a.file_name,
         a.mime_type,
         a.has_preview,
-        a.is_gzip_compressed,
-        a.bug_id,
-        a.path
+        a.is_gzip_compressed
     FROM
         public.attachments a
         JOIN public.comments c ON a.entity_id = c.id
@@ -215,9 +209,7 @@ CREATE OR REPLACE FUNCTION public.get_bug_attachment(_organization_id text, _rep
         mime_type text,
         has_preview boolean,
         is_gzip_compressed boolean,
-        created_at timestamp with time zone,
-        bug_id int,
-        path text
+        created_at timestamp with time zone
     )
     AS $$
 BEGIN
@@ -234,12 +226,10 @@ BEGIN
         a.mime_type,
         a.has_preview,
         a.is_gzip_compressed,
-        a.created_at,
-        a.bug_id,
-        a.path
+        a.created_at
     FROM
         public.attachments a
-        JOIN public.bugs b ON (a.entity_id = b.id or a.bug_id = b.id)
+        JOIN public.bugs b ON a.entity_id = b.id
         JOIN public.reports r ON b.report_id = r.id
     WHERE
         a.id = _attachment_id

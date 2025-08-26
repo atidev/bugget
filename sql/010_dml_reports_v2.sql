@@ -212,6 +212,30 @@ CREATE OR REPLACE FUNCTION public.list_comments_internal(_report_id int)
         b.report_id = _report_id;
 $$;
 
+-- 5) Вложения ко всем багам отчёта
+CREATE OR REPLACE FUNCTION public.list_attachments_internal(_report_id int)
+    RETURNS TABLE(
+        id int,
+        bug_id int,
+        path text,
+        attach_type text,
+        created_at timestamp)
+    LANGUAGE sql
+    STABLE
+    AS $$
+    SELECT
+        a.id,
+        a.bug_id,
+        a.path,
+        a.attach_type,
+        a.created_at
+    FROM
+        public.attachments a
+        JOIN public.bugs b ON a.bug_id = b.id
+    WHERE
+        b.report_id = _report_id;
+$$;
+
 CREATE OR REPLACE FUNCTION public.add_participant_if_not_exist_internal(_report_id integer, _user_id text)
     RETURNS text[] -- возвращаем массив идентификаторов или NULL
     LANGUAGE plpgsql
