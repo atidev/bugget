@@ -80,6 +80,7 @@ END;
 $$
 LANGUAGE plpgsql;
 
+DROP FUNCTION IF EXISTS public.list_attachments_internal(_report_id int);
 
 CREATE OR REPLACE FUNCTION public.list_attachments_internal(_report_id int)
     RETURNS TABLE(

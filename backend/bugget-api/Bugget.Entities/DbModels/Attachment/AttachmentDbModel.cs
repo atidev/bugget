@@ -71,7 +71,7 @@ public sealed class AttachmentDbModel
     /// <summary>
     /// Тип вложения
     /// </summary>
-    public string? MimeType { get; init; }
+    public string MimeType { get; init; } = "image/webp";
 
     /// <summary>
     /// Есть ли превью
