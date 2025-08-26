@@ -1,11 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-    </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
         <PackageReference Include="OpenTelemetry" Version="1.8.0-beta.1" />
@@ -23,6 +17,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Bugget.BO\Bugget.BO.csproj" />
+        <ProjectReference Include="..\Bugget.DbUp\Bugget.DbUp.csproj" />
     </ItemGroup>
     
     <PropertyGroup>

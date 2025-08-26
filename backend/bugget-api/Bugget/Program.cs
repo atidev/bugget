@@ -32,7 +32,7 @@ public class Program
             builder.Services
                 .AddConfiguration(builder.Configuration)
                 .AddLogging(builder.Configuration)
-                .AddDataAccess(builder.Configuration)
+                .AddDataAccess(builder.Configuration, builder.Environment)
                 .AddBusinessLogic()
                 .AddMessaging()
                 .AddWebApi(builder.Configuration, builder.Environment);
