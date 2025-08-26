@@ -1,7 +1,7 @@
 import { Attachment } from "@/types/attachment";
 
 import Title from "./components/Title/Title";
-import FilePreview from "./components/FilePreview/FilePreview";
+import FilePreview from "../FilePreview/FilePreview";
 import ResultTextarea from "./components/ResultTextarea/ResultTextarea";
 
 type Props = {

@@ -67,6 +67,7 @@ export const uploadAttachmentEvent = createEvent<{
   attachType: number;
   file: File;
 }>();
+
 export const deleteAttachmentEvent = createEvent<{
   reportId: number;
   bugId: number;

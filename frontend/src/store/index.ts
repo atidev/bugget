@@ -18,6 +18,7 @@ import { initSocketFx } from "./socket";
 import { $user } from "./user";
 
 import { setBugsEvent } from "./commonEvents";
+import { setCommentsByBugIdEvent } from "./comments";
 
 const $src = combine({ user: $user, reportPath: $reportPathStore });
 
@@ -96,6 +97,34 @@ sample({
     })),
   }),
   target: setBugsEvent,
+});
+
+// формирование хранилища комментариев при загрузке репорта
+sample({
+  clock: getReportFx.doneData,
+  fn: (report) => {
+    if (!report.bugs) return [];
+
+    const allComments = [];
+    for (const bug of report.bugs) {
+      if (bug.comments && !!bug.comments.length) {
+        allComments.push({
+          bugId: bug.id,
+          comments: bug.comments.map((comment) => ({
+            id: comment.id,
+            bugId: bug.id,
+            text: comment.text,
+            creatorUserId: comment.creatorUserId,
+            createdAt: comment.createdAt,
+            updatedAt: comment.updatedAt,
+            attachments: comment.attachments || null,
+          })),
+        });
+      }
+    }
+    return allComments;
+  },
+  target: setCommentsByBugIdEvent,
 });
 
 // очистка стора новых багов при смене репорта
