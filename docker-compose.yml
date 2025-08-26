@@ -6,7 +6,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     ports: ["5432:5432"]
     volumes:
-      - ./sql:/docker-entrypoint-initdb.d:ro
+      - ./backend/bugget-api/Bugget.DbUp/sql:/docker-entrypoint-initdb.d:ro
     profiles: ["full", "back", "front"]
 
   bugget-api:

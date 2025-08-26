@@ -21,6 +21,7 @@ using Bugget.BO.Services.Reports;
 using Bugget.BO.Services.Comments;
 using Bugget.BO.Services.Attachments;
 using OpenTelemetry.Metrics;
+using Bugget.DbUp;
 
 namespace Bugget.Extensions;
 
@@ -40,7 +41,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment env)
     {
         services
             .AddSingleton<ReportsDbClient>()
@@ -58,6 +59,11 @@ public static class ServiceCollectionExtensions
 
         services.AddHostedService((sp) => sp.GetRequiredService<EmployeesFileClient>());
         services.AddHostedService((sp) => sp.GetRequiredService<TeamsFileClient>());
+
+        if(!env.IsDevelopment())
+        {
+            services.AddHostedService<DbUpService>();
+        }
 
         return services;
     }

@@ -111,7 +111,7 @@ public sealed class ReportsService(
 
     private static ReportDbModel ApplyBoSort(ReportDbModel report)
     {
-        report.Bugs = report.Bugs?.OrderBy(b => b.Status).ToArray();
+        report.Bugs = report.Bugs?.OrderBy(b => b.Status).ThenBy(b => b.CreatedAt).ToArray();
         return report;
     }
 }

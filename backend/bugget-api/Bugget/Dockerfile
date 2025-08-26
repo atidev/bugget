@@ -11,7 +11,7 @@ RUN apt-get update \
 
 RUN ln -s /usr/lib/*/libmagic.so.1 /usr/lib/libmagic-1.so
 
-COPY ./*.sln ./*/*.csproj ./
+COPY ./*.sln ./*/*.csproj ./Directory.Build.props ./
 RUN for file in $(ls *.csproj); do mkdir -p ${file%.*}/ && mv $file ${file%.*}/; done
 RUN dotnet restore
 

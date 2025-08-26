@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Bugget",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/backend/bugget-api/Bugget/bin/Debug/net9.0/Bugget.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/backend/bugget-api/Bugget",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "development",
+                "ASPNETCORE_URLS": "http://localhost:7777",
+                "POSTGRES_CONNECTION_STRING": "Host=localhost;Port=5432;Database=postgres;Username=postgres"
+            }
+        }
+    ]
+}
