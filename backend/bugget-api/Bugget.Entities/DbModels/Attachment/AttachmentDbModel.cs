@@ -56,7 +56,7 @@ public sealed class AttachmentDbModel
     /// <summary>
     /// Создатель вложения
     /// </summary>
-    public string? CreatorUserId { get; init; }
+    public string CreatorUserId { get; init; } = "obsolete";
 
     /// <summary>
     /// Размер вложения
@@ -66,12 +66,12 @@ public sealed class AttachmentDbModel
     /// <summary>
     /// Имя вложения
     /// </summary>
-    public string? FileName { get; init; }
+    public string FileName { get; init; } = "obsolete.jpg";
 
     /// <summary>
     /// Тип вложения
     /// </summary>
-    public string? MimeType { get; init; }
+    public string MimeType { get; init; } = "image/webp";
 
     /// <summary>
     /// Есть ли превью
