@@ -183,7 +183,7 @@ const Bug = ({ bug }: Props) => {
         onAttachmentDelete={handleDeleteAttachment}
       />
 
-      <Comments reportId={reportId} bugId={bug.id} />
+      {reportId && <Comments reportId={reportId} bugId={bug.id} />}
     </div>
   );
 };
