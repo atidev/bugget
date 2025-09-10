@@ -1,17 +1,16 @@
 import type { RouteObject } from "react-router-dom";
 import { PatchableRouteObject } from "./extension";
 
+// Функция собирает новое дерево роутов: для каждого узла из extra либо вставляет его в корень,
+// либо обновляет существующий узел, не затирая непереданные поля.
+// Дочерние маршруты мерджатся по id, а normalizeRoute следит, чтобы у индексных роутов не было path.
 export function ApplyExtensions(
-  base: RouteObject[],
-  extra: RouteObject[]
+  base: PatchableRouteObject[],
+  extra: PatchableRouteObject[]
 ): RouteObject[] {
-  const baseArr = base as PatchableRouteObject[];
-  const extraArr = extra as PatchableRouteObject[];
+  let result = [...base];
 
-  // Для каждого extra-узла либо добавляем его на верхнем уровне, либо мержим в существующий
-  let result = [...baseArr];
-
-  for (const ext of extraArr) {
+  for (const ext of extra) {
     const idx = result.findIndex((r) => r.id && r.id === ext.id);
 
     if (idx === -1) {
@@ -27,7 +26,6 @@ export function ApplyExtensions(
   return result;
 }
 
-/** Глубокий (по дереву) мерж роута ext в base. Поля берём из ext только если они заданы. */
 function mergeRoute(
   base: PatchableRouteObject,
   ext: PatchableRouteObject
@@ -42,14 +40,12 @@ function mergeRoute(
     errorElement: ext.errorElement ?? base.errorElement,
     handle: ext.handle ?? base.handle,
     shouldRevalidate: ext.shouldRevalidate ?? base.shouldRevalidate,
-    // id оставляем базовый, чтобы не провоцировать ремоунт
     id: base.id,
   };
 
-  // Важно: если это index-роут, у него не должно быть path
+  // Если это index-роут, у него не должно быть path
   if (mergedTop.index === true) mergedTop.path = undefined;
 
-  // Дети
   const baseChildren = base.children ?? [];
   const extChildren = ext.children ?? [];
 
@@ -81,7 +77,7 @@ function mergeRoute(
   return mergedTop;
 }
 
-/** Нормализуем узел: гарантируем корректность index/path и отсутствие мутирующих ссылок. */
+// Гарантируем корректность index/path
 function normalizeRoute(r: PatchableRouteObject): PatchableRouteObject {
   const n: PatchableRouteObject = { ...r };
   if (n.index === true) n.path = undefined;
