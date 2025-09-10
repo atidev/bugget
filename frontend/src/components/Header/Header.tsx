@@ -9,7 +9,7 @@ import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
 import { useEffect } from "react";
 
 const HIDDEN_BUTTONS = {
-  createReport: ["/reports"],
+  createReport: ["/new-reports"],
   search: ["/search"],
 };
 
@@ -23,10 +23,10 @@ const Header = () => {
     setBreadcrumbs([
       reportsPageBreadcrumb,
       !reportId
-        ? { label: "Новый репорт", path: `/reports` }
+        ? { label: "Новый репорт", path: `/new-reports` }
         : {
             label: `Репорт #${reportId}`,
-            path: `/reports/${reportId}`,
+            path: `/new-reports/${reportId}`,
           },
     ]);
   }, [reportId]);
@@ -58,7 +58,7 @@ const Header = () => {
             className="btn btn-primary ml-2 font-normal"
             onClick={() => {
               clearReport();
-              navigate("/reports");
+              navigate("/new-reports");
             }}
           >
             Новый репорт
