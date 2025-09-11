@@ -64,7 +64,7 @@ const ReportPage = () => {
         onBlur={() => saveTitleEvent()}
         placeholder="Заголовок репорта"
         className="input-lg text-2xl"
-        autoFocus={true}
+        autoFocus={!reportId}
       />
       {reportId && (
         <div>
