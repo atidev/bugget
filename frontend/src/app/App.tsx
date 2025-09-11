@@ -10,9 +10,8 @@ import Search from "@/pages/Search/Search";
 import { authFx } from "@/store/user";
 import "@/styles/tailwind.css";
 import { loadExtensions } from "@/extensions/loader";
-import { AppExtension } from "@/extensions/extension";
+import { AppExtension, PatchableRouteObject } from "@/extensions/extension";
 import { ApplyExtensions } from "@/extensions/applyer";
-import { PatchableRouteObject } from "@/extensions/extension";
 
 // Компонент-обертка для старого Layout
 const LayoutWrapperObsolete = () => (

@@ -1,4 +1,5 @@
-import { AppExtension } from "./extension";
+import { AppExtension, AppExtensionFactory } from "./extension";
+import { hostApi } from "./hostApi";
 
 export async function loadExtensions(): Promise<AppExtension[]> {
   // "@app/sample-pages,@app/experiments"
@@ -11,7 +12,11 @@ export async function loadExtensions(): Promise<AppExtension[]> {
   for (const name of names) {
     try {
       const mod = await import(/* @vite-ignore */ name);
-      const ext = mod.default as AppExtension | AppExtension[];
+      const maybe = mod.default;
+      const ext =
+        typeof maybe === "function"
+          ? (maybe as AppExtensionFactory)(hostApi)
+          : maybe;
       result.push(...(Array.isArray(ext) ? ext : [ext]));
     } catch (e) {
       console.error(`[extensions] Failed to load "${name}"`, e);
