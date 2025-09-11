@@ -64,17 +64,20 @@ const ReportPage = () => {
         onBlur={() => saveTitleEvent()}
         placeholder="Заголовок репорта"
         className="input-lg text-2xl"
+        autoFocus={true}
       />
-      <div>
-        Создан{" "}
-        {initialReport?.createdAt
-          ? formatDistanceToNow(new Date(initialReport.createdAt), {
-              addSuffix: true,
-              locale: ru,
-            })
-          : ""}{" "}
-        пользователем <strong>{creatorUserName || "Загрузка..."}</strong>
-      </div>
+      {reportId && (
+        <div>
+          Создан{" "}
+          {initialReport?.createdAt
+            ? formatDistanceToNow(new Date(initialReport.createdAt), {
+                addSuffix: true,
+                locale: ru,
+              })
+            : ""}{" "}
+          пользователем <strong>{creatorUserName || "Загрузка..."}</strong>
+        </div>
+      )}
       <div className="flex flex-col gap-2">
         {allBugs.map((bug) => (
           <Bug key={bug.clientId} bug={bug} />
