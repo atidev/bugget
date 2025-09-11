@@ -1,6 +1,7 @@
 import { AppExtension, AppExtensionFactory } from "./extension";
 import { hostApi } from "./hostApi";
 
+// загрузчик плагинов из переменной окружения
 export async function loadExtensions(): Promise<AppExtension[]> {
   // "@app/sample-pages,@app/experiments"
   const names = (import.meta.env.VITE_APP_EXTENSIONS ?? "")

@@ -1,10 +1,9 @@
 import type { RouteObject } from "react-router-dom";
 import { PatchableRouteObject } from "./extension";
 
-// Функция собирает новое дерево роутов: для каждого узла из extra либо вставляет его в корень,
-// либо обновляет существующий узел, не затирая непереданные поля.
-// Дочерние маршруты мерджатся по id, а normalizeRoute следит, чтобы у индексных роутов не было path.
-export function ApplyExtensions(
+// Функция обновляет существующие маршруты в приложении
+// перезаписывая их по id или добавляя новые
+export function ApplyRoutesExtensions(
   base: PatchableRouteObject[],
   extra: PatchableRouteObject[]
 ): RouteObject[] {

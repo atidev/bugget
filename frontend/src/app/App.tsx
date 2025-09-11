@@ -11,7 +11,7 @@ import { authFx } from "@/store/user";
 import "@/styles/tailwind.css";
 import { loadExtensions } from "@/extensions/loader";
 import { AppExtension, PatchableRouteObject } from "@/extensions/extension";
-import { ApplyExtensions } from "@/extensions/applyer";
+import { ApplyRoutesExtensions } from "@/extensions/routesApplyer";
 
 // Компонент-обертка для старого Layout
 const LayoutWrapperObsolete = () => (
@@ -78,7 +78,7 @@ const App = () => {
 
   const routes = useMemo(() => {
     const extra = exts.flatMap((e) => e.routes ?? []);
-    return ApplyExtensions(baseRoutes(), extra);
+    return ApplyRoutesExtensions(baseRoutes(), extra);
   }, [exts]);
 
   return (
