@@ -12,6 +12,7 @@ import { Attachment } from "@/types/attachment";
 import getCommentTimeDisplay from "@/utils/dates/getCommentTimeDisplay";
 import { useUserDisplayName } from "@/hooks/useUserDisplayName";
 import FilePreview from "../../../FilePreview/FilePreview";
+import AutoLinkText from "@/components/AutoLinkText/AutoLinkText";
 
 type Props = {
   reportId: number;
@@ -142,7 +143,7 @@ const Comment = memo((props: Props) => {
               </div>
             </div>
           ) : (
-            <p className="text-base-content">{text}</p>
+            <AutoLinkText text={text} className="text-base-content" />
           )}
 
           <div className="mt-2">
