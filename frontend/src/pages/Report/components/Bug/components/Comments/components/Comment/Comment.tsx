@@ -1,6 +1,7 @@
 import { memo, useState } from "react";
 import { MoreVertical } from "lucide-react";
 import { useUnit } from "effector-react";
+import usePasteFile from "@/hooks/usePasteFile";
 import {
   deleteCommentEvent,
   updateCommentEvent,
@@ -78,6 +79,17 @@ const Comment = memo((props: Props) => {
     }
   };
 
+  const { handlePaste } = usePasteFile({
+    onFileUpload: (file) => {
+      addAttachment({
+        reportId,
+        bugId,
+        commentId: id,
+        file,
+      });
+    },
+  });
+
   return (
     <div className="border-b border-base-300">
       <div className="flex items-start gap-3">
@@ -120,6 +132,7 @@ const Comment = memo((props: Props) => {
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
                 className="textarea textarea-bordered w-full resize-none min-h-auto"
                 placeholder="Введите текст комментария... (Enter для сохранения)"
                 rows={1}

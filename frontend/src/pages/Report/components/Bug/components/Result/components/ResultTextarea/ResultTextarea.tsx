@@ -15,11 +15,21 @@ type Props = {
   onSave: (value: string) => void;
   onBlur: (value: string) => void;
   onInput: () => void;
+  onPaste?: (event: React.ClipboardEvent<HTMLTextAreaElement>) => void;
 };
 
 const ResultTextarea = forwardRef<HTMLTextAreaElement, Props>(
   (
-    { value, placeholder, autoFocus, rows = 1, onSave, onBlur, onInput },
+    {
+      value,
+      placeholder,
+      autoFocus,
+      rows = 1,
+      onSave,
+      onBlur,
+      onInput,
+      onPaste,
+    },
     ref
   ) => {
     const [localValue, setLocalValue] = useState(value);
@@ -72,6 +82,7 @@ const ResultTextarea = forwardRef<HTMLTextAreaElement, Props>(
         onBlur={handleBlur}
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
+        onPaste={onPaste}
         placeholder={placeholder}
         rows={rows}
         className="w-full textarea textarea-bordered text-sm resize-none bg-base-100 overflow-y-hidden"

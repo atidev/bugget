@@ -19,6 +19,7 @@ type Props = {
   onAttachmentUpload: (file: File) => void;
   onAttachmentDelete: (attachmentId: number) => void;
   onInput: () => void;
+  onPaste?: (event: React.ClipboardEvent<HTMLTextAreaElement>) => void;
 };
 
 const Result = forwardRef<HTMLTextAreaElement, Props>(
@@ -37,6 +38,7 @@ const Result = forwardRef<HTMLTextAreaElement, Props>(
       onAttachmentUpload,
       onAttachmentDelete,
       onInput,
+      onPaste,
     },
     ref
   ) => {
@@ -55,6 +57,7 @@ const Result = forwardRef<HTMLTextAreaElement, Props>(
           onBlur={onBlur}
           autoFocus={autoFocus}
           onInput={onInput}
+          onPaste={onPaste}
         />
         {reportId && bugId && (
           <FilePreview
