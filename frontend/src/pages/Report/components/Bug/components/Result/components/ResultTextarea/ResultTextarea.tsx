@@ -42,7 +42,6 @@ const ResultTextarea = forwardRef<HTMLTextAreaElement, Props>(
       }
       return textareaRef.current;
     });
-    const focusedRef = useRef(false);
 
     useEffect(() => {
       if (autoFocus && textareaRef.current) {
@@ -64,13 +63,8 @@ const ResultTextarea = forwardRef<HTMLTextAreaElement, Props>(
     };
 
     const handleBlur = () => {
-      focusedRef.current = false;
       handleSave();
       onBlur(localValue);
-    };
-
-    const handleFocus = () => {
-      focusedRef.current = true;
     };
 
     const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -87,7 +81,6 @@ const ResultTextarea = forwardRef<HTMLTextAreaElement, Props>(
         onChange={(event) => setLocalValue(event.target.value)}
         onInput={onInput}
         onBlur={handleBlur}
-        onFocus={handleFocus}
         onKeyDown={handleKeyDown}
         onPaste={onPaste}
         placeholder={placeholder}
