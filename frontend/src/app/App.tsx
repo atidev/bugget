@@ -12,6 +12,7 @@ import "@/styles/tailwind.css";
 import { loadExtensions } from "@/extensions/loader";
 import { AppExtension, PatchableRouteObject } from "@/extensions/extension";
 import { ApplyRoutesExtensions } from "@/extensions/routesApplyer";
+import { BASE_PATH } from "@/const";
 
 // Компонент-обертка для старого Layout
 const LayoutWrapperObsolete = () => (
@@ -82,7 +83,7 @@ const App = () => {
   }, [exts]);
 
   return (
-    <Router>
+    <Router basename={BASE_PATH}>
       <AppRoutes routes={routes} />
     </Router>
   );
