@@ -47,7 +47,7 @@ const Header = () => {
             className="btn btn-primary ml-2 font-normal"
             onClick={() => {
               clearReport();
-              navigate("/reports");
+              navigate("/new-reports");
             }}
           >
             Новый репорт

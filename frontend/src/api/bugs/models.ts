@@ -1,11 +1,11 @@
 export type CreateBugRequest = {
-  receive?: string | null; // required, min length 1, max length 512
-  expect?: string | null; // required, min length 1, max length 512
+  receive?: string | null; // required, min length 1, max length 2048
+  expect?: string | null; // required, min length 1, max length 2048
 };
 
 export type PatchBugRequest = {
-  receive?: string | null; // required, min length 1, max length 512
-  expect?: string | null; // required, min length 1, max length 512
+  receive?: string | null; // required, min length 1, max length 2048
+  expect?: string | null; // required, min length 1, max length 2048
   status?: number | null;
 };
 

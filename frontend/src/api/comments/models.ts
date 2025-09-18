@@ -1,9 +1,9 @@
 export type CreateCommentRequest = {
-  text: string; // required, min length 1, max length 512
+  text: string; // required, min length 1, max length 2048
 };
 
 export type UpdateCommentRequest = {
-  text: string; // required, min length 1, max length 512
+  text: string; // required, min length 1, max length 2048
 };
 
 export type CommentResponse = {
