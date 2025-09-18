@@ -34,7 +34,14 @@ const ResultTextarea = forwardRef<HTMLTextAreaElement, Props>(
   ) => {
     const [localValue, setLocalValue] = useState(value);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    useImperativeHandle(ref, () => textareaRef.current!);
+    // Позволяет родительскому компоненту получать прямой доступ к textarea элементу
+    // через ref для синхронизации высоты полей ввода
+    useImperativeHandle(ref, () => {
+      if (!textareaRef.current) {
+        throw new Error("Textarea ref is not available");
+      }
+      return textareaRef.current;
+    });
     const focusedRef = useRef(false);
 
     useEffect(() => {
