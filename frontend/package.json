@@ -15,7 +15,7 @@
   "dependencies": {
     "@microsoft/signalr": "^8.0.7",
     "@tailwindcss/typography": "^0.5.16",
-    "axios": "1.8.2",
+    "axios": "1.12.0",
     "daisyui": "^5.0.9",
     "date-fns": "^4.1.0",
     "effector": "^23.3.0",
