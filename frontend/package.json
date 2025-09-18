@@ -52,7 +52,7 @@
   },
   "lint-staged": {
     "*.{js,ts,mjs,d.mts,jsx,tsx}": [
-      "npx prettier --write"
+      "prettier --write"
     ]
   }
 }
