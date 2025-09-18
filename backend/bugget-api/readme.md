@@ -72,7 +72,7 @@
           "updated_at": "datetime",
           "attachments": [
             {
-              "id": "integer", 
+              "id": "integer",
               "entity_id": "integer", // в будущем спрячу
               "attach_type": "integer", // для комментов не будет этого поля
               "storage_key": "string", // в будущем спрячу
@@ -207,8 +207,8 @@
 ##### Запрос
 ```json
 {
-  "receive": "string", // optional, min length 1, max length 512
-  "expect": "string" // optional, min length 1, max length 512
+  "receive": "string", // optional, min length 1, max length 2048
+  "expect": "string" // optional, min length 1, max length 2048
 }
 ```
 Примечание: хотя поля опциональные, хотя бы одно из них должно быть заполнено.
@@ -252,8 +252,8 @@
 ##### Запрос
 ```json
 {
-  "receive": "string", // optional, min length 1, max length 512
-  "expect": "string", // optional, min length 1, max length 512
+  "receive": "string", // optional, min length 1, max length 2048
+  "expect": "string", // optional, min length 1, max length 2048
   "status": "integer" // optional, range 0-2 (Active = 0, Archived = 1, Rejected = 2)
 }
 ```
@@ -322,7 +322,7 @@
   "entity_id": "integer",
   "attach_type": "integer",
   "storage_key": "string",
-  "storage_kind": "integer", 
+  "storage_kind": "integer",
   "created_at": "datetime",
   "creator_user_id": "string",
   "length_bytes": "integer",
@@ -418,7 +418,7 @@
 ##### Запрос
 ```json
 {
-  "text": "string" // required, min length 1, max length 512
+  "text": "string" // required, min length 1, max length 2048
 }
 ```
 
@@ -478,7 +478,7 @@
 ##### Запрос
 ```json
 {
-  "text": "string" // required, min length 1, max length 512
+  "text": "string" // required, min length 1, max length 2048
 }
 ```
 
