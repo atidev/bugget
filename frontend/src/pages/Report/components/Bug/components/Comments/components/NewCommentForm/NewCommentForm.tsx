@@ -1,6 +1,7 @@
 import { memo, useRef, useState, useCallback } from "react";
 import { Send, Trash2 } from "lucide-react";
 import { useUnit } from "effector-react";
+import usePasteFile from "@/hooks/usePasteFile";
 import { createCommentFx, createCommentAttachmentFx } from "@/store/comments";
 import AttachFileButton from "@/components/AttachFileButton/AttachFileButton";
 import Avatar from "@/components/Avatar/Avatar";
@@ -70,6 +71,12 @@ const NewCommentForm = memo((props: Props) => {
     }
   };
 
+  const { handlePaste } = usePasteFile({
+    onFileUpload: (file) => {
+      setAttachments((prev) => [...prev, file]);
+    },
+  });
+
   return (
     <div className="flex items-start gap-3">
       <Avatar width={8} />
@@ -79,6 +86,7 @@ const NewCommentForm = memo((props: Props) => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
             placeholder="Оставьте сообщение..."
             className="textarea textarea-bordered resize-none min-h-auto flex-1"
             rows={1}

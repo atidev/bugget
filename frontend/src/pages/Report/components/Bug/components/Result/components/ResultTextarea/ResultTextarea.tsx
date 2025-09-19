@@ -1,74 +1,94 @@
-import { useState, useRef, useEffect, KeyboardEvent } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  KeyboardEvent,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 
 type Props = {
   value: string;
   placeholder: string;
   autoFocus: boolean;
-  rows: number;
+  rows?: number;
   onSave: (value: string) => void;
   onBlur: (value: string) => void;
+  onInput: () => void;
+  onPaste?: (event: React.ClipboardEvent<HTMLTextAreaElement>) => void;
 };
 
-const ResultTextarea = ({
-  value,
-  placeholder,
-  rows,
-  autoFocus,
-  onSave,
-  onBlur,
-}: Props) => {
-  const [localValue, setLocalValue] = useState(value);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const focusedRef = useRef(false);
+const ResultTextarea = forwardRef<HTMLTextAreaElement, Props>(
+  (
+    {
+      value,
+      placeholder,
+      autoFocus,
+      rows = 1,
+      onSave,
+      onBlur,
+      onInput,
+      onPaste,
+    },
+    ref
+  ) => {
+    const [localValue, setLocalValue] = useState(value);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    // Позволяет родительскому компоненту получать прямой доступ к textarea элементу
+    // через ref для синхронизации высоты полей ввода
+    useImperativeHandle(ref, () => {
+      if (!textareaRef.current) {
+        throw new Error("Textarea ref is not available");
+      }
+      return textareaRef.current;
+    });
 
-  useEffect(() => {
-    if (autoFocus && textareaRef.current) {
-      textareaRef.current.focus();
-      const len = textareaRef.current.value.length;
-      textareaRef.current.setSelectionRange(len, len);
-    }
-  }, [autoFocus]);
+    useEffect(() => {
+      if (autoFocus && textareaRef.current) {
+        textareaRef.current.focus();
+        const len = textareaRef.current.value.length;
+        textareaRef.current.setSelectionRange(len, len);
+      }
+    }, [autoFocus]);
 
-  const handleSave = () => {
-    const trimmed = localValue.trim();
-    if (trimmed !== (value || "").trim()) {
-      onSave(trimmed);
-    }
-  };
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
 
-  const handleBlur = () => {
-    focusedRef.current = false;
-    onBlur(localValue);
-  };
+    const handleSave = () => {
+      const trimmed = localValue.trim();
+      if (trimmed !== (value || "").trim()) {
+        onSave(trimmed);
+      }
+    };
 
-  const handleFocus = () => {
-    focusedRef.current = true;
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
+    const handleBlur = () => {
       handleSave();
-    }
-    if (event.key === "Escape") {
-      event.preventDefault();
-      setLocalValue(value || "");
-    }
-  };
+      onBlur(localValue);
+    };
 
-  return (
-    <textarea
-      ref={textareaRef}
-      value={localValue}
-      onChange={(event) => setLocalValue(event.target.value)}
-      onBlur={handleBlur}
-      onFocus={handleFocus}
-      onKeyDown={handleKeyDown}
-      placeholder={placeholder}
-      rows={rows}
-      className="w-full textarea textarea-bordered text-sm resize-none bg-base-100"
-    />
-  );
-};
+    const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setLocalValue(value || "");
+      }
+    };
+
+    return (
+      <textarea
+        ref={textareaRef}
+        value={localValue}
+        onChange={(event) => setLocalValue(event.target.value)}
+        onInput={onInput}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+        onPaste={onPaste}
+        placeholder={placeholder}
+        rows={rows}
+        className="w-full textarea textarea-bordered text-sm resize-none bg-base-100 overflow-y-hidden"
+      />
+    );
+  }
+);
 
 export default ResultTextarea;

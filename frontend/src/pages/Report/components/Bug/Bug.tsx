@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { useUnit, useStoreMap } from "effector-react";
+import usePasteFile from "@/hooks/usePasteFile";
 
 import { AttachmentTypes, BugResultTypes, BugStatuses } from "@/const";
 import { useSocketEvent } from "@/hooks/useSocketEvent";
@@ -33,6 +34,8 @@ const Bug = ({ bug }: Props) => {
   const reportId = useUnit($reportIdStore);
   const newBug = useUnit($newLocalBugStore);
   const focusedClientId = useUnit($focusedBugClientId);
+  const receiveTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const expectTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const allAttachments = useStoreMap({
     store: $attachmentsData,
@@ -43,6 +46,29 @@ const Bug = ({ bug }: Props) => {
       return attachmentIds.map((id) => attachments[id]).filter(Boolean);
     },
   });
+
+  const adjustTextareaHeights = () => {
+    const receiveTextarea = receiveTextareaRef.current;
+    const expectTextarea = expectTextareaRef.current;
+
+    if (receiveTextarea && expectTextarea) {
+      receiveTextarea.style.height = "auto";
+      expectTextarea.style.height = "auto";
+
+      const receiveHeight = receiveTextarea.scrollHeight;
+      const expectHeight = expectTextarea.scrollHeight;
+
+      const maxHeight = Math.max(receiveHeight, expectHeight);
+
+      receiveTextarea.style.height = `${maxHeight}px`;
+      expectTextarea.style.height = `${maxHeight}px`;
+    }
+  };
+
+  // Синхронизация высоты текстовых полей
+  useEffect(() => {
+    adjustTextareaHeights();
+  }, [bug.receive, bug.expect, newBug.receive, newBug.expect]);
 
   const receiveAttachments = allAttachments.filter(
     (att) => att.attachType === AttachmentTypes.FACT
@@ -145,6 +171,24 @@ const Bug = ({ bug }: Props) => {
     });
   };
 
+  const fileUploadCallback = (attachType: AttachmentTypes) => (file: File) => {
+    if (!reportId || bug.isLocalOnly) return;
+    uploadAttachmentEvent({
+      reportId,
+      bugId: bug.id,
+      attachType,
+      file,
+    });
+  };
+
+  const { handlePaste: handleReceivePaste } = usePasteFile({
+    onFileUpload: fileUploadCallback(AttachmentTypes.FACT),
+  });
+
+  const { handlePaste: handleExpectPaste } = usePasteFile({
+    onFileUpload: fileUploadCallback(AttachmentTypes.EXPECT),
+  });
+
   return (
     <div
       className={`card bg-base-100 shadow-lg border border-base-300 mb-4 p-4 grid grid-cols-2 gap-4 ${
@@ -154,6 +198,7 @@ const Bug = ({ bug }: Props) => {
       <BugHeader bug={bug} onStatusChange={handleStatusChange} />
 
       <Result
+        ref={receiveTextareaRef}
         title="фактический результат"
         value={bug.isLocalOnly ? newBug.receive : bug.receive || ""}
         onSave={handleReceiveChange}
@@ -166,9 +211,12 @@ const Bug = ({ bug }: Props) => {
         attachType={AttachmentTypes.FACT}
         onAttachmentUpload={handleAttachmentUpload(AttachmentTypes.FACT)}
         onAttachmentDelete={handleDeleteAttachment}
+        onInput={adjustTextareaHeights}
+        onPaste={handleReceivePaste}
       />
 
       <Result
+        ref={expectTextareaRef}
         title="ожидаемый результат"
         value={bug.isLocalOnly ? newBug.expect : bug.expect || ""}
         onSave={handleExpectChange}
@@ -181,6 +229,8 @@ const Bug = ({ bug }: Props) => {
         attachType={AttachmentTypes.EXPECT}
         onAttachmentUpload={handleAttachmentUpload(AttachmentTypes.EXPECT)}
         onAttachmentDelete={handleDeleteAttachment}
+        onInput={adjustTextareaHeights}
+        onPaste={handleExpectPaste}
       />
 
       {reportId && <Comments reportId={reportId} bugId={bug.id} />}

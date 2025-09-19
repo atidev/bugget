@@ -1,6 +1,7 @@
 import { memo, useState } from "react";
 import { MoreVertical } from "lucide-react";
 import { useUnit } from "effector-react";
+import usePasteFile from "@/hooks/usePasteFile";
 import {
   deleteCommentEvent,
   updateCommentEvent,
@@ -12,6 +13,7 @@ import { Attachment } from "@/types/attachment";
 import getCommentTimeDisplay from "@/utils/dates/getCommentTimeDisplay";
 import { useUserDisplayName } from "@/hooks/useUserDisplayName";
 import FilePreview from "../../../FilePreview/FilePreview";
+import AutoLinkText from "@/components/AutoLinkText/AutoLinkText";
 
 type Props = {
   reportId: number;
@@ -77,6 +79,17 @@ const Comment = memo((props: Props) => {
     }
   };
 
+  const { handlePaste } = usePasteFile({
+    onFileUpload: (file) => {
+      addAttachment({
+        reportId,
+        bugId,
+        commentId: id,
+        file,
+      });
+    },
+  });
+
   return (
     <div className="border-b border-base-300">
       <div className="flex items-start gap-3">
@@ -119,6 +132,7 @@ const Comment = memo((props: Props) => {
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
                 className="textarea textarea-bordered w-full resize-none min-h-auto"
                 placeholder="Введите текст комментария... (Enter для сохранения)"
                 rows={1}
@@ -142,7 +156,7 @@ const Comment = memo((props: Props) => {
               </div>
             </div>
           ) : (
-            <p className="text-base-content">{text}</p>
+            <AutoLinkText text={text} className="text-base-content" />
           )}
 
           <div className="mt-2">
