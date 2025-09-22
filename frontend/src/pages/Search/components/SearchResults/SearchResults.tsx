@@ -35,9 +35,9 @@ const SearchResults = () => {
     reportId: number
   ) => {
     if (e.ctrlKey || e.metaKey || e.button === 1) {
-      window.open(`/new-reports/${reportId}`, "_blank");
+      window.open(`/reports/${reportId}`, "_blank");
     } else {
-      navigate(`/new-reports/${reportId}`);
+      navigate(`/reports/${reportId}`);
     }
   };
 

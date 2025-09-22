@@ -47,7 +47,7 @@ const ReportPage = () => {
   // редирект после создания репорта
   useEffect(() => {
     if (!reportId && initialReport?.id) {
-      navigate(`/new-reports/${initialReport.id}`);
+      navigate(`/reports/${initialReport.id}`);
     }
   }, [initialReport?.id, reportId, navigate]);
 
