@@ -28,40 +28,38 @@ const LayoutWrapper = () => (
   </LayoutNew>
 );
 
-export function baseRoutes(): PatchableRouteObject[] {
-  return [
-    {
-      id: "root",
-      path: "/",
-      element: <LayoutWrapperObsolete />,
-      children: [
-        { id: "dashboard", index: true, element: <Home /> },
-        { id: "reports", path: "reports", element: <Reports /> },
-        {
-          id: "reports-report",
-          path: "reports/:reportId",
-          element: <Reports />,
-        },
-        { id: "search", path: "search", element: <Search /> },
-      ],
-    },
-    {
-      id: "new-reports-root",
-      path: "/new-reports",
-      element: <LayoutWrapper />,
-      children: [
-        { id: "new-reports", index: true, element: <NewReports /> },
-        {
-          id: "new-reports-report",
-          path: ":reportId",
-          element: <NewReports />,
-        },
-      ],
-    },
-  ];
-}
+export const baseRoutes: PatchableRouteObject[] = [
+  {
+    id: "root",
+    path: "/",
+    element: <LayoutWrapperObsolete />,
+    children: [
+      { id: "dashboard", index: true, element: <Home /> },
+      { id: "reports", path: "reports", element: <Reports /> },
+      {
+        id: "reports-report",
+        path: "reports/:reportId",
+        element: <Reports />,
+      },
+      { id: "search", path: "search", element: <Search /> },
+    ],
+  },
+  {
+    id: "new-reports-root",
+    path: "/new-reports",
+    element: <LayoutWrapper />,
+    children: [
+      { id: "new-reports", index: true, element: <NewReports /> },
+      {
+        id: "new-reports-report",
+        path: ":reportId",
+        element: <NewReports />,
+      },
+    ],
+  },
+];
 
-function AppRoutes({ routes }: { routes: ReturnType<typeof baseRoutes> }) {
+function AppRoutes({ routes }: { routes: PatchableRouteObject[] }) {
   const element = useRoutes(routes);
   return element;
 }
@@ -79,7 +77,7 @@ const App = () => {
 
   const routes = useMemo(() => {
     const extra = exts.flatMap((e) => e.routes ?? []);
-    return ApplyRoutesExtensions(baseRoutes(), extra);
+    return ApplyRoutesExtensions(baseRoutes, extra);
   }, [exts]);
 
   return (
