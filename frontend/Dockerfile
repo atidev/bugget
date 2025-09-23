@@ -1,4 +1,3 @@
-# Stage 1: Build Vite app
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
