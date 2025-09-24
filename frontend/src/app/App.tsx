@@ -32,7 +32,7 @@ const baseRoutes: PatchableRouteObject[] = [
         children: [
           {
             id: "reports-report",
-            path: ":reportId",
+            path: "reports/:reportId",
             element: <Report />,
           },
         ],
