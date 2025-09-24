@@ -17,7 +17,6 @@ namespace Bugget.Controllers;
 /// Api для работы с репортами
 /// </summary>
 [Route("/v1/reports")]
-[Obsolete("Используйте ReportsV2Controller")]
 public sealed class ReportsObsoleteController(
     ReportsService reportsService,
     IHubContext<ReportPageHub> hubContext,
@@ -30,6 +29,7 @@ public sealed class ReportsObsoleteController(
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(ReportView), 200)]
+    [Obsolete("Используйте ReportsV2Controller")]
     public async Task<ReportView?> CreateReportAsync([FromBody] ReportCreateDto createDto)
     {
         var user = User.GetIdentity();
@@ -59,6 +59,7 @@ public sealed class ReportsObsoleteController(
     /// <returns></returns>
     [HttpGet("{reportId}")]
     [ProducesResponseType(typeof(ReportObsoleteDbModel), 200)]
+    [Obsolete("Используйте ReportsV2Controller")]
     public async Task<ReportView?> GetReportAsync([FromRoute] int reportId)
     {
         var report = await reportsService.GetReportObsoleteAsync(reportId);
@@ -73,6 +74,7 @@ public sealed class ReportsObsoleteController(
     /// <returns></returns>
     [HttpPut("{reportId}")]
     [ProducesResponseType(typeof(ReportView), 200)]
+    [Obsolete("Используйте ReportsV2Controller")]
     public async Task<ReportView?> UpdateReportAsync([FromRoute] int reportId, [FromBody] ReportPatchDto updateDto)
     {
         var user = User.GetIdentity();
@@ -111,7 +113,7 @@ public sealed class ReportsObsoleteController(
                 take,
                 employeesClient.DictEmployeesByTeam()
                 ));
-        
+
         return searchResult.ToView(employeesClient.DictEmployees());
     }
 }
