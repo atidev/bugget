@@ -1,8 +1,11 @@
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 
+import { useUnit } from "effector-react";
 import { BugStatuses } from "@/const";
 import { BugClientEntity } from "@/types/bug";
+import { $user } from "@/store/user";
+import { $usersStore } from "@/store/report";
 
 import BugStatusSelect from "./components/BugStatusSelect/BugStatusSelect";
 
@@ -12,6 +15,17 @@ type Props = {
 };
 
 const BugHeader = ({ bug, onStatusChange }: Props) => {
+  const currentUser = useUnit($user);
+  const users = useUnit($usersStore);
+  const isAuthorCurrentUser = Boolean(
+    currentUser?.id && bug.creatorUserId === currentUser.id
+  );
+  const authorName = users[bug.creatorUserId]?.name;
+  const authorFragment = isAuthorCurrentUser
+    ? " вами"
+    : authorName
+    ? ` пользователем ${authorName}`
+    : "";
   return (
     <div className="col-span-2 flex justify-between items-center mb-4">
       <div className="flex items-center gap-2">
@@ -25,6 +39,7 @@ const BugHeader = ({ bug, onStatusChange }: Props) => {
               addSuffix: true,
               locale: ru,
             })}
+            <span>{authorFragment}</span>
           </span>
         )}
       </div>
