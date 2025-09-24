@@ -1,39 +1,65 @@
 import "@/store";
-import { useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Outlet,
-} from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { BrowserRouter as Router, Outlet, useRoutes } from "react-router-dom";
 import Layout from "@/components/Layout/Layout";
+import Home from "@/pages/Home/Home";
 import Report from "@/pages/Report/Report";
 import Search from "@/pages/Search/Search";
-import Home from "@/pages/Home/Home";
 import { authFx } from "@/store/user";
 import "@/styles/tailwind.css";
+import { loadExtensions } from "@/extensions/loader";
+import { AppExtension, PatchableRouteObject } from "@/extensions/extension";
+import { ApplyRoutesExtensions } from "@/extensions/routesApplyer";
+import { BASE_PATH } from "@/const";
 
-const LayoutWrapper = () => (
+const WrappedLayout = () => (
   <Layout>
     <Outlet />
   </Layout>
 );
 
+const baseRoutes: PatchableRouteObject[] = [
+  {
+    id: "root",
+    path: "/",
+    element: <WrappedLayout />,
+    children: [
+      { id: "dashboard", index: true, element: <Home /> },
+      {
+        id: "reports-report",
+        path: "reports/:reportId",
+        element: <Report />,
+      },
+      { id: "reports", path: "reports", element: <Report /> },
+      { id: "search", path: "search", element: <Search /> },
+    ],
+  },
+];
+
+function AppRoutes({ routes }: { routes: PatchableRouteObject[] }) {
+  const element = useRoutes(routes);
+  return element;
+}
+
 const App = () => {
+  const [exts, setExts] = useState<AppExtension[]>([]);
+
   useEffect(() => {
     authFx();
   }, []);
 
+  useEffect(() => {
+    loadExtensions().then(setExts);
+  }, []);
+
+  const routes = useMemo(() => {
+    const extra = exts.flatMap((e) => e.routes ?? []);
+    return ApplyRoutesExtensions(baseRoutes, extra);
+  }, [exts]);
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LayoutWrapper />}>
-          <Route index element={<Home />} />
-          <Route path="/reports" element={<Report />} />
-          <Route path="/reports/:reportId" element={<Report />} />
-          <Route path="/search" element={<Search />} />
-        </Route>
-      </Routes>
+    <Router basename={BASE_PATH}>
+      <AppRoutes routes={routes} />
     </Router>
   );
 };
