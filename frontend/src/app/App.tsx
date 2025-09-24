@@ -18,6 +18,10 @@ const WrappedLayout = () => (
   </Layout>
 );
 
+// Компоненты-обертки для разных случаев
+const NewReportPage = () => <Report />;
+const ReportPage = () => <Report />;
+
 const baseRoutes: PatchableRouteObject[] = [
   {
     id: "root",
@@ -26,17 +30,11 @@ const baseRoutes: PatchableRouteObject[] = [
     children: [
       { id: "dashboard", index: true, element: <Home /> },
       {
-        id: "reports",
-        path: "reports",
-        element: <Report />,
-        children: [
-          {
-            id: "reports-report",
-            path: "reports/:reportId",
-            element: <Report />,
-          },
-        ],
+        id: "reports-report",
+        path: "reports/:reportId",
+        element: <ReportPage />,
       },
+      { id: "reports", path: "reports", element: <NewReportPage /> },
       { id: "search", path: "search", element: <Search /> },
     ],
   },
