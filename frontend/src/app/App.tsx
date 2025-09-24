@@ -58,7 +58,7 @@ const App = () => {
   }, [exts]);
 
   return (
-    <Router basename={BASE_PATH}>
+    <Router basename={BASE_PATH || "/"}>
       <AppRoutes routes={routes} />
     </Router>
   );
