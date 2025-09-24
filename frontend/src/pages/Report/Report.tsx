@@ -9,6 +9,7 @@ import { useReportPageSocket } from "@/hooks/useReportPageSocket";
 import { useSocketEvent } from "@/hooks/useSocketEvent";
 import { $combinedBugsStore } from "@/store";
 import { createLocalBugEvent } from "@/store/localBugs";
+import { clearBugsEvent } from "@/store/bugs";
 import {
   $initialReportStore,
   $titleStore,
@@ -17,6 +18,7 @@ import {
   changeTitleEvent,
   saveTitleEvent,
   updateReportPathIdEvent,
+  clearReport,
 } from "@/store/report";
 import { SocketEvent } from "@/webSocketApi/models";
 
@@ -42,6 +44,18 @@ const ReportPage = () => {
     } else {
       updateReportPathIdEvent(null);
     }
+  }, [reportId]);
+
+  useEffect(() => {
+    // Очищаем стейт при изменении reportId
+    clearReport();
+    clearBugsEvent();
+
+    return () => {
+      // Также очищаем при размонтировании
+      clearReport();
+      clearBugsEvent();
+    };
   }, [reportId]);
 
   // редирект после создания репорта
