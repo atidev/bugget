@@ -31,7 +31,7 @@ const baseRoutes: PatchableRouteObject[] = [
       { id: "dashboard", index: true, element: <Home /> },
       {
         id: "reports-report",
-        path: "reports/:reportId",
+        path: "/reports/:reportId",
         element: <ReportPage />,
       },
       { id: "reports", path: "reports", element: <NewReportPage /> },
@@ -61,8 +61,9 @@ const App = () => {
     return ApplyRoutesExtensions(baseRoutes, extra);
   }, [exts]);
 
+  const routerBasename = BASE_PATH && BASE_PATH !== "/" ? BASE_PATH : undefined;
   return (
-    <Router basename={BASE_PATH || "/"}>
+    <Router basename={routerBasename}>
       <AppRoutes routes={routes} />
     </Router>
   );
