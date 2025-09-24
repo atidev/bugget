@@ -34,19 +34,6 @@ const baseRoutes: PatchableRouteObject[] = [
       { id: "search", path: "search", element: <Search /> },
     ],
   },
-  {
-    id: "new-reports-root",
-    path: "/new-reports",
-    element: <LayoutWrapper />,
-    children: [
-      { id: "new-reports", index: true, element: <Report /> },
-      {
-        id: "new-reports-report",
-        path: ":reportId",
-        element: <Report />,
-      },
-    ],
-  },
 ];
 
 function AppRoutes({ routes }: { routes: PatchableRouteObject[] }) {
