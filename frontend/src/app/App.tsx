@@ -25,12 +25,12 @@ const baseRoutes: PatchableRouteObject[] = [
     element: <WrappedLayout />,
     children: [
       { id: "dashboard", index: true, element: <Home /> },
-      { id: "reports", path: "reports", element: <Report /> },
       {
         id: "reports-report",
         path: "reports/:reportId",
         element: <Report />,
       },
+      { id: "reports", path: "reports", element: <Report /> },
       { id: "search", path: "search", element: <Search /> },
     ],
   },
