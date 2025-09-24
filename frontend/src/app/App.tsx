@@ -12,7 +12,7 @@ import { AppExtension, PatchableRouteObject } from "@/extensions/extension";
 import { ApplyRoutesExtensions } from "@/extensions/routesApplyer";
 import { BASE_PATH } from "@/const";
 
-const LayoutWrapper = () => (
+const WrappedLayout = () => (
   <Layout>
     <Outlet />
   </Layout>
@@ -22,7 +22,7 @@ const baseRoutes: PatchableRouteObject[] = [
   {
     id: "root",
     path: "/",
-    element: <LayoutWrapper />,
+    element: <WrappedLayout />,
     children: [
       { id: "dashboard", index: true, element: <Home /> },
       { id: "reports", path: "reports", element: <Report /> },
