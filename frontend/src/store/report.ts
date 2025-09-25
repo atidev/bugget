@@ -56,14 +56,14 @@ export const patchReportSocketEvent = createEvent<PatchReportSocketResponse>();
 export const updateResponsibleUserIdEvent = createEvent<string>();
 export const updateCreatorUserIdEvent = createEvent<string>();
 export const updateReportPathIdEvent = createEvent<number | null>();
+export const clearReport = createEvent<void>();
 
 /**
  * Сторы
  */
-export const $reportPathStore = createStore<number | null>(null).on(
-  updateReportPathIdEvent,
-  (_, reportPath) => reportPath
-);
+export const $reportPathStore = createStore<number | null>(null)
+  .on(updateReportPathIdEvent, (_, reportPath) => reportPath)
+  .reset(clearReport);
 
 // источник данных для других сторов
 export const $initialReportStore = createStore<ReportResponse | null>(null)
@@ -80,28 +80,31 @@ export const $initialReportStore = createStore<ReportResponse | null>(null)
     updatedAt: report.updatedAt,
     participantsUserIds: [],
     bugs: [],
-  }));
+  }))
+  .reset(clearReport);
 
 export const $titleStore = createStore<string>("")
   .on(getReportFx.doneData, (_, report) => report.title)
   .on(patchReportSocketEvent, (state, report) => report.title ?? state)
-  .on(changeTitleEvent, (_, title) => title);
+  .on(changeTitleEvent, (_, title) => title)
+  .reset(clearReport);
 
 export const $statusStore = createStore<ReportStatuses>(ReportStatuses.BACKLOG)
   .on(getReportFx.doneData, (_, report) => report.status)
-  .on(patchReportSocketEvent, (state, report) => report.status ?? state);
+  .on(patchReportSocketEvent, (state, report) => report.status ?? state)
+  .reset(clearReport);
 
 export const $responsibleUserIdStore = createStore<string>("")
   .on(getReportFx.doneData, (_, report) => report.responsibleUserId)
   .on(
     patchReportSocketEvent,
     (state, report) => report.responsibleUserId ?? state
-  );
+  )
+  .reset(clearReport);
 
-export const $creatorUserIdStore = createStore<string>("").on(
-  getReportFx.doneData,
-  (_, report) => report.creatorUserId
-);
+export const $creatorUserIdStore = createStore<string>("")
+  .on(getReportFx.doneData, (_, report) => report.creatorUserId)
+  .reset(clearReport);
 
 export const $pastResponsibleUserIdStore = createStore<string>("")
   .on(getReportFx.doneData, (_, report) => report.pastResponsibleUserId)
@@ -112,7 +115,8 @@ export const $pastResponsibleUserIdStore = createStore<string>("")
   .on(
     patchReportSocketEvent,
     (state, report) => report.pastResponsibleUserId ?? state
-  );
+  )
+  .reset(clearReport);
 
 export const $updatedAtStore = createStore<string>(new Date().toISOString())
   .on(getReportFx.doneData, (_, report) => report.updatedAt)
@@ -121,17 +125,16 @@ export const $updatedAtStore = createStore<string>(new Date().toISOString())
   .on(patchReportSocketEvent, (_, report) => {
     console.log("🔄 [Report] Updated at:", report.updatedAt);
     return report.updatedAt;
-  });
+  })
+  .reset(clearReport);
 
-export const $reportIdStore = createStore<number | null>(null).on(
-  $initialReportStore,
-  (_, report) => report?.id ?? null
-);
+export const $reportIdStore = createStore<number | null>(null)
+  .on($initialReportStore, (_, report) => report?.id ?? null)
+  .reset(clearReport);
 
-export const $participantsUserIdsStore = createStore<string[]>([]).on(
-  getReportFx.doneData,
-  (_, report) => report.participantsUserIds
-);
+export const $participantsUserIdsStore = createStore<string[]>([])
+  .on(getReportFx.doneData, (_, report) => report.participantsUserIds)
+  .reset(clearReport);
 
 // стор для хранения пользователей по ID
 export const $usersStore = createStore<Record<string, UserResponse>>({}).on(
