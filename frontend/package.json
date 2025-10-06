@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@bugreport/host-sdk": "file:../packages/host-sdk",
     "@microsoft/signalr": "^8.0.7",
     "@tailwindcss/typography": "^0.5.16",
     "axios": "^1.12.0",

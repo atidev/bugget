@@ -1,27 +1,15 @@
-import { AppExtension, AppExtensionFactory } from "./extension";
+// Extension loader now uses @bugreport/host-sdk
+import "@bugreport/host-sdk/init"; // Side-effect: initialize window.__SHARED__
+import { initExtensions } from "@bugreport/host-sdk/loader";
+import type { AppExtension } from "@bugreport/host-sdk/types";
 import { hostApi } from "./hostApi";
 
-// загрузчик плагинов из переменной окружения
+/**
+ * Load extensions using the host SDK
+ * All the magic (shared deps, loading, etc.) is handled by @bugreport/host-sdk
+ */
 export async function loadExtensions(): Promise<AppExtension[]> {
-  // "@app/sample-pages,@app/experiments"
-  const names = (import.meta.env.VITE_APP_EXTENSIONS ?? "")
-    .split(",")
-    .map((s: string) => s.trim())
-    .filter(Boolean);
-
-  const result: AppExtension[] = [];
-  for (const name of names) {
-    try {
-      const mod = await import(/* @vite-ignore */ name);
-      const maybe = mod.default;
-      const ext =
-        typeof maybe === "function"
-          ? (maybe as AppExtensionFactory)(hostApi)
-          : maybe;
-      result.push(...(Array.isArray(ext) ? ext : [ext]));
-    } catch (e) {
-      console.error(`[extensions] Failed to load "${name}"`, e);
-    }
-  }
-  return result;
+  return initExtensions(hostApi, {
+    debug: import.meta.env.DEV, // Enable debug logs in development
+  });
 }
