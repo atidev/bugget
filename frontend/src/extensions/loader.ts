@@ -2,7 +2,13 @@ import type { AppExtension } from "./extension";
 import { hostApi } from "./hostApi";
 
 export async function loadExtensions(): Promise<AppExtension[]> {
-  // Check if extensions are configured
+  // Check if extensions are configured via build-time env var
+  // This allows Vite to tree-shake the entire SDK loading block in standalone builds
+  if (!import.meta.env.VITE_APP_EXTENSIONS) {
+    return [];
+  }
+
+  // Check if extensions are configured at runtime
   const extensionsConfig =
     (typeof window !== "undefined" && window.env?.VITE_APP_EXTENSIONS) ||
     import.meta.env.VITE_APP_EXTENSIONS;
@@ -12,17 +18,18 @@ export async function loadExtensions(): Promise<AppExtension[]> {
   }
 
   try {
-    // Dynamically import SDK via computed specifiers to avoid TS/Vite resolution when disabled
-    const sdkBase = "@bugget/host-sdk";
-    const { initShared } = await import(/* @vite-ignore */ `${sdkBase}/init`);
-    const { initExtensions } = await import(
-      /* @vite-ignore */ `${sdkBase}/loader`
-    );
+    // Normal dynamic imports - Vite will:
+    // - In standalone: resolve to stub via alias
+    // - In Docker: resolve to actual SDK from node_modules
+    // @ts-ignore - Resolved via alias in standalone, from node_modules in Docker
+    const { initShared } = await import("@bugget/host-sdk/init");
+    // @ts-ignore - Resolved via alias in standalone, from node_modules in Docker
+    const { initExtensions } = await import("@bugget/host-sdk/loader");
 
-    // Initialize shared dependencies (React, Effector, etc.)
+    // Initialize shared dependencies
     initShared();
 
-    // Load and initialize extensions
+    // Load extensions
     return await initExtensions(hostApi, {
       debug: import.meta.env.DEV,
     });
