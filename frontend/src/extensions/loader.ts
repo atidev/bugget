@@ -12,9 +12,12 @@ export async function loadExtensions(): Promise<AppExtension[]> {
   }
 
   try {
-    // Dynamically import SDK - it will only be bundled if VITE_APP_EXTENSIONS is set at build time
-    const { initShared } = await import("@bugget/host-sdk/init");
-    const { initExtensions } = await import("@bugget/host-sdk/loader");
+    // Dynamically import SDK via computed specifiers to avoid TS/Vite resolution when disabled
+    const sdkBase = "@bugget/host-sdk";
+    const { initShared } = await import(/* @vite-ignore */ `${sdkBase}/init`);
+    const { initExtensions } = await import(
+      /* @vite-ignore */ `${sdkBase}/loader`
+    );
 
     // Initialize shared dependencies (React, Effector, etc.)
     initShared();
