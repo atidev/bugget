@@ -1,6 +1,3 @@
-# Standalone bugget/frontend build (no extensions support)
-# For extensions support, see bugreport/frontend/saas-ui/Dockerfile
-
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
