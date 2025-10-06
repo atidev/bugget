@@ -2,12 +2,6 @@ import type { AppExtension } from "./extension";
 import { hostApi } from "./hostApi";
 
 export async function loadExtensions(): Promise<AppExtension[]> {
-  // Check if extensions are configured via build-time env var
-  // This allows Vite to tree-shake the entire SDK loading block in standalone builds
-  if (!import.meta.env.VITE_APP_EXTENSIONS) {
-    return [];
-  }
-
   // Check if extensions are configured at runtime
   const extensionsConfig =
     (typeof window !== "undefined" && window.env?.VITE_APP_EXTENSIONS) ||

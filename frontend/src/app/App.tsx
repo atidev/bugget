@@ -72,9 +72,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    loadExtensions().then((loadedExts) => {
-      setExts(loadedExts);
-    });
+    loadExtensions().then(setExts);
   }, []);
 
   const routes = useMemo(() => {
