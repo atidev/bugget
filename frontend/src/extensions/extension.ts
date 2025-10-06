@@ -1,47 +1,33 @@
-/**
- * Extension types
- * These types are used both in standalone mode and when @bugget/host-sdk is loaded
- */
+import { UserResponse } from "@/types/user";
+import { Store } from "effector";
+import { RouteObject } from "react-router-dom";
 
-import type { Store } from "effector";
-import type { RouteObject } from "react-router-dom";
+/// интерфейсы для плагинов
+
+// фабрикам реализуемая приложением-плагином
+export type AppExtensionFactory = (
+  host: HostApi // то что плагин может использовать на своей стороне
+) => AppExtension | AppExtension[];
+
+// интерфейс для плагинов
+export type AppExtension = {
+  id: string;
+  routes?: PatchableRouteObject[]; // то что плагин может добавлять в приложение
+  // navs, sidebars, etc
+};
 
 export type HostApi = {
   effector: {
     stores: {
+      // доступ плагинов к сторам
       auth: Store<UserResponse | null>;
     };
   };
+  // components, utils, etc
 };
 
-export type UserResponse = {
-  id: string;
-  name: string;
-  teamId?: string | null;
-  photoUrl?: string | null;
-};
-
-export type AppExtension = {
-  id: string;
-  routes?: PatchableRouteObject[];
-};
-
+// статический ресурс плагина - маршруты
 export type PatchableRouteObject = RouteObject & {
   id?: string;
   children?: PatchableRouteObject[];
 };
-
-export type AppExtensionFactory = (
-  host: HostApi
-) => AppExtension | AppExtension[];
-
-// Global type declarations for window.env (used by extensions)
-declare global {
-  interface Window {
-    env?: {
-      API_URL?: string;
-      BASE_PATH?: string;
-      VITE_APP_EXTENSIONS?: string;
-    };
-  }
-}

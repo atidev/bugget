@@ -1,12 +1,6 @@
 import type { AppExtension } from "./extension";
 import { hostApi } from "./hostApi";
 
-/**
- * Load extensions if configured.
- *
- * This function conditionally imports @bugget/host-sdk only when VITE_APP_EXTENSIONS
- * is set. In standalone builds, the SDK won't be bundled at all.
- */
 export async function loadExtensions(): Promise<AppExtension[]> {
   // Check if extensions are configured
   const extensionsConfig =

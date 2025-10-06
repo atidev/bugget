@@ -73,17 +73,13 @@ const App = () => {
 
   useEffect(() => {
     loadExtensions().then((loadedExts) => {
-      console.log("[App] Loaded extensions:", loadedExts);
       setExts(loadedExts);
     });
   }, []);
 
   const routes = useMemo(() => {
     const extra = exts.flatMap((e) => e.routes ?? []);
-    console.log("[App] Extensions routes:", extra);
-    const merged = ApplyRoutesExtensions(baseRoutes, extra);
-    console.log("[App] Final routes:", merged);
-    return merged;
+    return ApplyRoutesExtensions(baseRoutes, extra);
   }, [exts]);
 
   return (
