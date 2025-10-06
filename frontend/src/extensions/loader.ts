@@ -2,29 +2,10 @@ import type { AppExtension } from "./extension";
 import { hostApi } from "./hostApi";
 
 /**
- * Wait for SDK to initialize (with timeout)
- */
-async function waitForSDK(timeoutMs = 2000): Promise<boolean> {
-  const startTime = Date.now();
-
-  while (Date.now() - startTime < timeoutMs) {
-    if ((window as any).__SHARED__ && (window as any).__initExtensions) {
-      return true;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 50));
-  }
-
-  return false;
-}
-
-/**
- * Load extensions if available.
+ * Load extensions if configured.
  *
- * Extensions are loaded via window.__SHARED__ which is initialized by the host SDK.
- * This function doesn't import the SDK directly - it only checks if the SDK
- * has already been loaded and initialized the global __SHARED__ object.
- *
- * This approach keeps bugget/frontend completely independent from SDK packages.
+ * This function conditionally imports @bugget/host-sdk only when VITE_APP_EXTENSIONS
+ * is set. In standalone builds, the SDK won't be bundled at all.
  */
 export async function loadExtensions(): Promise<AppExtension[]> {
   // Check if extensions are configured
@@ -36,23 +17,20 @@ export async function loadExtensions(): Promise<AppExtension[]> {
     return [];
   }
 
-  // Wait for SDK to initialize (libraries are exported, now waiting for host-sdk.js)
-  const sdkReady = await waitForSDK();
-
-  if (!sdkReady) {
-    console.log(
-      "[extensions] SDK initialization timeout. Running in standalone mode."
-    );
-    return [];
-  }
-
   try {
-    // SDK is ready - call the global loader function
-    return (window as any).__initExtensions(hostApi, {
+    // Dynamically import SDK - it will only be bundled if VITE_APP_EXTENSIONS is set at build time
+    const { initShared } = await import("@bugget/host-sdk/init");
+    const { initExtensions } = await import("@bugget/host-sdk/loader");
+
+    // Initialize shared dependencies (React, Effector, etc.)
+    initShared();
+
+    // Load and initialize extensions
+    return await initExtensions(hostApi, {
       debug: import.meta.env.DEV,
     });
   } catch (error) {
-    console.error("[extensions] Failed to initialize extensions:", error);
+    console.error("[extensions] Failed to load SDK:", error);
     return [];
   }
 }
