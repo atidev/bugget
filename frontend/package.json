@@ -13,7 +13,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@bugreport/host-sdk": "file:../packages/host-sdk",
     "@microsoft/signalr": "^8.0.7",
     "@tailwindcss/typography": "^0.5.16",
     "axios": "^1.12.0",
@@ -47,6 +46,9 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0",
     "vite": "^6.3.6"
+  },
+  "optionalDependencies": {
+    "@bugget/host-sdk": "file:../../bugreport/packages/host-sdk"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
