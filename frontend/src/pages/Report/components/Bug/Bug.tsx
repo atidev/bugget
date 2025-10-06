@@ -189,11 +189,16 @@ const Bug = ({ bug }: Props) => {
     onFileUpload: fileUploadCallback(AttachmentTypes.EXPECT),
   });
 
+  let borderColor = "";
+  if (bug.status === BugStatuses.ARCHIVED) {
+    borderColor = "border-success";
+  } else if (bug.status === BugStatuses.REJECTED) {
+    borderColor = "border-warning";
+  }
+
   return (
     <div
-      className={`card bg-base-100 shadow-lg border border-base-300 mb-4 p-4 grid grid-cols-2 gap-4 ${
-        bug.status === BugStatuses.ARCHIVED ? "border-success" : ""
-      }`}
+      className={`card bg-base-100 shadow-lg border border-base-300 mb-4 p-4 grid grid-cols-2 gap-4 ${borderColor}`}
     >
       <BugHeader bug={bug} onStatusChange={handleStatusChange} />
 

@@ -1,11 +1,9 @@
 import "@/store";
 import { useEffect, useMemo, useState } from "react";
 import { BrowserRouter as Router, Outlet, useRoutes } from "react-router-dom";
-import Layout from "@/components/LayoutObsolette/Layout";
-import LayoutNew from "@/components/Layout/Layout";
+import Layout from "@/components/Layout/Layout";
 import Home from "@/pages/Home/Home";
-import Reports from "@/pages/ReportObsolete/Report";
-import NewReports from "@/pages/Report/Report";
+import Report from "@/pages/Report/Report";
 import Search from "@/pages/Search/Search";
 import { authFx } from "@/store/user";
 import "@/styles/tailwind.css";
@@ -14,47 +12,26 @@ import { AppExtension, PatchableRouteObject } from "@/extensions/extension";
 import { ApplyRoutesExtensions } from "@/extensions/routesApplyer";
 import { BASE_PATH } from "@/const";
 
-// Компонент-обертка для старого Layout
-const LayoutWrapperObsolete = () => (
+const WrappedLayout = () => (
   <Layout>
     <Outlet />
   </Layout>
 );
 
-// Компонент-обертка для нового Layout
-const LayoutWrapper = () => (
-  <LayoutNew>
-    <Outlet />
-  </LayoutNew>
-);
-
-export const baseRoutes: PatchableRouteObject[] = [
+const baseRoutes: PatchableRouteObject[] = [
   {
     id: "root",
     path: "/",
-    element: <LayoutWrapperObsolete />,
+    element: <WrappedLayout />,
     children: [
       { id: "dashboard", index: true, element: <Home /> },
-      { id: "reports", path: "reports", element: <Reports /> },
       {
         id: "reports-report",
         path: "reports/:reportId",
-        element: <Reports />,
+        element: <Report />,
       },
+      { id: "reports", path: "reports", element: <Report /> },
       { id: "search", path: "search", element: <Search /> },
-    ],
-  },
-  {
-    id: "new-reports-root",
-    path: "/new-reports",
-    element: <LayoutWrapper />,
-    children: [
-      { id: "new-reports", index: true, element: <NewReports /> },
-      {
-        id: "new-reports-report",
-        path: ":reportId",
-        element: <NewReports />,
-      },
     ],
   },
 ];

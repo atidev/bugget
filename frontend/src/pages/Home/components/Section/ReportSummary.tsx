@@ -15,7 +15,7 @@ const ReportSummary = ({ report, highlight }: ReportProps) => {
       className={`card card-border shadow-lg cursor-pointer hover:bg-base-200 ${
         highlight ? "border-error" : "border-gray-300"
       }`}
-      onClick={() => navigate(`/new-reports/${report.id}`)}
+      onClick={() => navigate(`/reports/${report.id}`)}
     >
       <div className="card-body p-4">
         <h3 className="card-title text-lg font-semibold">{report.title}</h3>

@@ -1,15 +1,14 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { clearReport } from "@/storeObsolete/report";
-import { setBreadcrumbs } from "@/storeObsolete/breadcrumbs";
+import { clearReport } from "@/store/report";
+import { setBreadcrumbs, $breadcrumbs } from "@/store/breadcrumbs";
 import { useUnit } from "effector-react";
-import { $breadcrumbs } from "../../storeObsolete/breadcrumbs";
 import { Search } from "lucide-react";
 import Avatar from "../Avatar/Avatar";
 import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
 import { useEffect } from "react";
 
 const HIDDEN_BUTTONS = {
-  createReport: ["/new-reports"],
+  createReport: ["/reports"],
   search: ["/search"],
 };
 
@@ -18,24 +17,28 @@ const reportsPageBreadcrumb = { label: "Репорты", path: "/" };
 const Header = () => {
   const breadcrumbs = useUnit($breadcrumbs);
   const { reportId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    setBreadcrumbs([
-      reportsPageBreadcrumb,
-      !reportId
-        ? { label: "Новый репорт", path: `/new-reports` }
-        : {
-            label: `Репорт #${reportId}`,
-            path: `/new-reports/${reportId}`,
-          },
-    ]);
-  }, [reportId]);
+    const breadcrumbs = [reportsPageBreadcrumb];
+
+    if (location.pathname.startsWith("/reports")) {
+      if (!reportId) {
+        breadcrumbs.push({ label: "Новый репорт", path: `/reports` });
+      } else {
+        breadcrumbs.push({
+          label: `Репорт #${reportId}`,
+          path: `/reports/${reportId}`,
+        });
+      }
+    }
+
+    setBreadcrumbs(breadcrumbs);
+  }, [reportId, location.pathname]);
 
   const isVisible = (button: keyof typeof HIDDEN_BUTTONS) =>
     !HIDDEN_BUTTONS[button].includes(location.pathname);
-
-  const navigate = useNavigate();
-  const location = useLocation();
 
   return (
     <header className="h-16 justify-between bg-base-200 shadow-sm px-4 flex items-center">
@@ -58,7 +61,7 @@ const Header = () => {
             className="btn btn-primary ml-2 font-normal"
             onClick={() => {
               clearReport();
-              navigate("/new-reports");
+              navigate("/reports");
             }}
           >
             Новый репорт

@@ -5,10 +5,6 @@ export type User = {
   name: string | null;
 };
 
-export type AttachmentRequest = {
-  file: File;
-};
-
 export type AttachmentResponse = {
   id: number;
   bugId: number;
@@ -31,17 +27,6 @@ export type BugResponse = {
   comments: CommentResponse[];
 };
 
-export type BugCreateRequest = {
-  receive: string | null;
-  expect: string | null;
-};
-
-export type BugUpdateRequest = {
-  receive: string | null;
-  expect: string | null;
-  status: BugStatuses | null;
-};
-
 export type CommentResponse = {
   id: number;
   bugId: number;
@@ -61,23 +46,6 @@ export type ReportResponse = {
   updatedAt: string;
   participants: User[] | null;
   bugs: BugResponse[] | null;
-};
-
-export type CreateReportRequest = {
-  title: string | null;
-  responsibleId: string | null;
-  bugs:
-    | {
-        receive: string | null;
-        expect: string | null;
-      }[]
-    | null;
-};
-
-export type UpdateReportRequest = {
-  title: string | null;
-  status: ReportStatuses | null;
-  responsibleUserId: string | null;
 };
 
 export type SearchResponse = {

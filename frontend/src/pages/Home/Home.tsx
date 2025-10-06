@@ -8,7 +8,7 @@ import {
 import Section from "./components/Section/Section";
 import "./Home.css";
 
-const Main = () => {
+const Home = () => {
   const responsibleReports = useUnit($responsibleReports);
   const participantReports = useUnit($participantReports);
 
@@ -25,4 +25,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default Home;
