@@ -33,6 +33,9 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend_bugget
+    environment:
+      API_URL: http://localhost:7777
+      BASE_PATH: /
     ports: ["80:80"]
     develop:
       watch:
