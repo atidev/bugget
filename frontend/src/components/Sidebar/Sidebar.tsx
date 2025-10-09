@@ -9,6 +9,7 @@ import {
   changeResponsibleUserIdEvent,
 } from "@/store/report";
 import ReportStatusSelect from "./components/ReportStatusSelect";
+import SidebarContainer from "./SidebarContainer";
 
 const autocompleteUsersHandler = async (searchString: string) => {
   const response = await autocompleteUsers(searchString);
@@ -23,7 +24,7 @@ const Sidebar = () => {
   const participantsWithNames = useUnit($participantsWithNamesStore);
 
   return (
-    <div className="flex flex-col gap-4 px-6 py-8 border-l border-base-content/30 rounded-l-sm">
+    <SidebarContainer>
       <div className="flex flex-col gap-2">
         <div className="text-sm text-base-content/70">Статус</div>
         <ReportStatusSelect />
@@ -55,7 +56,7 @@ const Sidebar = () => {
           )}
         </div>
       </div>
-    </div>
+    </SidebarContainer>
   );
 };
 
