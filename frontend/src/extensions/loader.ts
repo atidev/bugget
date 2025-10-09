@@ -1,27 +1,34 @@
-import { AppExtension, AppExtensionFactory } from "./extension";
+import type { AppExtension } from "./extension";
 import { hostApi } from "./hostApi";
 
-// загрузчик плагинов из переменной окружения
 export async function loadExtensions(): Promise<AppExtension[]> {
-  // "@app/sample-pages,@app/experiments"
-  const names = (import.meta.env.VITE_APP_EXTENSIONS ?? "")
-    .split(",")
-    .map((s: string) => s.trim())
-    .filter(Boolean);
+  // Check if extensions are configured at runtime
+  const extensionsConfig =
+    (typeof window !== "undefined" && window.env?.VITE_APP_EXTENSIONS) ||
+    import.meta.env.VITE_APP_EXTENSIONS;
 
-  const result: AppExtension[] = [];
-  for (const name of names) {
-    try {
-      const mod = await import(/* @vite-ignore */ name);
-      const maybe = mod.default;
-      const ext =
-        typeof maybe === "function"
-          ? (maybe as AppExtensionFactory)(hostApi)
-          : maybe;
-      result.push(...(Array.isArray(ext) ? ext : [ext]));
-    } catch (e) {
-      console.error(`[extensions] Failed to load "${name}"`, e);
-    }
+  if (!extensionsConfig || extensionsConfig === "") {
+    return [];
   }
-  return result;
+
+  try {
+    // Normal dynamic imports - Vite will:
+    // - In standalone: resolve to stub via alias
+    // - In Docker: resolve to actual SDK from node_modules
+    // @ts-ignore - Resolved via alias in standalone, from node_modules in Docker
+    const { initShared } = await import("@bugget/host-sdk/init");
+    // @ts-ignore - Resolved via alias in standalone, from node_modules in Docker
+    const { initExtensions } = await import("@bugget/host-sdk/loader");
+
+    // Initialize shared dependencies
+    initShared();
+
+    // Load extensions
+    return await initExtensions(hostApi, {
+      debug: import.meta.env.DEV,
+    });
+  } catch (error) {
+    console.error("[extensions] Failed to load SDK:", error);
+    return [];
+  }
 }

@@ -24,8 +24,8 @@ const BugHeader = ({ bug, onStatusChange }: Props) => {
   const authorFragment = isAuthorCurrentUser
     ? " вами"
     : authorName
-    ? ` пользователем ${authorName}`
-    : "";
+      ? ` пользователем ${authorName}`
+      : "";
   return (
     <div className="col-span-2 flex justify-between items-center mb-4">
       <div className="flex items-center gap-2">

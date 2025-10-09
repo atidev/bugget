@@ -20,7 +20,7 @@ export type HostApi = {
   effector: {
     stores: {
       // доступ плагинов к сторам
-      user: Store<UserResponse | null>;
+      auth: Store<UserResponse | null>;
     };
   };
   // components, utils, etc

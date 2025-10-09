@@ -140,10 +140,13 @@ export const $participantsUserIdsStore = createStore<string[]>([])
 export const $usersStore = createStore<Record<string, UserResponse>>({}).on(
   fetchUsersFx.doneData,
   (state, users) => {
-    const usersById = users.reduce((acc, user) => {
-      acc[user.id] = user;
-      return acc;
-    }, {} as Record<string, UserResponse>);
+    const usersById = users.reduce(
+      (acc, user) => {
+        acc[user.id] = user;
+        return acc;
+      },
+      {} as Record<string, UserResponse>
+    );
     return { ...state, ...usersById };
   }
 );
