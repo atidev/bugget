@@ -49,7 +49,7 @@ public static class BugMapper
         };
     }
 
-    public static BugView ToView(this BugDbModel bug, IReadOnlyDictionary<string, Employee> employeesDict)
+    public static BugView ToView(this BugDbModel bug, IReadOnlyDictionary<string, User> usersDict)
     {
         return new BugView
         {
@@ -57,9 +57,9 @@ public static class BugMapper
             ReportId = bug.ReportId,
             Receive = bug.Receive,
             Expect = bug.Expect,
-            Creator = employeesDict.TryGetValue(bug.CreatorUserId, out var e)
-                ? EmployeeAdapter.ToUserView(e)
-                : EmployeeAdapter.ToUserView(bug.CreatorUserId),
+            Creator = usersDict.TryGetValue(bug.CreatorUserId, out var e)
+                ? UsersAdapter.ToUserView(e)
+                : UsersAdapter.ToUserView(bug.CreatorUserId),
             CreatedAt = bug.CreatedAt,
             UpdatedAt = bug.UpdatedAt,
             Status = bug.Status,
@@ -75,7 +75,7 @@ public static class BugMapper
                 FileName = a.FileName ?? string.Empty,
                 CreatorUserId = a.CreatorUserId ?? string.Empty,
             }).ToArray(),
-            Comments = bug.Comments?.Select(c => c.ToCommentView(bug.ReportId, employeesDict))
+            Comments = bug.Comments?.Select(c => c.ToCommentView(bug.ReportId, usersDict))
                 .ToArray(),
         };
     }

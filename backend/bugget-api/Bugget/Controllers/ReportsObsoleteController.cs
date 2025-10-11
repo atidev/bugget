@@ -20,7 +20,7 @@ namespace Bugget.Controllers;
 public sealed class ReportsObsoleteController(
     ReportsService reportsService,
     IHubContext<ReportPageHub> hubContext,
-    IEmployeesClient employeesClient) : ApiController
+    IUsersClient usersClient) : ApiController
 {
     /// <summary>
     /// Создать репорт
@@ -35,7 +35,7 @@ public sealed class ReportsObsoleteController(
         var user = User.GetIdentity();
         var createdReport = await reportsService.CreateReportObsoleteAsync(createDto.ToReport(user.Id));
 
-        return createdReport?.ToView(employeesClient.DictEmployees());
+        return createdReport?.ToView(usersClient.DictUsers());
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public sealed class ReportsObsoleteController(
         var user = User.GetIdentity();
 
         var reports = await reportsService.ListReportsAsync(user.Id);
-        return reports.Select(r => r.ToView(employeesClient.DictEmployees())).ToArray();
+        return reports.Select(r => r.ToView(usersClient.DictUsers())).ToArray();
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public sealed class ReportsObsoleteController(
     public async Task<ReportView?> GetReportAsync([FromRoute] int reportId)
     {
         var report = await reportsService.GetReportObsoleteAsync(reportId);
-        return report?.ToView(employeesClient.DictEmployees());
+        return report?.ToView(usersClient.DictUsers());
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public sealed class ReportsObsoleteController(
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");
 
-        return report?.ToView(employeesClient.DictEmployees());
+        return report?.ToView(usersClient.DictUsers());
     }
 
     /// <summary>
@@ -111,9 +111,9 @@ public sealed class ReportsObsoleteController(
                 sort,
                 skip,
                 take,
-                employeesClient.DictEmployeesByTeam()
+                usersClient.DictUsersByTeam()
                 ));
 
-        return searchResult.ToView(employeesClient.DictEmployees());
+        return searchResult.ToView(usersClient.DictUsers());
     }
 }

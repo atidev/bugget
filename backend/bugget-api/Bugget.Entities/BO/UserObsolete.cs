@@ -1,6 +1,6 @@
 namespace Bugget.Entities.BO;
 
-public class EmployeeObsolete
+public class UserObsolete
 {
     /// <summary>
     /// Уникальный идентификатор соответствующий хэдеру авторизации USER_ID_KEY

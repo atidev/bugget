@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace Bugget.DA.Files;
 
-public sealed class TeamsFileClient(ILogger<EmployeesFileClient> logger) : BackgroundService, ITeamsClient
+public sealed class TeamsFileClient(ILogger<UsersFileClient> logger) : BackgroundService, ITeamsClient
 {
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {

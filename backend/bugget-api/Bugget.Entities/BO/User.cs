@@ -1,7 +1,7 @@
 
 namespace Bugget.Entities.BO;
 
-public class Employee
+public class User
 {
     /// <summary>
     /// Уникальный идентификатор соответствующий хэдеру авторизации USER_ID_KEY

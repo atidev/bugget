@@ -7,7 +7,7 @@ using Bugget.ExternalClients.Interfaces;
 namespace Bugget.ExternalClients.Notifications.Mattermost;
 
 public sealed class MattermostService(
-    IEmployeesClient employeesClient,
+    IUsersClient usersClient,
     MattermostClient mattermostClient) : IReportCreatePostAction, IReportUpdatePostAction, IReportPatchPostAction
 {
     public async Task ExecuteAsync(ReportCreateContext createContext)
@@ -15,16 +15,16 @@ public sealed class MattermostService(
         if (createContext.Report.ResponsibleUserId == createContext.ReportDbModel.CreatorUserId)
             return;
 
-        var responsibleEmployee = await employeesClient.GetEmployeeAsync(createContext.Report.ResponsibleUserId);
-        var creatorEmployee = await employeesClient.GetEmployeeAsync(createContext.Report.CreatorUserId);
-        if (responsibleEmployee == null || creatorEmployee == null)
+        var responsibleUser = await usersClient.GetUserAsync(createContext.Report.ResponsibleUserId);
+        var creatorUser = await usersClient.GetUserAsync(createContext.Report.CreatorUserId);
+        if (responsibleUser == null || creatorUser == null)
             return ;
 
         var message = ReportMessageBuilder.GetYourResponsibleInNewReportMessage(
-            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, creatorEmployee.Name
+            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, creatorUser.Name
         );
 
-        await mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
+        await mattermostClient.SendMessageAsync(responsibleUser.NotificationUserId, message);
     }
 
     public async Task ExecuteAsync(ReportUpdateContext createContext)
@@ -36,16 +36,16 @@ public sealed class MattermostService(
         if (createContext.Report.UpdaterUserId == createContext.Report.ResponsibleUserId)
             return ;
 
-        var responsibleEmployee = await employeesClient.GetEmployeeAsync(createContext.Report.ResponsibleUserId);
-        var updaterEmployee = await employeesClient.GetEmployeeAsync(createContext.Report.UpdaterUserId);
-        if (responsibleEmployee == null || updaterEmployee == null)
+        var responsibleUser = await usersClient.GetUserAsync(createContext.Report.ResponsibleUserId);
+        var updaterUser = await usersClient.GetUserAsync(createContext.Report.UpdaterUserId);
+        if (responsibleUser == null || updaterUser == null)
             return ;
 
         var message = ReportMessageBuilder.GetYourResponsibleInExistReportMessage(
-            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, updaterEmployee.Name
+            createContext.ReportDbModel.Id, createContext.ReportDbModel.Title, updaterUser.Name
         );
 
-        await mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
+        await mattermostClient.SendMessageAsync(responsibleUser.NotificationUserId, message);
     }
 
     public async Task ExecuteAsync(ReportPatchContext reportPatchContext)
@@ -57,15 +57,15 @@ public sealed class MattermostService(
         if (reportPatchContext.UserId == reportPatchContext.Result.ResponsibleUserId)
             return;
 
-        var responsibleEmployee = await employeesClient.GetEmployeeAsync(reportPatchContext.Result.ResponsibleUserId);
-        var updaterEmployee = await employeesClient.GetEmployeeAsync(reportPatchContext.UserId);
-        if (responsibleEmployee == null || updaterEmployee == null)
+        var responsibleUser = await usersClient.GetUserAsync(reportPatchContext.Result.ResponsibleUserId);
+        var updaterUser = await usersClient.GetUserAsync(reportPatchContext.UserId);
+        if (responsibleUser == null || updaterUser == null)
             return;
 
         var message = ReportMessageBuilder.GetYourResponsibleAfterPatchReportMessage(
-            reportPatchContext.Result.Id, reportPatchContext.Result.Title, updaterEmployee.Name
+            reportPatchContext.Result.Id, reportPatchContext.Result.Title, updaterUser.Name
         );
 
-        await mattermostClient.SendMessageAsync(responsibleEmployee.NotificationUserId, message);
+        await mattermostClient.SendMessageAsync(responsibleUser.NotificationUserId, message);
     }
 }

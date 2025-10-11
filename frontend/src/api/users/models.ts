@@ -1,6 +1,6 @@
 import { UserResponse } from "@/types/user";
 
 export type AutocompleteUsersResponse = {
-  employees: UserResponse[];
+  users: UserResponse[];
   total: number;
 };

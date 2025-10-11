@@ -3,18 +3,18 @@ using Bugget.Entities.Views;
 
 namespace Bugget.DA.Interfaces;
 
-public interface IEmployeesClient
+public interface IUsersClient
 {
-    Task<Employee?> GetEmployeeAsync(string userId);
-    Task<IEnumerable<Employee>> GetEmployeesAsync(IEnumerable<string> userIds, string? organizationId);
+    Task<User?> GetUserAsync(string userId);
+    Task<IEnumerable<User>> GetUsersAsync(IEnumerable<string> userIds, string? organizationId);
     
     [Obsolete]
-    IReadOnlyDictionary<string, Employee> DictEmployees();
+    IReadOnlyDictionary<string, User> DictUsers();
 
     [Obsolete]
-    public IReadOnlyDictionary<string, IReadOnlyCollection<Employee>> DictEmployeesByTeam();
+    public IReadOnlyDictionary<string, IReadOnlyCollection<User>> DictUsersByTeam();
     
-    public Task<(IEnumerable<Employee>, int)> AutocompleteEmployeesAsync(
+    public Task<(IEnumerable<User>, int)> AutocompleteUsersAsync(
         string userId,
         string searchString,
         int skip,

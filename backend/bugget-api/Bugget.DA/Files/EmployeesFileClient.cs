@@ -6,45 +6,45 @@ using System.Text.Json;
 
 namespace Bugget.DA.Files;
 
-public sealed class EmployeesFileClient(ILogger<EmployeesFileClient> logger) : BackgroundService, IEmployeesClient
+public sealed class UsersFileClient(ILogger<UsersFileClient> logger) : BackgroundService, IUsersClient
 {
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
     };
 
-    private static Employee[] _employees = [];
-    private static readonly Lazy<IReadOnlyDictionary<string, Employee>> EmployeesDict = new(() => _employees.ToDictionary(k => k.Id));
+    private static User[] _users = [];
+    private static readonly Lazy<IReadOnlyDictionary<string, User>> UsersDict = new(() => _users.ToDictionary(k => k.Id));
 
 
-    public Task<Employee?> GetEmployeeAsync(string userId)
+    public Task<User?> GetUserAsync(string userId)
     {
-        EmployeesDict.Value.TryGetValue(userId, out var employee);
-        return Task.FromResult(employee);
+        UsersDict.Value.TryGetValue(userId, out var users);
+        return Task.FromResult(users);
     }
 
-    public Task<IEnumerable<Employee>> GetEmployeesAsync(IEnumerable<string> userIds, string? organizationId)
+    public Task<IEnumerable<User>> GetUsersAsync(IEnumerable<string> userIds, string? organizationId)
     {
-        var employees = userIds
-            .Select(id => EmployeesDict.Value.GetValueOrDefault(id))
+        var users = userIds
+            .Select(id => UsersDict.Value.GetValueOrDefault(id))
             .Where(e => e != null);
-        return Task.FromResult(employees!);
+        return Task.FromResult(users!);
     }
 
-    public IReadOnlyDictionary<string, Employee> DictEmployees()
+    public IReadOnlyDictionary<string, User> DictUsers()
     {
-        return EmployeesDict.Value;
+        return UsersDict.Value;
     }
     
-    public IReadOnlyDictionary<string, IReadOnlyCollection<Employee>> DictEmployeesByTeam()
+    public IReadOnlyDictionary<string, IReadOnlyCollection<User>> DictUsersByTeam()
     {
-        return _employees
+        return _users
             .Where(e => !string.IsNullOrEmpty(e.TeamId))
             .GroupBy(e => e.TeamId!)
             .ToDictionary(
                 grp => grp.Key!,
-                grp => (IReadOnlyCollection<Employee>)grp
-                    .Select(e => new Employee
+                grp => (IReadOnlyCollection<User>)grp
+                    .Select(e => new User
                     {
                         Id = e.Id,
                         Name = e.Name,
@@ -58,18 +58,18 @@ public sealed class EmployeesFileClient(ILogger<EmployeesFileClient> logger) : B
             );
     }
     
-    public async Task<(IEnumerable<Employee>, int)> AutocompleteEmployeesAsync(
+    public async Task<(IEnumerable<User>, int)> AutocompleteUsersAsync(
         string userId,
         string searchString,
         int skip,
         int take,
         uint depth)
     {
-        var user = await GetEmployeeAsync(userId);
+        var user = await GetUserAsync(userId);
         if (user == null)
             return ([], 0);
 
-        var foundedUsers = _employees
+        var foundedUsers = _users
             // текущая глубина + 1
             .Where(e => user.Depth == null || e.Depth >= user.Depth - depth)
             .Where(v => v.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
@@ -82,29 +82,29 @@ public sealed class EmployeesFileClient(ILogger<EmployeesFileClient> logger) : B
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        return LoadEmployeesAsync();
+        return LoadUsersAsync();
     }
 
-    private async Task LoadEmployeesAsync()
+    private async Task LoadUsersAsync()
     {
-        string employeesFilePath = Path.Combine(AppContext.BaseDirectory, "employees.json");
+        string usersFilePath = Path.Combine(AppContext.BaseDirectory, "employees.json");
 
-        if (File.Exists(employeesFilePath))
+        if (File.Exists(usersFilePath))
         {
-            _employees = JsonSerializer.Deserialize<Employee[]>(await File.ReadAllTextAsync(employeesFilePath), JsonSerializerOptions)
+            _users = JsonSerializer.Deserialize<User[]>(await File.ReadAllTextAsync(usersFilePath), JsonSerializerOptions)
                         ?? throw new InvalidOperationException("Ошибка загрузки данных из employees.json");
             return;
         }
 
         logger.LogWarning("Файл employees.json не найден, используются данные по умолчанию");
-        _employees = GetDefaultEmployees();
+        _users = GetDefaultUsers();
     }
 
-    private static Employee[] GetDefaultEmployees()
+    private static User[] GetDefaultUsers()
     {
         return
         [
-            new Employee
+            new User
             {
                 Id = "1",
                 Name = "Иванов Иван Иванович",
@@ -113,7 +113,7 @@ public sealed class EmployeesFileClient(ILogger<EmployeesFileClient> logger) : B
                 OrganizationId = "1",
                 Depth = -1
             },
-            new Employee
+            new User
             {
                 Id = "any-id-1",
                 Name = "Петров Петр Петрович",
@@ -122,7 +122,7 @@ public sealed class EmployeesFileClient(ILogger<EmployeesFileClient> logger) : B
                 OrganizationId = "1",
                 Depth = 0
             },
-            new Employee
+            new User
             {
                 Id = "int",
                 Name = "Сергей Сергеев Сергеевич",
@@ -131,7 +131,7 @@ public sealed class EmployeesFileClient(ILogger<EmployeesFileClient> logger) : B
                 OrganizationId = "1",
                 Depth = 2
             },
-            new Employee
+            new User
             {
                 Id = "guid",
                 Name = "Алексей Алексеев Алексеевич",
@@ -140,7 +140,7 @@ public sealed class EmployeesFileClient(ILogger<EmployeesFileClient> logger) : B
                 OrganizationId = "1",
                 Depth = 1
             },
-            new Employee
+            new User
             {
                 Id = "default-user",
                 Name = "Дефолт Дефолтов Дефолтович",

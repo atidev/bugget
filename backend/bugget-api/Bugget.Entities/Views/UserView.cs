@@ -1,6 +1,6 @@
 namespace Bugget.Entities.Views;
 
-public class EmployeeView
+public class UserView
 {
     /// <summary>
     /// Id пользователя
