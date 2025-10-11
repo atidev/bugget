@@ -16,7 +16,7 @@ public class UserAuthHandlerTests
 {
     private static UserAuthHandler CreateHandler(
         DefaultHttpContext context,
-        Mock<IEmployeesClient> clientMock,
+        Mock<IUsersClient> clientMock,
         AuthHeadersOptions headersOptions)
     {
         // Mock AuthenticationSchemeOptions
@@ -60,8 +60,8 @@ public class UserAuthHandlerTests
         context.Request.Headers[headersOptions.OrganizationIdHeaderName] = "org-789";
         context.Request.Headers["X-Signal-R-Connection-Id"] = "conn-abc";
 
-        var employeesClient = new Mock<IEmployeesClient>();
-        var handler = CreateHandler(context, employeesClient, headersOptions);
+        var usersClient = new Mock<IUsersClient>();
+        var handler = CreateHandler(context, usersClient, headersOptions);
 
         // Act
         var result = await handler.AuthenticateAsync();
@@ -85,8 +85,8 @@ public class UserAuthHandlerTests
         };
         var context = new DefaultHttpContext(); // no headers
 
-        var employeesClient = new Mock<IEmployeesClient>();
-        var handler = CreateHandler(context, employeesClient, headersOptions);
+        var usersClient = new Mock<IUsersClient>();
+        var handler = CreateHandler(context, usersClient, headersOptions);
 
         // Act
         var result = await handler.AuthenticateAsync();
@@ -103,9 +103,9 @@ public class UserAuthHandlerTests
         var headersOptions = new AuthHeadersOptions();
         var context = new DefaultHttpContext();
 
-        var clientMock = new Mock<IEmployeesClient>();
-        clientMock.Setup(c => c.GetEmployeeAsync("default-user"))
-            .ReturnsAsync(new Employee
+        var clientMock = new Mock<IUsersClient>();
+        clientMock.Setup(c => c.GetUserAsync("default-user"))
+            .ReturnsAsync(new User
             {
                 TeamId = "fallback-team",
                 Id = null
@@ -135,7 +135,7 @@ public class UserAuthHandlerTests
         context.Request.Headers[headersOptions.UserIdHeaderName] = "user-123";
         context.Request.Headers[headersOptions.TeamIdHeaderName] = string.Empty;
 
-        var clientMock = new Mock<IEmployeesClient>();
+        var clientMock = new Mock<IUsersClient>();
         var handler = CreateHandler(context, clientMock, headersOptions);
 
         // Act
@@ -159,9 +159,9 @@ public class UserAuthHandlerTests
         context.Request.Headers[headersOptions.UserIdHeaderName] = "user-123";
         context.Request.Headers[headersOptions.OrganizationIdHeaderName] = string.Empty;
 
-        var clientMock = new Mock<IEmployeesClient>();
-        clientMock.Setup(c => c.GetEmployeeAsync("user-123"))
-            .ReturnsAsync(new Employee
+        var clientMock = new Mock<IUsersClient>();
+        clientMock.Setup(c => c.GetUserAsync("user-123"))
+            .ReturnsAsync(new User
             {
                 TeamId = "fallback-team",
                 Id = null

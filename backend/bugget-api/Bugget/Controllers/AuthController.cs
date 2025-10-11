@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bugget.Controllers;
 
 [Route("/v1/auth")]
-public sealed class AuthController(IEmployeesClient employeesClient) : ApiController
+public sealed class AuthController(IUsersClient usersClient) : ApiController
 {
     /// <summary>
     /// Получить данные текущего пользователя
@@ -17,17 +17,17 @@ public sealed class AuthController(IEmployeesClient employeesClient) : ApiContro
     {
         var user = User.GetIdentity();
         
-        var employee = await employeesClient.GetEmployeeAsync(user.Id);
-        if (employee == null)
+        var user = await usersClient.GetUserAsync(user.Id);
+        if (user == null)
         {
             return Unauthorized();
         }
 
         return Ok(new UserAuthView
         {
-            Id = employee.Id,
-            Name = employee.Name,
-            PhotoUrl = employee.PhotoUrl,
+            Id = user.Id,
+            Name = user.Name,
+            PhotoUrl = user.PhotoUrl,
             TeamId = user.TeamId 
         });
     }

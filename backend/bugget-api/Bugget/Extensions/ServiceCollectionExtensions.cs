@@ -50,14 +50,14 @@ public static class ServiceCollectionExtensions
             .AddSingleton<BugsDbClient>()
             .AddSingleton<AttachmentObsoleteDbClient>()
             .AddSingleton<AttachmentDbClient>()
-            .AddSingleton<EmployeesFileClient>()
+            .AddSingleton<UsersFileClient>()
             .AddSingleton<TeamsFileClient>()
             .AddSingleton<ParticipantsDbClient>()
-            .AddSingleton<IEmployeesClient>((sp) => sp.GetRequiredService<EmployeesFileClient>())
+            .AddSingleton<IUsersClient>((sp) => sp.GetRequiredService<UsersFileClient>())
             .AddSingleton<ITeamsClient>((sp) => sp.GetRequiredService<TeamsFileClient>())
             .AddSingleton<IFileStorageClient, LocalFileStorageClient>();
 
-        services.AddHostedService((sp) => sp.GetRequiredService<EmployeesFileClient>());
+        services.AddHostedService((sp) => sp.GetRequiredService<UsersFileClient>());
         services.AddHostedService((sp) => sp.GetRequiredService<TeamsFileClient>());
 
         if(!env.IsDevelopment())

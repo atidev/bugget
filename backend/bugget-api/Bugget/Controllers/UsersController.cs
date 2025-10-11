@@ -10,14 +10,14 @@ namespace Bugget.Controllers;
 /// Api для работы с пользователями
 /// </summary>
 [Route("/v1/users")]
-public sealed class UsersController(IEmployeesClient employeesClient) : ApiController
+public sealed class UsersController(IUsersClient usersClient) : ApiController
 {
     /// <summary>
     /// Поиск пользователей по имени
     /// </summary>
     [HttpGet("autocomplete")]
     [ProducesResponseType(typeof(AutocompleteUsersView), 200)]
-    public async Task<IActionResult> AutocompleteEmployees([FromQuery] [Required] string searchString,
+    public async Task<IActionResult> AutocompleteUsers([FromQuery] [Required] string searchString,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 10,
         [FromQuery] uint depth = 1)
@@ -26,7 +26,7 @@ public sealed class UsersController(IEmployeesClient employeesClient) : ApiContr
             return BadRequest();
 
         var user = User.GetIdentity();
-        var (employees, total) = await employeesClient.AutocompleteEmployeesAsync(
+        var (users, total) = await usersClient.AutocompleteUsersAsync(
             user.Id,
             searchString,
             skip,
@@ -35,7 +35,7 @@ public sealed class UsersController(IEmployeesClient employeesClient) : ApiContr
 
         return Ok(new AutocompleteUsersView
         {
-            Employees = employees.Select(e => new UserView
+            Users = users.Select(e => new UserView
             {
                 Id = e.Id,
                 Name = e.Name,
@@ -57,7 +57,7 @@ public sealed class UsersController(IEmployeesClient employeesClient) : ApiContr
             return BadRequest();
 
         var user = User.GetIdentity();
-        var employees = await employeesClient.GetEmployeesAsync(userIds, user.OrganizationId);
-        return Ok(employees.Select(e => new UserView { Id = e.Id, Name = e.Name, PhotoUrl = e.PhotoUrl, TeamId = e.TeamId }));
+        var users = await usersClient.GetUsersAsync(userIds, user.OrganizationId);
+        return Ok(users.Select(e => new UserView { Id = e.Id, Name = e.Name, PhotoUrl = e.PhotoUrl, TeamId = e.TeamId }));
     }
 }

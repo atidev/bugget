@@ -17,7 +17,7 @@ namespace Bugget.Controllers;
 [Obsolete("Use v2")]
 public sealed class BugsObsoleteController(BugsService bugsService,
     IHubContext<ReportPageHub> hubContext,
-    IEmployeesClient employeesClient) : ApiController
+    IUsersClient usersClient) : ApiController
 {
     /// <summary>
     /// Добавить баг
@@ -31,7 +31,7 @@ public sealed class BugsObsoleteController(BugsService bugsService,
     {
         var user = User.GetIdentity();
         var createdBug = await bugsService.CreateBugObsoleteAsync(createDto.ToBug(reportId, user.Id));
-        return createdBug?.ToView(employeesClient.DictEmployees());
+        return createdBug?.ToView(usersClient.DictUsers());
     }
     
     /// <summary>
@@ -51,6 +51,6 @@ public sealed class BugsObsoleteController(BugsService bugsService,
         await hubContext.Clients.Group($"{reportId}")
             .SendAsync("ReceiveReport");
 
-        return updatedBug?.ToView(employeesClient.DictEmployees());
+        return updatedBug?.ToView(usersClient.DictUsers());
     }
 }

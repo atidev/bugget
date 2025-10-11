@@ -1,6 +1,6 @@
 import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Avatar from "@/components/Avatar/Avatar";
-import { autocompleteUsers } from "@/api/employees";
+import { autocompleteUsers } from "@/api/users";
 import { UserResponse } from "@/types/user";
 import { useUnit } from "effector-react";
 import {
@@ -13,9 +13,9 @@ import SidebarContainer from "./SidebarContainer";
 
 const autocompleteUsersHandler = async (searchString: string) => {
   const response = await autocompleteUsers(searchString);
-  return (response.employees ?? []).map((employee: UserResponse) => ({
-    id: employee.id,
-    display: employee.name,
+  return (response.users ?? []).map((user: UserResponse) => ({
+    id: user.id,
+    display: user.name,
   }));
 };
 

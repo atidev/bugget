@@ -170,9 +170,9 @@
 }
 ```
 
-### Employees API v1
+### Users API v1
 
-#### POST /v1/employees/users
+#### POST /v1/users/batch/list
 Получение информации о пользователях по их идентификаторам.
 
 ##### Запрос

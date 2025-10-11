@@ -5,7 +5,7 @@ import {
   ReportResponse,
   CreateReportResponse,
 } from "@/api/reports/models";
-import { fetchUsers } from "@/api/employees";
+import { fetchUsers } from "@/api/users";
 import { UserResponse } from "@/types/user";
 
 import { ReportStatuses } from "@/const";

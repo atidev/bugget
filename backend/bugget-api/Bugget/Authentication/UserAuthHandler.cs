@@ -11,7 +11,7 @@ public class UserAuthHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,
     UrlEncoder encoder,
-    IEmployeesClient employeesClient,
+    IUsersClient usersClient,
     IOptionsMonitor<AuthHeadersOptions> authHeadersOptions)
     : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
@@ -77,8 +77,8 @@ public class UserAuthHandler(
                 return teamId;
         }
 
-        var employee = await employeesClient.GetEmployeeAsync(userId);
-        return employee?.TeamId;
+        var user = await usersClient.GetUserAsync(userId);
+        return user?.TeamId;
     }
 
     private static string? GetHeaderOrDefault(IHeaderDictionary headers, string? headerName, string? defaultValue = null)

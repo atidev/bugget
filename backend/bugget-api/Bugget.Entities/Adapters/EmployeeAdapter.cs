@@ -3,9 +3,9 @@ using Bugget.Entities.Views.Users;
 
 namespace Bugget.Entities.Adapters;
 
-public static class EmployeeAdapter
+public static class UsersAdapter
 {    
-    public static UserView ToUserView(Employee e)
+    public static UserView ToUserView(User e)
     {
         return new UserView { Id = e.Id, Name = e.Name, TeamId = e.TeamId, PhotoUrl = e.PhotoUrl };
     }
