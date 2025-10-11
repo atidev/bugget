@@ -23,14 +23,23 @@ export type HostApi = {
       // доступ плагинов к сторам
       auth: Store<UserResponse | null>;
     };
+    events: {
+      // доступ плагинов к событиям
+      clearReport: () => void;
+    };
   };
   // компоненты которые могут использоваться в расширениях
   components: {
     SidebarContainer: React.ComponentType<{ children: React.ReactNode }>;
+    HeaderContainer: React.ComponentType<{ children: React.ReactNode }>;
     Layout: React.ComponentType<{
       children: React.ReactNode;
       sidebar?: React.ReactNode;
+      header?: React.ReactNode;
     }>;
+    Report: React.ComponentType;
+    Search: React.ComponentType;
+    Sidebar: React.ComponentType;
   };
   // utils, etc
 };

@@ -12,6 +12,7 @@ import { loadExtensions } from "@/extensions/loader";
 import { AppExtension, PatchableRouteObject } from "@/extensions/extension";
 import { ApplyRoutesExtensions } from "@/extensions/routesApplyer";
 import { BASE_PATH } from "@/const";
+import ApiBaseBoot from "./ApiBaseBoot";
 
 // Layout без сайдбара
 const LayoutWrapper = () => (
@@ -78,6 +79,7 @@ const App = () => {
 
   return (
     <Router basename={BASE_PATH}>
+      <ApiBaseBoot />
       <AppRoutes routes={routes} />
     </Router>
   );
