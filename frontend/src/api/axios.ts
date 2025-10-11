@@ -5,6 +5,7 @@ import {
   convertObjectToSnake,
 } from "@/utils/convertCases";
 import { API_URL } from "@/const";
+import { extendedBasePath } from "@/api/basePath";
 
 const instance = axios.create({
   baseURL: API_URL,
@@ -42,6 +43,13 @@ instance.interceptors.response.use((response) => {
 
 // Интерцептор запроса: преобразуем camelCase → snake_case
 instance.interceptors.request.use((config) => {
+  // динамически префиксуем только относительные url
+  if (config.url && config.url.startsWith("/")) {
+    const prefix = extendedBasePath || "";
+    // избегаем двойных слэшей: "/abc" + "/v2" -> "/abc/v2"
+    config.url = `${prefix}${config.url}`.replace(/\/{2,}/g, "/");
+  }
+
   if (config.headers["Content-Type"] !== "multipart/form-data" && config.data) {
     config.data = convertObjectToSnake(config.data);
   }

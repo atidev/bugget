@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import { useUnit } from "effector-react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 import { useReportPageSocket } from "@/hooks/useReportPageSocket";
 import { useSocketEvent } from "@/hooks/useSocketEvent";
@@ -26,6 +26,7 @@ import Bug from "./components/Bug/Bug";
 
 const ReportPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { reportId } = useParams();
   const initialReport = useUnit($initialReportStore);
   const title = useUnit($titleStore);
@@ -61,9 +62,9 @@ const ReportPage = () => {
   // редирект после создания репорта
   useEffect(() => {
     if (!reportId && initialReport?.id) {
-      navigate(`/reports/${initialReport.id}`);
+      navigate(`${location.pathname}/${initialReport.id}`);
     }
-  }, [initialReport?.id, reportId, navigate]);
+  }, [initialReport?.id, reportId, navigate, location.pathname]);
 
   const handleAddBugClick = () => {
     createLocalBugEvent({ reportId: Number(reportId) });

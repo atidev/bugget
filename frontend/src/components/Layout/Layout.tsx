@@ -4,12 +4,13 @@ import Header from "../Header/Header";
 type LayoutProps = {
   children: React.ReactNode;
   sidebar?: React.ReactNode;
+  header?: React.ReactNode;
 };
 
-const Layout = ({ children, sidebar }: LayoutProps) => {
+const Layout = ({ children, sidebar, header }: LayoutProps) => {
   return (
     <div className="flex flex-col h-full">
-      <Header />
+      {header || <Header />}
       <div
         className={`grow ${sidebar ? "grid grid-cols-[minmax(0,1fr)_300px]" : ""}`}
       >

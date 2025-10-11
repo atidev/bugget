@@ -22,7 +22,7 @@ export const createReport = async (
 ): Promise<CreateReportResponse> => {
   try {
     const { data } = await axios.post<CreateReportResponse>(
-      "/v2/reports",
+      `/v2/reports`,
       request
     );
     return data;
