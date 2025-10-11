@@ -17,7 +17,7 @@ public sealed class AuthController(IUsersClient usersClient) : ApiController
     {
         var user = User.GetIdentity();
         
-        var user = await usersClient.GetUserAsync(user.Id);
+        var userDbModel = await usersClient.GetUserAsync(user.Id);
         if (user == null)
         {
             return Unauthorized();
@@ -25,10 +25,10 @@ public sealed class AuthController(IUsersClient usersClient) : ApiController
 
         return Ok(new UserAuthView
         {
-            Id = user.Id,
-            Name = user.Name,
-            PhotoUrl = user.PhotoUrl,
-            TeamId = user.TeamId 
+            Id = userDbModel.Id,
+            Name = userDbModel.Name,
+            PhotoUrl = userDbModel.PhotoUrl,
+            TeamId = userDbModel.TeamId 
         });
     }
 }
