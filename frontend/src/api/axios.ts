@@ -1,64 +1,85 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 
 import {
   convertObjectToCamel,
   convertObjectToSnake,
 } from "@/utils/convertCases";
-import { API_URL } from "@/const";
-import { extendedBasePath } from "@/api/basePath";
-
-const instance = axios.create({
-  baseURL: API_URL,
-  timeout: 10000,
-});
+import { API_URL, USERS_API_URL } from "@/const";
+import { extendedBasePath } from "./basePath";
 
 let signalRConnectionId: string | null = null;
 export const setSignalRConnectionId = (id: string | null) => {
   signalRConnectionId = id;
 };
 
-// Интерцептор ответа
-instance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error && error.response?.status >= 500) {
-      const issueName = `${
-        error.response.status
-      } ${error.config?.method?.toUpperCase()} ${error.config?.url}`.trim();
-      console.error(issueName);
+// Функция для настройки response interceptors
+const setupResponseInterceptors = (axiosInstance: AxiosInstance) => {
+  // Интерцептор для обработки ошибок
+  axiosInstance.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    (error) => {
+      if (error && error.response?.status >= 500) {
+        const issueName = `${
+          error.response.status
+        } ${error.config?.method?.toUpperCase()} ${error.config?.url}`.trim();
+        console.error(issueName);
+      }
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
-  }
-);
+  );
 
-// Интерцептор ответа: преобразуем snake_case → camelCase
-instance.interceptors.response.use((response) => {
-  if (response.data) {
-    response.data = convertObjectToCamel(response.data);
-  }
-  return response;
-});
+  // Интерцептор для преобразования snake_case → camelCase
+  axiosInstance.interceptors.response.use((response) => {
+    if (response.data) {
+      response.data = convertObjectToCamel(response.data);
+    }
+    return response;
+  });
+};
 
-// Интерцептор запроса: преобразуем camelCase → snake_case
-instance.interceptors.request.use((config) => {
-  // динамически префиксуем только относительные url
-  if (config.url && config.url.startsWith("/")) {
-    const prefix = extendedBasePath || "";
-    // избегаем двойных слэшей: "/abc" + "/v2" -> "/abc/v2"
-    config.url = `${prefix}${config.url}`.replace(/\/{2,}/g, "/");
-  }
+// Функция для настройки request interceptors
+const setupRequestInterceptors = (axiosInstance: AxiosInstance) => {
+  axiosInstance.interceptors.request.use((config) => {
+    // динамически префиксуем только относительные url
+    if (config.url && config.url.startsWith("/")) {
+      const prefix = extendedBasePath || "";
+      // избегаем двойных слэшей: "/abc" + "/v2" -> "/abc/v2"
+      config.url = `${prefix}${config.url}`.replace(/\/{2,}/g, "/");
+    }
 
-  if (config.headers["Content-Type"] !== "multipart/form-data" && config.data) {
-    config.data = convertObjectToSnake(config.data);
-  }
+    if (
+      config.headers["Content-Type"] !== "multipart/form-data" &&
+      config.data
+    ) {
+      config.data = convertObjectToSnake(config.data);
+    }
 
-  if (signalRConnectionId) {
-    config.headers["X-Signal-R-Connection-Id"] = signalRConnectionId;
-  }
+    if (signalRConnectionId) {
+      config.headers["X-Signal-R-Connection-Id"] = signalRConnectionId;
+    }
 
-  return config;
-});
+    return config;
+  });
+};
+
+// Функция для создания и настройки axios instance
+const createAxiosInstance = (baseURL: string): AxiosInstance => {
+  const instance = axios.create({
+    baseURL,
+    timeout: 10000,
+  });
+
+  setupResponseInterceptors(instance);
+  setupRequestInterceptors(instance);
+
+  return instance;
+};
+
+// Создаем основные instances
+const instance = createAxiosInstance(API_URL);
+const usersAxios = createAxiosInstance(USERS_API_URL);
 
 export default instance;
+export { usersAxios };
