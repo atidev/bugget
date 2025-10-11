@@ -1,6 +1,7 @@
 import { UserResponse } from "@/types/user";
 import { Store } from "effector";
 import { RouteObject } from "react-router-dom";
+import React from "react";
 
 /// интерфейсы для плагинов
 
@@ -23,7 +24,15 @@ export type HostApi = {
       auth: Store<UserResponse | null>;
     };
   };
-  // components, utils, etc
+  // компоненты которые могут использоваться в расширениях
+  components: {
+    SidebarContainer: React.ComponentType<{ children: React.ReactNode }>;
+    Layout: React.ComponentType<{
+      children: React.ReactNode;
+      sidebar?: React.ReactNode;
+    }>;
+  };
+  // utils, etc
 };
 
 // статический ресурс плагина - маршруты
