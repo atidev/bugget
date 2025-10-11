@@ -1,4 +1,4 @@
-import axios from "@/api/axios";
+import { usersAxios } from "@/api/axios";
 import { AutocompleteUsersResponse } from "./models";
 import { UserResponse } from "@/types/user";
 
@@ -9,7 +9,7 @@ export const autocompleteUsers = async (
   depth: number = 1
 ): Promise<AutocompleteUsersResponse> => {
   try {
-    const { data } = await axios.get(`/v1/users/autocomplete`, {
+    const { data } = await usersAxios.get(`/v1/users/autocomplete`, {
       params: {
         searchString,
         skip,
@@ -28,7 +28,7 @@ export const fetchUsers = async (
   userIds: string[]
 ): Promise<UserResponse[]> => {
   try {
-    const { data } = await axios.post(`/v1/users/batch/list`, userIds);
+    const { data } = await usersAxios.post(`/v1/users/batch/list`, userIds);
     return data;
   } catch (error) {
     console.error(error);

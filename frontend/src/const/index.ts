@@ -60,6 +60,7 @@ export const bugStatusMap: Record<number, StatusMeta> = {
 export const API_URL = window.env?.API_URL || import.meta.env.VITE_BASE_URL;
 export const BASE_PATH =
   window.env?.BASE_PATH || import.meta.env.VITE_BASE_PATH;
+export const USERS_API_URL = window.env?.USERS_API_URL || API_URL;
 
 export enum BugResultTypes {
   RECEIVE = "receive",
