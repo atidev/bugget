@@ -111,6 +111,7 @@ public static class ReportMapper
         int[]? reportStatuses,
         string? userId,
         string? teamId,
+        string? organizationId,
         string? sort,
         uint skip,
         uint take,
@@ -137,7 +138,8 @@ public static class ReportMapper
             UserIds = resultUserIds.Count > 0 ? resultUserIds.ToArray() : null,
             Skip = skip,
             Take = take,
-            Sort = SortOption.Parse(sort)
+            Sort = SortOption.Parse(sort),
+            OrganizationId = organizationId
         };
     }
 
