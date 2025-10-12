@@ -1,15 +1,9 @@
 using Bugget.BO.Mappers;
-using Bugget.BO.Services;
 using Bugget.BO.Services.Reports;
-using Bugget.DA.Files;
 using Bugget.DA.Interfaces;
 using Bugget.Entities.Authentication;
-using Bugget.Entities.DbModels.Report;
-using Bugget.Entities.DTO.Report;
 using Bugget.Entities.Views;
-using Bugget.Hubs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Bugget.Controllers;
 
@@ -19,25 +13,9 @@ namespace Bugget.Controllers;
 [Route("/v1/reports")]
 public sealed class ReportsObsoleteController(
     ReportsService reportsService,
-    IHubContext<ReportPageHub> hubContext,
-    IUsersClient usersClient) : ApiController
+    IUsersClient usersClient,
+    ILogger<ReportsObsoleteController> logger) : ApiController
 {
-    /// <summary>
-    /// Создать репорт
-    /// </summary>
-    /// <param name="createDto"></param>
-    /// <returns></returns>
-    [HttpPost]
-    [ProducesResponseType(typeof(ReportView), 200)]
-    [Obsolete("Используйте ReportsV2Controller")]
-    public async Task<ReportView?> CreateReportAsync([FromBody] ReportCreateDto createDto)
-    {
-        var user = User.GetIdentity();
-        var createdReport = await reportsService.CreateReportObsoleteAsync(createDto.ToReport(user.Id));
-
-        return createdReport?.ToView(usersClient.DictUsers());
-    }
-
     /// <summary>
     /// Получить репорты (для главной страницы)
     /// </summary>
@@ -50,40 +28,6 @@ public sealed class ReportsObsoleteController(
 
         var reports = await reportsService.ListReportsAsync(user.Id);
         return reports.Select(r => r.ToView(usersClient.DictUsers())).ToArray();
-    }
-
-    /// <summary>
-    /// Получить репорт
-    /// </summary>
-    /// <param name="reportId"></param>
-    /// <returns></returns>
-    [HttpGet("{reportId}")]
-    [ProducesResponseType(typeof(ReportObsoleteDbModel), 200)]
-    [Obsolete("Используйте ReportsV2Controller")]
-    public async Task<ReportView?> GetReportAsync([FromRoute] int reportId)
-    {
-        var report = await reportsService.GetReportObsoleteAsync(reportId);
-        return report?.ToView(usersClient.DictUsers());
-    }
-
-    /// <summary>
-    /// Изменить репорт
-    /// </summary>
-    /// <param name="reportId"></param>
-    /// <param name="updateDto"></param>
-    /// <returns></returns>
-    [HttpPut("{reportId}")]
-    [ProducesResponseType(typeof(ReportView), 200)]
-    [Obsolete("Используйте ReportsV2Controller")]
-    public async Task<ReportView?> UpdateReportAsync([FromRoute] int reportId, [FromBody] ReportPatchDto updateDto)
-    {
-        var user = User.GetIdentity();
-        var report = await reportsService.UpdateReportObsoleteAsync(updateDto.ToReportUpdate(reportId, user.Id));
-
-        await hubContext.Clients.Group($"{reportId}")
-            .SendAsync("ReceiveReport");
-
-        return report?.ToView(usersClient.DictUsers());
     }
 
     /// <summary>
@@ -102,12 +46,14 @@ public sealed class ReportsObsoleteController(
         [FromQuery] uint take = 10
         )
     {
+        var user = User.GetIdentity();
         var searchResult = await reportsService.SearchReportsAsync(
             ReportMapper.ToSearchReports(
                 query,
                 reportStatuses,
                 userId,
                 teamId,
+                user.OrganizationId,
                 sort,
                 skip,
                 take,

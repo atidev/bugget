@@ -189,7 +189,7 @@ public sealed class ReportsDbClient : PostgresClient
         await using var connection = await DataSource.OpenConnectionAsync();
 
         var jsonResult = await connection.ExecuteScalarAsync<string>(
-            "SELECT public.search_reports(@sortField, @sortDesc, @skip, @take, @query, @statuses, @userIds);",
+            "SELECT public.search_reports_v2(@sortField, @sortDesc, @skip, @take, @query, @statuses, @userIds, @organizationId);",
             new
             {
                 sortField = search.Sort.Field,
@@ -199,6 +199,7 @@ public sealed class ReportsDbClient : PostgresClient
                 query = search.Query,
                 statuses = search.ReportStatuses,
                 userIds = search.UserIds,
+                organizationId = search.OrganizationId,
             }
         );
 
