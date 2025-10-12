@@ -26,7 +26,7 @@ public sealed class CommentsController(
     public async Task<IActionResult> CreateCommentAsync([FromRoute] int reportId, [FromRoute] int bugId, [FromBody] CommentDto createDto)
     {
         var user = User.GetIdentity();
-        return Accepted(await commentsService.CreateCommentAsync(user, reportId, bugId, createDto));
+        return Ok(await commentsService.CreateCommentAsync(user, reportId, bugId, createDto));
     }
 
     /// <summary>

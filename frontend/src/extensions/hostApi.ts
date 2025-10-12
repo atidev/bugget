@@ -12,7 +12,7 @@ import Sidebar from "@/components/Sidebar/Sidebar";
 export const hostApi: HostApi = {
   effector: {
     stores: {
-      auth: $user,
+      user: $user,
     },
     events: {
       clearReport: () => clearReport(),
