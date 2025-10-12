@@ -1,9 +1,9 @@
 import { UserResponse } from "@/types/user";
 import { createEffect, createStore } from "effector";
-import { fetchAuth } from "@/api/auth";
+import { fetchUser } from "@/api/users";
 
 export const authFx = createEffect(async () => {
-  return await fetchAuth();
+  return await fetchUser();
 });
 
 export const $user = createStore<UserResponse>({} as UserResponse).on(

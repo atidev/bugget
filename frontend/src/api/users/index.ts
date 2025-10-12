@@ -35,3 +35,13 @@ export const fetchUsers = async (
     throw error;
   }
 };
+
+export const fetchUser = async (): Promise<UserResponse> => {
+  try {
+    const { data } = await usersAxios.get(`/v1/users`);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

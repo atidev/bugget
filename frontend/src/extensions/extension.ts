@@ -21,7 +21,7 @@ export type HostApi = {
   effector: {
     stores: {
       // доступ плагинов к сторам
-      auth: Store<UserResponse | null>;
+      user: Store<UserResponse | null>;
     };
     events: {
       // доступ плагинов к событиям

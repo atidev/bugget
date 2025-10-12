@@ -22,7 +22,7 @@ public sealed class ReportsV2Controller(ReportsService reportsService) : ApiCont
     public async Task<IActionResult> CreateReportAsync([FromBody] ReportV2CreateDto createDto)
     {
         var user = User.GetIdentity();
-        return Accepted(await reportsService.CreateReportAsync(user.Id, user.TeamId, user.OrganizationId, createDto));
+        return Ok(await reportsService.CreateReportAsync(user.Id, user.TeamId, user.OrganizationId, createDto));
     }
 
     /// <summary>   

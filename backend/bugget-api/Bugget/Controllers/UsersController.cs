@@ -60,4 +60,28 @@ public sealed class UsersController(IUsersClient usersClient) : ApiController
         var users = await usersClient.GetUsersAsync(userIds, user.OrganizationId);
         return Ok(users.Select(e => new UserView { Id = e.Id, Name = e.Name, PhotoUrl = e.PhotoUrl, TeamId = e.TeamId }));
     }
+
+    /// <summary>
+    /// Получить данные текущего пользователя
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        var user = User.GetIdentity();
+        
+        var userDbModel = await usersClient.GetUserAsync(user.Id);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(new UserAuthView
+        {
+            Id = userDbModel.Id,
+            Name = userDbModel.Name,
+            PhotoUrl = userDbModel.PhotoUrl,
+            TeamId = userDbModel.TeamId 
+        });
+    }
 }
