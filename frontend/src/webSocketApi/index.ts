@@ -5,14 +5,14 @@ import {
   LogLevel,
 } from "@microsoft/signalr";
 import { backoff } from "@/utils/retry";
-import { buildFullUrl } from "@/utils/buildFullUrl";
+import { buildFullApiUrl } from "@/utils/buildFullUrl";
 
 const RECONNECT_DELAYS = [0, 2_000, 5_000, 10_000, 30_000, 60_000, 120_000]; // до 2 мин
 
 export const buildConnection = (): HubConnection => {
   // Строим URL для WebSocket с учетом extendedBasePath
   const hubPath = "v1/report-page-hub";
-  const fullUrl = buildFullUrl(hubPath);
+  const fullUrl = buildFullApiUrl(hubPath);
 
   const conn = new HubConnectionBuilder()
     .withUrl(fullUrl, {

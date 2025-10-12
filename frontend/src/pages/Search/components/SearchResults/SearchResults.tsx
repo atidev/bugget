@@ -5,6 +5,7 @@ import { ru } from "date-fns/locale";
 import getStatusMeta from "@/utils/getStatusMeta";
 import { useNavigate } from "react-router-dom";
 import { ReportResponse } from "@/apiObsolete/reports/models";
+import { buildFullAppUrl } from "@/utils/buildFullUrl";
 
 const getLatestUpdateDate = (report: ReportResponse) => {
   let latestTime: number = new Date(report.updatedAt).getTime();
@@ -34,10 +35,13 @@ const SearchResults = () => {
     e: React.MouseEvent<HTMLDivElement>,
     reportId: number
   ) => {
+    const reportPath = `reports/${reportId}`;
+    const fullUrl = buildFullAppUrl(reportPath);
+
     if (e.ctrlKey || e.metaKey || e.button === 1) {
-      window.open(`/reports/${reportId}`, "_blank");
+      window.open(fullUrl, "_blank");
     } else {
-      navigate(`/reports/${reportId}`);
+      navigate(fullUrl);
     }
   };
 
