@@ -6,7 +6,7 @@ import HeaderContainer from "@/components/Header/HeaderContainer";
 import Layout from "@/components/Layout/Layout";
 import Report from "@/pages/Report/Report";
 import Search from "@/pages/Search/Search";
-import Sidebar from "@/components/Sidebar/Sidebar";
+import RightSidebar from "@/components/Sidebar/RightSidebar";
 
 // реализация интерфейса доступа плагинов к сторам, эффектам, компонентам
 export const hostApi: HostApi = {
@@ -24,6 +24,6 @@ export const hostApi: HostApi = {
     Layout,
     Report,
     Search,
-    Sidebar,
+    RightSidebar,
   },
 };

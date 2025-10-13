@@ -19,7 +19,7 @@ const autocompleteUsersHandler = async (searchString: string) => {
   }));
 };
 
-const Sidebar = () => {
+const RightSidebar = () => {
   const responsibleUserName = useUnit($responsibleUserNameStore);
   const participantsWithNames = useUnit($participantsWithNamesStore);
 
@@ -60,4 +60,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default RightSidebar;

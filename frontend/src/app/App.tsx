@@ -5,7 +5,7 @@ import Layout from "@/components/Layout/Layout";
 import Home from "@/pages/Home/Home";
 import Report from "@/pages/Report/Report";
 import Search from "@/pages/Search/Search";
-import Sidebar from "@/components/Sidebar/Sidebar";
+import RightSidebar from "@/components/Sidebar/RightSidebar";
 import { authFx } from "@/store/user";
 import "@/styles/tailwind.css";
 import { loadExtensions } from "@/extensions/loader";
@@ -21,9 +21,9 @@ const LayoutWrapper = () => (
   </Layout>
 );
 
-// Layout с сайдбаром
+// Layout с правым сайдбаром
 const LayoutWithSidebarWrapper = () => (
-  <Layout sidebar={<Sidebar />}>
+  <Layout rightSidebar={<RightSidebar />}>
     <Outlet />
   </Layout>
 );

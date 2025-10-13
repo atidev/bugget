@@ -34,12 +34,13 @@ export type HostApi = {
     HeaderContainer: React.ComponentType<{ children: React.ReactNode }>;
     Layout: React.ComponentType<{
       children: React.ReactNode;
-      sidebar?: React.ReactNode;
+      rightSidebar?: React.ReactNode;
+      leftSidebar?: React.ReactNode;
       header?: React.ReactNode;
     }>;
     Report: React.ComponentType;
     Search: React.ComponentType;
-    Sidebar: React.ComponentType;
+    RightSidebar: React.ComponentType;
   };
   // utils, etc
 };
