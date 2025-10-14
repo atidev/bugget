@@ -40,7 +40,7 @@ export type HostApi = {
     }>;
     Report: React.ComponentType;
     Search: React.ComponentType;
-    RightSidebar: React.ComponentType;
+    ReportSidebar: React.ComponentType;
   };
   // utils, etc
 };
