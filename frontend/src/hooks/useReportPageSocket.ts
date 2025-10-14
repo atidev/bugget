@@ -1,5 +1,5 @@
 import { useUnit } from "effector-react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { HubConnectionState } from "@microsoft/signalr";
 
 import {
@@ -18,11 +18,17 @@ export const useReportPageSocket = () => {
 
   const isConnected = connection?.state === HubConnectionState.Connected;
 
-  const join = (id: number) =>
-    joinReportFx({ conn: connection!, reportId: id }).catch(console.error);
+  const join = useCallback(
+    (id: number) =>
+      joinReportFx({ conn: connection!, reportId: id }).catch(console.error),
+    [connection]
+  );
 
-  const leave = (id: number) =>
-    leaveReportFx({ conn: connection!, reportId: id }).catch(console.error);
+  const leave = useCallback(
+    (id: number) =>
+      leaveReportFx({ conn: connection!, reportId: id }).catch(console.error),
+    [connection]
+  );
 
   // Повторное присоединение после восстановления соединения
   useEffect(() => {
@@ -35,7 +41,7 @@ export const useReportPageSocket = () => {
     });
 
     return stop;
-  }, [connection, isConnected]);
+  }, [connection, isConnected, join]);
 
   // Первичное присоединение, смена репорта, отключение
   useEffect(() => {
@@ -57,5 +63,5 @@ export const useReportPageSocket = () => {
         currentReportId.current = null;
       }
     };
-  }, [isConnected, initialReport?.id]);
+  }, [isConnected, initialReport?.id, join, leave]);
 };

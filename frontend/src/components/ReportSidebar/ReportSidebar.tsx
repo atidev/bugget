@@ -8,8 +8,8 @@ import {
   $participantsWithNamesStore,
   changeResponsibleUserIdEvent,
 } from "@/store/report";
-import ReportStatusSelect from "./components/ReportStatusSelect";
-import SidebarContainer from "./SidebarContainer";
+import ReportStatusSelect from "../Sidebar/components/ReportStatusSelect";
+import SidebarContainer from "../Sidebar/SidebarContainer";
 
 const autocompleteUsersHandler = async (searchString: string) => {
   const response = await autocompleteUsers(searchString);
@@ -19,7 +19,7 @@ const autocompleteUsersHandler = async (searchString: string) => {
   }));
 };
 
-const Sidebar = () => {
+const ReportSidebar = () => {
   const responsibleUserName = useUnit($responsibleUserNameStore);
   const participantsWithNames = useUnit($participantsWithNamesStore);
 
@@ -60,4 +60,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default ReportSidebar;
