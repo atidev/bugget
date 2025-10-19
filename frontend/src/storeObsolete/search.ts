@@ -5,7 +5,6 @@ import {
   SearchRequestQueryParams,
   User,
 } from "@/apiObsolete/reports/models";
-import { $user } from "@/store/user";
 import { Team } from "@/typesObsolete/team";
 
 export const searchFx = createEffect(
@@ -27,7 +26,7 @@ export const searchFx = createEffect(
 );
 
 export const searchStarted = createEvent<SearchRequestQueryParams>();
-export const pageMounted = createEvent();
+export const searchPageOpened = createEvent();
 
 export const updateQuery = createEvent<string>();
 export const updateSortField = createEvent<string>();
@@ -50,9 +49,10 @@ export const $statuses = createStore<number[] | null>(null).on(
   (_, s) => s
 );
 
-export const $userFilter = createStore<User | null>(null)
-  .on($user, (_, user) => (user ? { id: user.id, name: user.name } : null))
-  .on(updateUserFilter, (_, user) => user);
+export const $userFilter = createStore<User | null>(null).on(
+  updateUserFilter,
+  (_, user) => user
+);
 
 export const $teamFilter = createStore<Team | null>(null).on(
   updateTeamFilter,
@@ -68,35 +68,7 @@ sample({
   target: searchFx,
 });
 
-sample({
-  source: {
-    query: $query,
-    sortField: $sortField,
-    sortDirection: $sortDirection,
-    reportStatuses: $statuses || undefined,
-    userFilter: $userFilter,
-    teamFilter: $teamFilter,
-  },
-  clock: pageMounted,
-  fn: ({
-    query,
-    sortField,
-    sortDirection,
-    reportStatuses,
-    userFilter,
-    teamFilter,
-  }) => ({
-    query,
-    sort: `${sortField}_${sortDirection}`,
-    reportStatuses: reportStatuses ?? undefined,
-    userId: userFilter?.id ?? undefined,
-    teamId: teamFilter?.id ?? undefined,
-    skip: 0,
-    take: 100,
-  }),
-  target: searchStarted,
-});
-
+// При изменении фильтров или ручном триггере - запустить поиск
 sample({
   source: {
     query: $query,
@@ -111,7 +83,7 @@ sample({
     $sortField.updates,
     $sortDirection.updates,
     $statuses.updates,
-    $userFilter.updates,
+    updateUserFilter,
     $teamFilter.updates,
   ],
   fn: ({

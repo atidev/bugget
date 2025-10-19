@@ -19,6 +19,12 @@ import { $user } from "./user";
 
 import { setBugsEvent } from "./commonEvents";
 import { setCommentsByBugIdEvent } from "./comments";
+import {
+  searchPageOpened,
+  updateUserFilter,
+  $userFilter,
+} from "@/storeObsolete/search";
+import { authFx } from "./user";
 
 const $src = combine({ user: $user, reportPath: $reportPathStore });
 
@@ -131,4 +137,34 @@ sample({
 sample({
   clock: $reportIdStore,
   target: clearLocalBugEvent,
+});
+
+/**
+ * Связь между user и search сторами
+ */
+
+// Стор для отслеживания, открыта ли страница поиска
+const $isSearchPageActive = createStore<boolean>(false).on(
+  searchPageOpened,
+  () => true
+);
+
+// При открытии страницы поиска, если пользователь уже загружен - инициализировать фильтр (это запустит поиск)
+sample({
+  source: $user,
+  clock: searchPageOpened,
+  filter: (user) => !!user?.id,
+  fn: (user) => ({ id: user.id, name: user.name }),
+  target: updateUserFilter,
+});
+
+// При загрузке пользователя, если страница поиска уже открыта - инициализировать фильтр (это запустит поиск)
+// (Для случая прямой загрузки страницы /search, когда компонент монтируется раньше, чем загружается user)
+sample({
+  source: { isActive: $isSearchPageActive, currentUserFilter: $userFilter },
+  clock: authFx.doneData,
+  filter: ({ isActive, currentUserFilter }, user) =>
+    isActive && !!user?.id && !currentUserFilter?.id,
+  fn: (_, user) => ({ id: user.id, name: user.name }),
+  target: updateUserFilter,
 });
