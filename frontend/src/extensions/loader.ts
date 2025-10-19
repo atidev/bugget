@@ -15,9 +15,9 @@ export async function loadExtensions(): Promise<AppExtension[]> {
     // Normal dynamic imports - Vite will:
     // - In standalone: resolve to stub via alias
     // - In Docker: resolve to actual SDK from node_modules
-    // @ts-error - Resolved via alias in standalone, from node_modules in Docker
+    // @ts-ignore - Resolved via alias in standalone, from node_modules in Docker
     const { initShared } = await import("@bugget/host-sdk/init");
-    // @ts-error - Resolved via alias in standalone, from node_modules in Docker
+    // @ts-ignore - Resolved via alias in standalone, from node_modules in Docker
     const { initExtensions } = await import("@bugget/host-sdk/loader");
 
     // Initialize shared dependencies
