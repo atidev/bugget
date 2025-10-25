@@ -11,7 +11,7 @@ public sealed class AttachmentDbModel
     /// </summary>
     public int? EntityId 
     {
-        get => _entityId ?? BugId;
+        get => _entityId;
         init => _entityId = value;
     }
 
@@ -20,12 +20,6 @@ public sealed class AttachmentDbModel
     /// </summary>
     public required int AttachType { get; init; }
     
-    /// <summary>
-    /// Идентификатор бага
-    /// </summary>
-    [Obsolete]
-    public int BugId { get; init; }
-
     private readonly string? _storageKey;
     
     /// <summary>
@@ -33,15 +27,9 @@ public sealed class AttachmentDbModel
     /// </summary>
     public string? StorageKey 
     { 
-        get => _storageKey ?? Path; 
+        get => _storageKey; 
         init => _storageKey = value; 
     }
-
-    /// <summary>
-    /// Относительный путь
-    /// </summary>
-    [Obsolete]
-    public required string Path { get; init; }
 
     /// <summary>
     /// Тип хранилища 0=Temp , 1=Standard, 2=Cold
@@ -56,7 +44,7 @@ public sealed class AttachmentDbModel
     /// <summary>
     /// Создатель вложения
     /// </summary>
-    public string CreatorUserId { get; init; } = "obsolete";
+    public string CreatorUserId { get; init; }
 
     /// <summary>
     /// Размер вложения
@@ -66,7 +54,7 @@ public sealed class AttachmentDbModel
     /// <summary>
     /// Имя вложения
     /// </summary>
-    public string FileName { get; init; } = "obsolete.jpg";
+    public string FileName { get; init; }
 
     /// <summary>
     /// Тип вложения

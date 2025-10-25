@@ -1,5 +1,5 @@
 import { autocompleteUsers } from "@/api/users";
-import { teamsAutocomplete } from "@/apiObsolete/teams";
+import { teamsAutocomplete } from "@/api/teams";
 import Autosuggest from "@/components/Autosuggest/Autosuggest";
 import Dropdown from "@/components/Dropdown/Dropdown";
 import {

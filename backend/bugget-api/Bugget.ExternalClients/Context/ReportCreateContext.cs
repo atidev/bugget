@@ -3,4 +3,4 @@ using Bugget.Entities.DbModels.Report;
 
 namespace Bugget.ExternalClients.Context;
 
-public record ReportCreateContext(Report Report, ReportObsoleteDbModel ReportDbModel);
+public record ReportCreateContext(Report Report, ReportDbModel ReportDbModel);

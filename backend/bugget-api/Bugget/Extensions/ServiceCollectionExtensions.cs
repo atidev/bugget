@@ -45,10 +45,8 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddSingleton<ReportsDbClient>()
-            .AddSingleton<CommentsObsoleteDbClient>()
             .AddSingleton<CommentsDbClient>()
             .AddSingleton<BugsDbClient>()
-            .AddSingleton<AttachmentObsoleteDbClient>()
             .AddSingleton<AttachmentDbClient>()
             .AddSingleton<UsersFileClient>()
             .AddSingleton<TeamsFileClient>()
@@ -74,7 +72,6 @@ public static class ServiceCollectionExtensions
             .AddSingleton<ReportsService>()
             .AddSingleton<BugsService>()
             .AddSingleton<BugsEventsService>()
-            .AddSingleton<AttachmentObsoleteService>()
             .AddSingleton<ReportEventsService>()
             .AddSingleton<ReportAutoStatusService>()
             .AddSingleton<ParticipantsService>()
@@ -84,7 +81,6 @@ public static class ServiceCollectionExtensions
             .AddSingleton<ImageOptimizeWriter>()
             .AddSingleton<TextOptimizeWriter>()
             .AddSingleton<IAttachmentKeyGenerator, LocalAttachmentKeyGenerator>()
-            .AddSingleton<CommentsObsoleteService>()
             .AddSingleton<CommentsService>()
             .AddSingleton<CommentEventsService>()
             .AddSingleton<LimitsService>();

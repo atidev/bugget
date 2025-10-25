@@ -57,51 +57,9 @@ public sealed class ReportsService(
         return false;
     }
 
-    public async Task<ReportObsoleteDbModel?> CreateReportObsoleteAsync(Report report)
+    public Task<ReportDbModel[]> ListReportsAsync(string? organizationId, string? userId, string? teamId, int[]? reportStatuses, int skip, int take)
     {
-        var reportDbModel = await reportsDbClient.CreateReportAsync(report.ToReportDbModel());
-        if (reportDbModel == null)
-        {
-            return null;
-        }
-
-        await taskQueue.EnqueueAsync(() => externalClientsActionService.ExecuteReportCreatePostActions(new ReportCreateContext(report, reportDbModel)));
-
-        return reportDbModel;
-    }
-
-    public Task<ReportObsoleteDbModel[]> ListReportsAsync(string userId)
-    {
-        return reportsDbClient.ListReportsAsync(userId);
-    }
-
-    public async Task<ReportObsoleteDbModel?> GetReportObsoleteAsync(int reportId)
-    {
-        var report = await reportsDbClient.GetReportAsync(reportId);
-        if (report == null)
-        {
-            return null;
-        }
-
-        foreach (var bug in report.Bugs)
-        {
-            bug.Comments = bug.Comments?.OrderBy(c => c.CreatedAt).ToArray();
-            bug.Attachments = bug.Attachments?.OrderBy(a => a.CreatedAt).ToArray();
-        }
-
-        return report;
-    }
-
-    public async Task<ReportObsoleteDbModel?> UpdateReportObsoleteAsync(ReportUpdate report)
-    {
-        var reportDbModel = await reportsDbClient.UpdateReportAsync(report.ToReportUpdateDbModel());
-
-        if (reportDbModel == null)
-            return null;
-
-        await taskQueue.EnqueueAsync(() => externalClientsActionService.ExecuteReportUpdatePostActions(new ReportUpdateContext(report, reportDbModel)));
-
-        return reportDbModel;
+        return reportsDbClient.ListReportsAsync(organizationId, userId, teamId, reportStatuses, skip, take);
     }
 
     public Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)

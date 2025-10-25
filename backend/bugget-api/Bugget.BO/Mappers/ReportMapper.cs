@@ -13,7 +13,7 @@ namespace Bugget.BO.Mappers;
 
 public static class ReportMapper
 {
-    public static ReportView ToView(this ReportObsoleteDbModel report, IReadOnlyDictionary<string, User> usersDict)
+    public static ReportView ToView(this ReportDbModel report, IReadOnlyDictionary<string, User> usersDict)
     {
         return new ReportView
         {
@@ -32,7 +32,7 @@ public static class ReportMapper
                 usersDict.TryGetValue(p, out var e)
                     ? UsersAdapter.ToUserView(e)
                     : UsersAdapter.ToUserView(p)).ToArray(),
-            Bugs = report.Bugs.Select(b => b.ToView(usersDict)).ToArray()
+            Bugs = report.Bugs?.Select(b => b.ToView(usersDict)).ToArray()
         };
     }
 

@@ -1,10 +1,10 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
-import { searchReports } from "@/apiObsolete/reports/search";
+import { searchReports } from "@/api/searchReports/search";
 import {
   SearchResponse,
   SearchRequestQueryParams,
   User,
-} from "@/apiObsolete/reports/models";
+} from "@/api/searchReports/models";
 import { Team } from "@/typesObsolete/team";
 
 export const searchFx = createEffect(

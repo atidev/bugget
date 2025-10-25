@@ -7,13 +7,15 @@ import {
 } from "@/storeObsolete/reportsSummary";
 import Section from "./components/Section/Section";
 import "./Home.css";
+import { $user } from "@/store/user";
 
 const Home = () => {
   const responsibleReports = useUnit($responsibleReports);
   const participantReports = useUnit($participantReports);
+  const user = useUnit($user);
 
   useEffect(() => {
-    loadReportsFx();
+    loadReportsFx(user.id);
   }, []);
 
   return (

@@ -4,7 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import getStatusMeta from "@/utils/getStatusMeta";
 import { useNavigate } from "react-router-dom";
-import { ReportResponse } from "@/apiObsolete/reports/models";
+import { ReportResponse } from "@/api/searchReports/models";
 import { buildFullAppUrl } from "@/utils/buildFullUrl";
 
 const getLatestUpdateDate = (report: ReportResponse) => {

@@ -3,8 +3,12 @@ using Bugget.BO.Services.Reports;
 using Bugget.Entities.Authentication;
 using Bugget.Entities.DbModels.Report;
 using Bugget.Entities.DTO.Report;
+using Bugget.Entities.Views;
 using Bugget.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Bugget.DA.Interfaces;
+using Bugget.BO.Mappers;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bugget.Controllers;
 
@@ -12,7 +16,7 @@ namespace Bugget.Controllers;
 /// v2 Api для работы с репортами
 /// </summary>
 [Route("/v2/reports")]
-public sealed class ReportsV2Controller(ReportsService reportsService) : ApiController
+public sealed class ReportsController(ReportsService reportsService, IUsersClient usersClient) : ApiController
 {
     /// <summary>
     /// Создать репорт
@@ -47,5 +51,24 @@ public sealed class ReportsV2Controller(ReportsService reportsService) : ApiCont
     {
         var user = User.GetIdentity();
         return reportsService.PatchReportAsync(reportId, user, patchDto);
+    }
+
+    /// <summary>
+    /// Получить репорты (для главной страницы)
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(ReportView[]), 200)]
+    public async Task<ReportView[]> ListReportsAsync(
+        [FromQuery] string? userId = null,
+         [FromQuery] string? teamId = null,
+         [FromQuery] int[]? reportStatuses = null,
+         [FromQuery][Range(0, int.MaxValue)] int skip = 0,
+         [FromQuery][Range(1, 100)] int take = 10)
+    {
+        var user = User.GetIdentity();
+
+        var reports = await reportsService.ListReportsAsync(user.OrganizationId, userId, teamId, reportStatuses, skip, take);
+        return reports.Select(r => r.ToView(usersClient.DictUsers())).ToArray();
     }
 }

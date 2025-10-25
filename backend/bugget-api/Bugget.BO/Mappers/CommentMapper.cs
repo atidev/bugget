@@ -20,17 +20,6 @@ public static class CommentMapper
         };
     }
 
-    public static Comment ToComment(this CommentObsoleteDto comment, int bugId, int reportId, string userId)
-    {
-        return new Comment
-        {
-            CreatorUserId = userId,
-            BugId = bugId,
-            ReportId = reportId,
-            Text = comment.Text,
-        };
-    }
-
     public static CommentView ToCommentView(this CommentDbModel comment, int reportId, IReadOnlyDictionary<string, User> usersDict)
     {
         return new CommentView
@@ -47,8 +36,6 @@ public static class CommentMapper
             Attachments = comment.Attachments?.Select(a => new AttachmentView
             {
                 Id = a.Id,
-                ReportId = reportId,
-                BugId = comment.BugId,
                 EntityId = a.EntityId!.Value,
                 AttachType = a.AttachType,
                 CreatedAt = a.CreatedAt,

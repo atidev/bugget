@@ -47,3 +47,27 @@ export const patchReport = async (
     throw error;
   }
 };
+
+export const listReports = async (
+  userId: string | null = null,
+  teamId: string | null = null,
+  reportStatuses: number[] | null = null,
+  skip: number = 0,
+  take: number = 10
+): Promise<ReportResponse[]> => {
+  try {
+    const { data } = await axios.get("/v2/reports", {
+      params: {
+        userId,
+        teamId,
+        reportStatuses,
+        skip,
+        take,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

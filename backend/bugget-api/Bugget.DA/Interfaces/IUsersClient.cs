@@ -1,5 +1,4 @@
 using Bugget.Entities.BO;
-using Bugget.Entities.Views;
 
 namespace Bugget.DA.Interfaces;
 

@@ -12,17 +12,6 @@ namespace Bugget.BO.Mappers;
 
 public static class BugMapper
 {
-    public static Bug ToBug(this BugDtoObsolete bug, int reportId, string creatorUserId)
-    {
-        return new Bug
-        {
-            ReportId = reportId,
-            Receive = bug.Receive,
-            Expect = bug.Expect,
-            CreatorUserId = creatorUserId
-        };
-    }
-
     public static BugCreateDbModel ToBugCreateDbModel(this Bug bug)
     {
         return new BugCreateDbModel
@@ -66,8 +55,6 @@ public static class BugMapper
             Attachments = bug.Attachments?.Select(a => new AttachmentView
             {
                 Id = a.Id,
-                BugId = bug.Id,
-                ReportId = bug.ReportId,
                 EntityId = a.EntityId!.Value,
                 AttachType = a.AttachType,
                 CreatedAt = a.CreatedAt,
@@ -77,19 +64,6 @@ public static class BugMapper
             }).ToArray(),
             Comments = bug.Comments?.Select(c => c.ToCommentView(bug.ReportId, usersDict))
                 .ToArray(),
-        };
-    }
-
-    public static BugUpdate ToBugUpdate(this BugUpdateDtoObsolete bugUpdateDto, int reportId, int bugId, string userId)
-    {
-        return new BugUpdate
-        {
-            Id = bugId,
-            ReportId = reportId,
-            UpdaterUserId = userId,
-            Status = bugUpdateDto.Status,
-            Receive = bugUpdateDto.Receive,
-            Expect = bugUpdateDto.Expect,
         };
     }
 }

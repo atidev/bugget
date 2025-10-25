@@ -11,25 +11,10 @@ namespace Bugget.Controllers;
 /// Api для работы с репортами
 /// </summary>
 [Route("/v1/reports")]
-public sealed class ReportsObsoleteController(
+public sealed class SearchController(
     ReportsService reportsService,
-    IUsersClient usersClient,
-    ILogger<ReportsObsoleteController> logger) : ApiController
+    IUsersClient usersClient) : ApiController
 {
-    /// <summary>
-    /// Получить репорты (для главной страницы)
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet]
-    [ProducesResponseType(typeof(ReportView[]), 200)]
-    public async Task<ReportView[]> ListReportsAsync()
-    {
-        var user = User.GetIdentity();
-
-        var reports = await reportsService.ListReportsAsync(user.Id);
-        return reports.Select(r => r.ToView(usersClient.DictUsers())).ToArray();
-    }
-
     /// <summary>
     /// Поиск по репортам
     /// </summary>
