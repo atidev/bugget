@@ -87,8 +87,8 @@ CREATE OR REPLACE FUNCTION public.list_bugs_internal(_report_ids int[])
         expect text,
         status int,
         creator_user_id text,
-        created_at timestamp,
-        updated_at timestamp)
+        created_at timestamp with time zone,
+        updated_at timestamp with time zone)
     LANGUAGE sql
     STABLE
     AS $$
@@ -115,8 +115,8 @@ CREATE OR REPLACE FUNCTION public.list_comments_internal(_report_ids int[])
         bug_id int,
         text text,
         creator_user_id text,
-        created_at timestamp,
-        updated_at timestamp)
+        created_at timestamp with time zone,
+        updated_at timestamp with time zone)
     LANGUAGE sql
     STABLE
     AS $$
@@ -210,8 +210,8 @@ CREATE OR REPLACE FUNCTION public.list_reports_internal(_report_ids int[])
         id int,
         title text,
         status text,
-        created_at timestamp,
-        updated_at timestamp,
+        created_at timestamp with time zone,
+        updated_at timestamp with time zone,
         creator_user_id text,
         creator_team_id text,
         responsible_user_id text,
