@@ -58,8 +58,8 @@ public sealed class ReportsController(ReportsService reportsService, IUsersClien
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [ProducesResponseType(typeof(ReportView[]), 200)]
-    public async Task<ReportView[]> ListReportsAsync(
+    [ProducesResponseType(typeof(ReportViews), 200)]
+    public async Task<ReportViews> ListReportsAsync(
         [FromQuery] string? userId = null,
          [FromQuery] string? teamId = null,
          [FromQuery] int[]? reportStatuses = null,
@@ -69,6 +69,10 @@ public sealed class ReportsController(ReportsService reportsService, IUsersClien
         var user = User.GetIdentity();
 
         var reports = await reportsService.ListReportsAsync(user.OrganizationId, userId, teamId, reportStatuses, skip, take);
-        return reports.Select(r => r.ToView(usersClient.DictUsers())).ToArray();
+        return new ReportViews
+        {
+            Total = reports.Total,
+            Reports = reports.Reports
+        };
     }
 }

@@ -23,8 +23,10 @@ import {
   searchPageOpened,
   updateUserFilter,
   $userFilter,
-} from "@/storeObsolete/search";
+} from "@/store/search";
+import { dashboardPageOpened, loadReportsFx } from "@/store/reportsDashboard";
 import { authFx } from "./user";
+import { $reports } from "./reportsDashboard";
 
 const $src = combine({ user: $user, reportPath: $reportPathStore });
 
@@ -167,4 +169,41 @@ sample({
     isActive && !!user?.id && !currentUserFilter?.id,
   fn: (_, user) => ({ id: user.id, name: user.name }),
   target: updateUserFilter,
+});
+
+/**
+ * Связь между user и dashboard сторами
+ */
+
+// Стор для отслеживания, открыта ли страница дашборда
+const $isDashboardPageActive = createStore<boolean>(false).on(
+  dashboardPageOpened,
+  () => true
+);
+
+// При открытии страницы дашборда, если пользователь уже загружен - загрузить отчеты
+sample({
+  source: $user,
+  clock: dashboardPageOpened,
+  filter: (user) => !!user?.id,
+  fn: (user) => user.id,
+  target: loadReportsFx,
+});
+
+// При загрузке пользователя, если страница дашборда уже открыта - загрузить отчеты
+// (Для случая прямой загрузки страницы /, когда компонент монтируется раньше, чем загружается user)
+sample({
+  source: $isDashboardPageActive,
+  clock: authFx.doneData,
+  filter: (isActive, user) => isActive && !!user?.id,
+  fn: (_, user) => user.id,
+  target: loadReportsFx,
+});
+
+export const $responsibleReports = combine($reports, $user, (reports, user) => {
+  return reports.filter((report) => report.responsibleUserId === user?.id);
+});
+
+export const $participantReports = combine($reports, $user, (reports, user) => {
+  return reports.filter((report) => report.responsibleUserId !== user?.id);
 });

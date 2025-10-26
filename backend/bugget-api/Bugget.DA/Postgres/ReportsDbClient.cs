@@ -75,7 +75,7 @@ public sealed class ReportsDbClient : PostgresClient
 
 
 
-    public async Task<(long total, ReportDbModel[] reports)> ListReportsGraphAsync(
+    public async Task<(long total, ReportDbModel[] reports)> ListReportsAsync(
     string? organizationId, string? userId, string? teamId, int[]? statuses, int skip, int take)
     {
         DefaultTypeMap.MatchNamesWithUnderscores = true;
@@ -146,28 +146,6 @@ public sealed class ReportsDbClient : PostgresClient
         return (total, reports);
     }
 
-    public async Task<ReportDbModel[]> ListReportsAsync(string? organizationId, string? userId, string? teamId, int[]? reportStatuses, int skip, int take)
-    {
-        await using var connection = await DataSource.OpenConnectionAsync();
-        var jsonResults = await connection.QueryAsync<string>(
-            "SELECT public.list_reports_v2(@organization_id, @user_id, @team_id, @report_statuses, @skip, @take);",
-            new
-            {
-                organization_id = organizationId,
-                user_id = userId,
-                team_id = teamId,
-                report_statuses = reportStatuses,
-                skip = skip,
-                take = take
-            }
-        );
-
-        return jsonResults
-            .Where(json => json != null)
-            .Select(json => Deserialize<ReportDbModel>(json)!)
-            .ToArray();
-    }
-
     /// <summary>
     /// Создает новый отчет и возвращает его краткую структуру.
     /// </summary>
@@ -207,7 +185,7 @@ public sealed class ReportsDbClient : PostgresClient
         await using var connection = await DataSource.OpenConnectionAsync();
 
         var jsonResult = await connection.ExecuteScalarAsync<string>(
-            "SELECT public.search_reports_v2(@sortField, @sortDesc, @skip, @take, @query, @statuses, @userIds, @organizationId);",
+            "SELECT public.search_reports(@sortField, @sortDesc, @skip, @take, @query, @statuses, @userIds, @organizationId);",
             new
             {
                 sortField = search.Sort.Field,

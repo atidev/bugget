@@ -1,5 +1,5 @@
 import { useUnit } from "effector-react";
-import { $searchResult } from "@/storeObsolete/search";
+import { $searchResult } from "@/store/search";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import getStatusMeta from "@/utils/getStatusMeta";

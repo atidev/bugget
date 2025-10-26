@@ -11,7 +11,7 @@ import {
   updateSortField,
   updateSortDirection,
   searchPageOpened,
-} from "@/storeObsolete/search";
+} from "@/store/search";
 import { useEffect } from "react";
 
 const Search = () => {

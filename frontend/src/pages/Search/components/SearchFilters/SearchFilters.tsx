@@ -9,9 +9,9 @@ import {
   updateUserFilter,
   $teamFilter,
   updateTeamFilter,
-} from "@/storeObsolete/search";
+} from "@/store/search";
 import { UserResponse } from "@/types/user";
-import { Team } from "@/typesObsolete/team";
+import { Team } from "@/types/team";
 import { useUnit } from "effector-react";
 
 const autocompleteUsersHandler = async (searchString: string) => {

@@ -1,13 +1,23 @@
 import { useNavigate } from "react-router-dom";
-import { Report } from "@/typesObsolete/report";
+import { useUnit } from "effector-react";
+import { ReportResponse } from "@/api/reports/models";
+import { $usersStore } from "@/store/reportsDashboard";
 
 type ReportProps = {
-  report: Report;
+  report: ReportResponse;
   highlight?: boolean;
 };
 
 const ReportSummary = ({ report, highlight }: ReportProps) => {
   const navigate = useNavigate();
+  const users = useUnit($usersStore);
+
+  const responsibleUserName =
+    users[report.responsibleUserId]?.name || report.responsibleUserId;
+
+  const participantsNames = (report.participantsUserIds || [])
+    .map((id) => users[id]?.name)
+    .filter(Boolean);
 
   return (
     <div
@@ -20,14 +30,11 @@ const ReportSummary = ({ report, highlight }: ReportProps) => {
       <div className="card-body p-4">
         <h3 className="card-title text-lg font-semibold">{report.title}</h3>
         <p className="text-sm dark:text-stone-300">
-          Ответственный: {report.responsible?.name}
+          Ответственный: {responsibleUserName}
         </p>
-        {!!report.participants?.length && (
+        {!!participantsNames.length && (
           <p className="text-sm dark:text-stone-200">
-            Участники:{" "}
-            {report.participants
-              .map((participant) => participant.name)
-              .join(", ")}
+            Участники: {participantsNames.join(", ")}
           </p>
         )}
       </div>

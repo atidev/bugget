@@ -5,6 +5,7 @@ import {
   PatchReportResponse,
   ReportResponse,
   CreateReportResponse,
+  ListReportsResponse,
 } from "./models";
 
 export const fetchReport = async (id: number): Promise<ReportResponse> => {
@@ -54,7 +55,7 @@ export const listReports = async (
   reportStatuses: number[] | null = null,
   skip: number = 0,
   take: number = 10
-): Promise<ReportResponse[]> => {
+): Promise<ListReportsResponse> => {
   try {
     const { data } = await axios.get("/v2/reports", {
       params: {

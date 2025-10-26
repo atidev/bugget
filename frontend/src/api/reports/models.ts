@@ -75,3 +75,8 @@ export type PatchReportResponse = {
   pastResponsibleUserId: string;
   updatedAt: string;
 };
+
+export type ListReportsResponse = {
+  total: number;
+  reports: ReportResponse[];
+};

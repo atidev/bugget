@@ -1,9 +1,9 @@
-import { Report } from "@/typesObsolete/report";
+import { ReportResponse } from "@/api/reports/models";
 import ReportSummary from "./ReportSummary";
 
 type Props = {
   title: string;
-  reports: Report[];
+  reports: ReportResponse[];
 };
 
 const Section = ({ title, reports }: Props) => {

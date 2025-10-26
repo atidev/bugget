@@ -5,7 +5,7 @@ import {
   SearchRequestQueryParams,
   User,
 } from "@/api/searchReports/models";
-import { Team } from "@/typesObsolete/team";
+import { Team } from "@/types/team";
 
 export const searchFx = createEffect(
   async (params: SearchRequestQueryParams) => {
@@ -68,7 +68,7 @@ sample({
   target: searchFx,
 });
 
-// При изменении фильтров или ручном триггере - запустить поиск
+// При изменении фильтров - запустить поиск
 sample({
   source: {
     query: $query,

@@ -57,7 +57,7 @@ public sealed class ReportsService(
         return false;
     }
 
-    public Task<ReportDbModel[]> ListReportsAsync(string? organizationId, string? userId, string? teamId, int[]? reportStatuses, int skip, int take)
+    public Task<(long Total, ReportDbModel[] Reports)> ListReportsAsync(string? organizationId, string? userId, string? teamId, int[]? reportStatuses, int skip, int take)
     {
         return reportsDbClient.ListReportsAsync(organizationId, userId, teamId, reportStatuses, skip, take);
     }

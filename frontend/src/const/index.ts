@@ -1,4 +1,4 @@
-import { StatusMeta } from "@/typesObsolete/status";
+import { StatusMeta } from "@/types/status";
 
 export enum BugStatuses {
   ACTIVE = 0,
