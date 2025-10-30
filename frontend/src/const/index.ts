@@ -6,11 +6,6 @@ export enum BugStatuses {
   REJECTED = 2,
 }
 
-export enum ReportStatusesObsolete {
-  IN_PROGRESS = 0,
-  RESOLVED = 1,
-}
-
 export enum ReportStatuses {
   BACKLOG = 0,
   RESOLVED = 1,
@@ -32,15 +27,25 @@ export enum AttachmentTypes {
 }
 
 export const reportStatusMap: Record<number, StatusMeta> = {
-  [ReportStatusesObsolete.IN_PROGRESS]: {
+  [ReportStatuses.IN_PROGRESS]: {
     title: "В работе",
-    color: "badge-error",
-    border: "border-error",
+    color: "badge-warning",
+    border: "border-warning",
   },
-  [ReportStatusesObsolete.RESOLVED]: {
+  [ReportStatuses.RESOLVED]: {
     title: "Решён",
     color: "badge-success",
     border: "border-success",
+  },
+  [ReportStatuses.REJECTED]: {
+    title: "Отклонён",
+    color: "badge-error",
+    border: "border-error",
+  },
+  [ReportStatuses.BACKLOG]: {
+    title: "Бэклог",
+    color: "badge-neutral",
+    border: "border-neutral",
   },
 };
 
