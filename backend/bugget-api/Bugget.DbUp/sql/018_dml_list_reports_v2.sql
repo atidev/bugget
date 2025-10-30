@@ -56,8 +56,6 @@ CREATE OR REPLACE FUNCTION public.list_reports_count(_organization_id text DEFAU
                 AND rp.user_id = _user_id));
 $$;
 
-DROP FUNCTION IF EXISTS public.list_participants_internal(_report_id int);
-
 CREATE OR REPLACE FUNCTION public.list_participants_internal(_report_ids int[])
     RETURNS TABLE(
         report_id int,
@@ -76,8 +74,6 @@ CREATE OR REPLACE FUNCTION public.list_participants_internal(_report_ids int[])
         p.report_id,
         p.user_id;
 $$;
-
-DROP FUNCTION IF EXISTS public.list_bugs_internal(_report_id int);
 
 CREATE OR REPLACE FUNCTION public.list_bugs_internal(_report_ids int[])
     RETURNS TABLE(
@@ -107,8 +103,6 @@ CREATE OR REPLACE FUNCTION public.list_bugs_internal(_report_ids int[])
         b.report_id = ANY(_report_ids);
 $$;
 
-DROP FUNCTION IF EXISTS public.list_comments_internal(_report_id int);
-
 CREATE OR REPLACE FUNCTION public.list_comments_internal(_report_ids int[])
     RETURNS TABLE(
         id int,
@@ -133,8 +127,6 @@ CREATE OR REPLACE FUNCTION public.list_comments_internal(_report_ids int[])
     WHERE
         b.report_id = ANY(_report_ids);
 $$;
-
-DROP FUNCTION IF EXISTS public.list_attachments_internal(_report_id int);
 
 CREATE OR REPLACE FUNCTION public.list_attachments_internal(_report_ids int[])
     RETURNS TABLE(
