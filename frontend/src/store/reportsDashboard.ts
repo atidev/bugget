@@ -5,16 +5,20 @@ import {
   sample,
   combine,
 } from "effector";
-import { listReports } from "@/api/reports";
+import { fetchReportsList } from "@/api/reports";
 import { ReportResponse } from "@/api/reports/models";
 import { fetchUsers } from "@/api/users";
 import { UserResponse } from "@/types/user";
+import { ReportStatuses } from "@/const";
 
 // Событие открытия страницы дашборда
 export const dashboardPageOpened = createEvent();
 
 export const loadReportsFx = createEffect(async (userId: string) => {
-  const data = await listReports(userId);
+  const data = await fetchReportsList(userId, null, [
+    Number(ReportStatuses.BACKLOG),
+    Number(ReportStatuses.IN_PROGRESS),
+  ]);
   return data.reports;
 });
 

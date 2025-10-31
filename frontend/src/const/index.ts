@@ -29,8 +29,8 @@ export enum AttachmentTypes {
 export const reportStatusMap: Record<number, StatusMeta> = {
   [ReportStatuses.IN_PROGRESS]: {
     title: "В работе",
-    color: "badge-warning",
-    border: "border-warning",
+    color: "badge-error",
+    border: "border-error",
   },
   [ReportStatuses.RESOLVED]: {
     title: "Решён",
@@ -39,8 +39,8 @@ export const reportStatusMap: Record<number, StatusMeta> = {
   },
   [ReportStatuses.REJECTED]: {
     title: "Отклонён",
-    color: "badge-error",
-    border: "border-error",
+    color: "badge-info",
+    border: "border-info",
   },
   [ReportStatuses.BACKLOG]: {
     title: "Бэклог",

@@ -49,7 +49,7 @@ export const patchReport = async (
   }
 };
 
-export const listReports = async (
+export const fetchReportsList = async (
   userId: string | null = null,
   teamId: string | null = null,
   reportStatuses: number[] | null = null,
@@ -57,15 +57,18 @@ export const listReports = async (
   take: number = 10
 ): Promise<ListReportsResponse> => {
   try {
-    const { data } = await axios.get("/v2/reports", {
-      params: {
-        userId,
-        teamId,
-        reportStatuses,
-        skip,
-        take,
-      },
-    });
+    const searchParams = new URLSearchParams();
+    if (userId) searchParams.append("userId", userId);
+    if (teamId) searchParams.append("teamId", teamId);
+    if (reportStatuses) {
+      for (const status of reportStatuses) {
+        searchParams.append("reportStatuses", String(status));
+      }
+    }
+    searchParams.append("skip", String(skip));
+    searchParams.append("take", String(take));
+
+    const { data } = await axios.get(`/v2/reports?${searchParams.toString()}`);
     return data;
   } catch (error) {
     console.error(error);

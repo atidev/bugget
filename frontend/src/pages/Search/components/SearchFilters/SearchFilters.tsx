@@ -13,6 +13,7 @@ import {
 import { UserResponse } from "@/types/user";
 import { Team } from "@/types/team";
 import { useUnit } from "effector-react";
+import { ReportStatuses } from "@/const";
 
 const autocompleteUsersHandler = async (searchString: string) => {
   const response = await autocompleteUsers(searchString);
@@ -51,8 +52,10 @@ const SearchFilters = () => {
           updateStatuses(list.filter((v) => v !== null));
         }}
         options={[
-          { label: "В работе", value: 0 },
-          { label: "Решён", value: 1 },
+          { label: "В работе", value: ReportStatuses.IN_PROGRESS },
+          { label: "Решён", value: ReportStatuses.RESOLVED },
+          { label: "Отклонён", value: ReportStatuses.REJECTED },
+          { label: "Бэклог", value: ReportStatuses.BACKLOG },
         ]}
       />
       <div>
