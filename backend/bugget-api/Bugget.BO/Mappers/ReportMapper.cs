@@ -30,7 +30,7 @@ public static class ReportMapper
 
         if (!string.IsNullOrEmpty(userId))
         {
-            resultUserIds.AddRange(userId);
+            resultUserIds.Add(userId);
         }
 
         return new SearchReports

@@ -12,13 +12,19 @@ public class SortOption
             return new SortOption();
 
         var parts = sort.Split('_');
-        if (parts.Length != 2 || (!string.IsNullOrEmpty(parts[0]) && !AllowedFields.Contains(parts[0])))
-            throw new ArgumentException("Invalid sort format");
+        if (parts.Length != 2)
+            return new SortOption();
+
+        var field = parts[0];
+        var direction = parts[1];
+
+        if (string.IsNullOrWhiteSpace(field) || !AllowedFields.Contains(field))
+            return new SortOption();
 
         return new SortOption
         {
-            Field = parts[0],
-            IsDescending = parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase)
+            Field = field,
+            IsDescending = direction.Equals("desc", StringComparison.OrdinalIgnoreCase)
         };
     }
 }

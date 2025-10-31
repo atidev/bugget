@@ -134,8 +134,7 @@ CREATE OR REPLACE FUNCTION public.search_reports_ids(_sort_field text, _sort_des
             AND NOT _sort_desc THEN
             updated_at
         END ASC,
-        updated_at DESC NULLS FIRST,
-        created_at DESC OFFSET GREATEST(_skip, 0)
+        id DESC OFFSET GREATEST(_skip, 0)
     LIMIT GREATEST(_take, 0);
 $$;
 

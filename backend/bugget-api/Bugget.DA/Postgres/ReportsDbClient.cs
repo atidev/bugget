@@ -97,6 +97,10 @@ public sealed class ReportsDbClient : PostgresClient
         await using var grid = await conn.QueryMultipleAsync(sql, new { ids });
 
         var reports = (await grid.ReadAsync<ReportDbModel>()).ToArray();
+        
+        // Восстанавливаем порядок сортировки из ids
+        var reportDict = reports.ToDictionary(r => r.Id);
+        reports = ids.Select(id => reportDict.GetValueOrDefault(id)).Where(r => r != null).ToArray()!;
 
         var participants = await grid.ReadAsync<(int ReportId, string UserId)>();
         var participantsByReport = participants
@@ -196,6 +200,10 @@ public sealed class ReportsDbClient : PostgresClient
         await using var grid = await conn.QueryMultipleAsync(sql, new { ids });
 
         var reports = (await grid.ReadAsync<ReportDbModel>()).ToArray();
+        
+        // Восстанавливаем порядок сортировки из ids
+        var reportDict = reports.ToDictionary(r => r.Id);
+        reports = ids.Select(id => reportDict.GetValueOrDefault(id)).Where(r => r != null).ToArray()!;
 
         var participants = await grid.ReadAsync<(int ReportId, string UserId)>();
         var participantsByReport = participants
