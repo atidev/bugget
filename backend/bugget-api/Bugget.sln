@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bugget.Tests", "Bugget.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bugget.DbUp", "Bugget.DbUp\Bugget.DbUp.csproj", "{856E3C7E-FB63-4298-A2F8-478DE9193ED1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bugget.IntegrationTests", "Bugget.IntegrationTests\Bugget.IntegrationTests.csproj", "{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -136,6 +138,18 @@ Global
 		{856E3C7E-FB63-4298-A2F8-478DE9193ED1}.Release|x64.Build.0 = Release|Any CPU
 		{856E3C7E-FB63-4298-A2F8-478DE9193ED1}.Release|x86.ActiveCfg = Release|Any CPU
 		{856E3C7E-FB63-4298-A2F8-478DE9193ED1}.Release|x86.Build.0 = Release|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Debug|x64.Build.0 = Debug|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Debug|x86.Build.0 = Debug|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Release|x64.ActiveCfg = Release|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Release|x64.Build.0 = Release|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Release|x86.ActiveCfg = Release|Any CPU
+		{B8F9E4C2-1A7D-4E3F-9B2C-8D5E6F7A8B9C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,13 +2,6 @@ namespace Bugget.Entities.Views.Attachment;
 
 public sealed class AttachmentView
 {
-
-    [Obsolete("Use EntityId")]
-    public required int BugId { get; init; }
-
-    [Obsolete("Бери из другого места это поле")]
-    public required int ReportId { get; init; }
-
     public required int Id { get; init; }
     
     /// <summary>

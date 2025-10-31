@@ -25,14 +25,12 @@ namespace Bugget.BO.Mappers
             return new AttachmentView
             {
                 Id = attachmentDbModel.Id,
-                ReportId = reportId,
-                BugId = attachmentDbModel.BugId,
                 EntityId = attachmentDbModel.EntityId!.Value,
                 AttachType = attachmentDbModel.AttachType,
                 CreatedAt = attachmentDbModel.CreatedAt,
                 CreatorUserId = attachmentDbModel.CreatorUserId ?? string.Empty,
                 FileName = attachmentDbModel.FileName ?? string.Empty,
-                HasPreview = attachmentDbModel.HasPreview.Value,
+                HasPreview = attachmentDbModel.HasPreview!.Value,
             };
         }
     }

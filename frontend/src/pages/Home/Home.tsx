@@ -1,10 +1,7 @@
 import { useEffect } from "react";
 import { useUnit } from "effector-react";
-import {
-  loadReportsFx,
-  $responsibleReports,
-  $participantReports,
-} from "@/storeObsolete/reportsSummary";
+import { dashboardPageOpened } from "@/store/reportsDashboard";
+import { $responsibleReports, $participantReports } from "@/store/index";
 import Section from "./components/Section/Section";
 import "./Home.css";
 
@@ -13,7 +10,7 @@ const Home = () => {
   const participantReports = useUnit($participantReports);
 
   useEffect(() => {
-    loadReportsFx();
+    dashboardPageOpened();
   }, []);
 
   return (

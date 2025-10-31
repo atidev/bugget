@@ -10,8 +10,8 @@ import {
   $sortDirection,
   updateSortField,
   updateSortDirection,
-  pageMounted,
-} from "@/storeObsolete/search";
+  searchPageOpened,
+} from "@/store/search";
 import { useEffect } from "react";
 
 const Search = () => {
@@ -29,7 +29,7 @@ const Search = () => {
   ];
 
   useEffect(() => {
-    pageMounted();
+    searchPageOpened();
   }, []);
 
   const onToggleDirectionHandler = () => {

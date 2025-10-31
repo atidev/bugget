@@ -1,14 +1,9 @@
-import { StatusMeta } from "@/typesObsolete/status";
+import { StatusMeta } from "@/types/status";
 
 export enum BugStatuses {
   ACTIVE = 0,
   ARCHIVED = 1,
   REJECTED = 2,
-}
-
-export enum ReportStatusesObsolete {
-  IN_PROGRESS = 0,
-  RESOLVED = 1,
 }
 
 export enum ReportStatuses {
@@ -32,15 +27,25 @@ export enum AttachmentTypes {
 }
 
 export const reportStatusMap: Record<number, StatusMeta> = {
-  [ReportStatusesObsolete.IN_PROGRESS]: {
+  [ReportStatuses.IN_PROGRESS]: {
     title: "В работе",
     color: "badge-error",
     border: "border-error",
   },
-  [ReportStatusesObsolete.RESOLVED]: {
+  [ReportStatuses.RESOLVED]: {
     title: "Решён",
     color: "badge-success",
     border: "border-success",
+  },
+  [ReportStatuses.REJECTED]: {
+    title: "Отклонён",
+    color: "badge-info",
+    border: "border-info",
+  },
+  [ReportStatuses.BACKLOG]: {
+    title: "Бэклог",
+    color: "badge-neutral",
+    border: "border-neutral",
   },
 };
 
