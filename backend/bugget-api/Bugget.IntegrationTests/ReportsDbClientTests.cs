@@ -22,7 +22,7 @@ public class ReportsDbClientTests : IClassFixture<AppWithPostgresFixture>
     {
         // Arrange
         var userId = $"user_{Guid.NewGuid()}";
-        var dto = new ReportV2CreateDto
+        var dto = new ReportCreateDto
         {
             Title = "Test Report"
         };
@@ -47,7 +47,7 @@ public class ReportsDbClientTests : IClassFixture<AppWithPostgresFixture>
         // Arrange
         var userId = $"user_{Guid.NewGuid()}";
         var teamId = $"team_{Guid.NewGuid()}";
-        var dto = new ReportV2CreateDto
+        var dto = new ReportCreateDto
         {
             Title = "Test Report with Team"
         };
@@ -70,7 +70,7 @@ public class ReportsDbClientTests : IClassFixture<AppWithPostgresFixture>
         // Arrange
         var userId = $"user_{Guid.NewGuid()}";
         var organizationId = $"org_{Guid.NewGuid()}";
-        var dto = new ReportV2CreateDto
+        var dto = new ReportCreateDto
         {
             Title = "Test Report with Organization"
         };
@@ -93,7 +93,7 @@ public class ReportsDbClientTests : IClassFixture<AppWithPostgresFixture>
         var userId = $"user_{Guid.NewGuid()}";
         var teamId = $"team_{Guid.NewGuid()}";
         var organizationId = $"org_{Guid.NewGuid()}";
-        var dto = new ReportV2CreateDto
+        var dto = new ReportCreateDto
         {
             Title = "Complete Test Report"
         };
@@ -118,8 +118,8 @@ public class ReportsDbClientTests : IClassFixture<AppWithPostgresFixture>
     {
         // Arrange
         var userId = $"user_{Guid.NewGuid()}";
-        var dto1 = new ReportV2CreateDto { Title = "First Report" };
-        var dto2 = new ReportV2CreateDto { Title = "Second Report" };
+        var dto1 = new ReportCreateDto { Title = "First Report" };
+        var dto2 = new ReportCreateDto { Title = "Second Report" };
 
         // Act
         var result1 = await _reportsDbClient.CreateReportAsync(userId, null, null, dto1);
@@ -141,7 +141,7 @@ public class ReportsDbClientTests : IClassFixture<AppWithPostgresFixture>
         // Arrange
         var userId = $"user_{Guid.NewGuid()}";
         var longTitle = new string('a', 128); // Максимальная длина согласно валидации
-        var dto = new ReportV2CreateDto
+        var dto = new ReportCreateDto
         {
             Title = longTitle
         };
@@ -161,7 +161,7 @@ public class ReportsDbClientTests : IClassFixture<AppWithPostgresFixture>
     {
         // Arrange
         var userId = $"user_{Guid.NewGuid()}";
-        var dto = new ReportV2CreateDto
+        var dto = new ReportCreateDto
         {
             Title = "Responsibility Test Report"
         };
@@ -180,7 +180,7 @@ public class ReportsDbClientTests : IClassFixture<AppWithPostgresFixture>
     {
         // Arrange
         var userId = $"user_{Guid.NewGuid()}";
-        var dto = new ReportV2CreateDto
+        var dto = new ReportCreateDto
         {
             Title = "Status Test Report"
         };

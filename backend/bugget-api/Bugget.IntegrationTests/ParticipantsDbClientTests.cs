@@ -144,7 +144,7 @@ public class ParticipantsDbClientTests : IClassFixture<AppWithPostgresFixture>
         string userId,
         string? organizationId = null)
     {
-        var reportDto = new ReportV2CreateDto
+        var reportDto = new ReportCreateDto
         {
             Title = $"Test Report {Guid.NewGuid()}"
         };

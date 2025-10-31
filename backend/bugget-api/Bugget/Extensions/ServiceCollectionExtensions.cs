@@ -111,7 +111,6 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddWebApi(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment env)
     {
-        services.AddAutoMapper(typeof(Bugget.Entities.MappingProfiles.BugMappingProfile).Assembly);
         services.AddExternalClients();
         services.AddHealthChecks();
         services.AddAuthHeaders();

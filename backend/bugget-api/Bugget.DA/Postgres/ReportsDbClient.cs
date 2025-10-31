@@ -146,7 +146,7 @@ public sealed class ReportsDbClient : PostgresClient
     /// <summary>
     /// Создает новый отчет и возвращает его краткую структуру.
     /// </summary>
-    public async Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto dto)
+    public async Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportCreateDto dto)
     {
         await using var conn = await DataSource.OpenConnectionAsync();
         return await conn.QuerySingleAsync<ReportSummaryDbModel>(

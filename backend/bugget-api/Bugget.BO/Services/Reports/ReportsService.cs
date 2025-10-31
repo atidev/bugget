@@ -21,7 +21,7 @@ public sealed class ReportsService(
     ReportEventsService reportEventsService)
 {
 
-    public Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportV2CreateDto createDto)
+    public Task<ReportSummaryDbModel> CreateReportAsync(string userId, string? teamId, string? organizationId, ReportCreateDto createDto)
     {
         return reportsDbClient.CreateReportAsync(userId, teamId, organizationId, createDto);
     }

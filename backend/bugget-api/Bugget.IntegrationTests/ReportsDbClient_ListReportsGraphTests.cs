@@ -389,7 +389,7 @@ public class ReportsDbClient_ListReportsGraphTests : IClassFixture<AppWithPostgr
         string? organizationId = null,
         string? title = null)
     {
-        var reportDto = new ReportV2CreateDto
+        var reportDto = new ReportCreateDto
         {
             Title = title ?? $"Test Report {Guid.NewGuid()}"
         };

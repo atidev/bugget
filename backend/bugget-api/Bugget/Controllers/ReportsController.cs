@@ -23,7 +23,7 @@ public sealed class ReportsController(ReportsService reportsService, IUsersClien
     /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(ReportSummaryDbModel), 201)]
-    public async Task<IActionResult> CreateReportAsync([FromBody] ReportV2CreateDto createDto)
+    public async Task<IActionResult> CreateReportAsync([FromBody] ReportCreateDto createDto)
     {
         var user = User.GetIdentity();
         return Ok(await reportsService.CreateReportAsync(user.Id, user.TeamId, user.OrganizationId, createDto));

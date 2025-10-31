@@ -1,9 +1,5 @@
-using AutoMapper;
 using Bugget.BO.Errors;
-using Bugget.BO.Mappers;
 using Bugget.DA.Postgres;
-using Bugget.Entities.BO;
-using Bugget.Entities.BO.BugBo;
 using Bugget.Entities.DbModels.Bug;
 using Bugget.Entities.DTO.Bug;
 using Bugget.Entities.Authentication;
@@ -11,7 +7,7 @@ using Monade;
 using TaskQueue;
 namespace Bugget.BO.Services;
 
-public sealed class BugsService(BugsDbClient bugsDbClient, IMapper mapper, BugsEventsService bugsEventsService, ITaskQueue taskQueue)
+public sealed class BugsService(BugsDbClient bugsDbClient, BugsEventsService bugsEventsService, ITaskQueue taskQueue)
 {
     public async Task<MonadeStruct<BugSummaryDbModel>> CreateBugAsync(UserIdentity user, int reportId, BugDto bug)
     {
