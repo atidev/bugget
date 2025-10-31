@@ -1,59 +1,67 @@
-CREATE OR REPLACE FUNCTION public.list_reports_ids(_skip int, _take int, _organization_id text DEFAULT NULL, _user_id text DEFAULT NULL, _team_id text DEFAULT NULL, _report_statuses int[] DEFAULT NULL)
-    RETURNS TABLE(
-        id int)
-    LANGUAGE sql
-    STABLE
-    AS $$
+CREATE OR REPLACE FUNCTION public.list_reports_base(
+    _organization_id   text DEFAULT NULL,
+    _user_id           text DEFAULT NULL,
+    _team_id           text DEFAULT NULL,
+    _report_statuses   int[] DEFAULT NULL
+)
+RETURNS TABLE(
+    id          int,
+    created_at  timestamptz,
+    updated_at  timestamptz
+)
+LANGUAGE sql
+STABLE
+AS $$
     SELECT
-        r.id
-    FROM
-        public.reports r
-    WHERE(_organization_id IS NULL
-        OR r.creator_organization_id = _organization_id)
-    AND(_team_id IS NULL
-        OR r.creator_team_id = _team_id)
-    AND(_report_statuses IS NULL
-        OR r.status = ANY(_report_statuses))
-    AND(_user_id IS NULL
-        OR EXISTS(
-            SELECT
-                1
-            FROM
-                public.report_participants rp
-            WHERE
-                rp.report_id = r.id
-                AND rp.user_id = _user_id))
-ORDER BY
-    r.updated_at DESC NULLS FIRST,
-    r.created_at DESC OFFSET GREATEST(_skip, 0)
-LIMIT GREATEST(_take, 0);
+        r.id,
+        r.created_at,
+        r.updated_at
+    FROM public.reports r
+    WHERE (_organization_id IS NULL OR r.creator_organization_id = _organization_id)
+      AND (_team_id        IS NULL OR r.creator_team_id        = _team_id)
+      AND (_report_statuses IS NULL OR r.status = ANY(_report_statuses))
+      AND (_user_id        IS NULL OR EXISTS (
+            SELECT 1
+            FROM public.report_participants rp
+            WHERE rp.report_id = r.id
+              AND rp.user_id   = _user_id
+      ));
 $$;
 
--- Общее количество
-CREATE OR REPLACE FUNCTION public.list_reports_count(_organization_id text DEFAULT NULL, _user_id text DEFAULT NULL, _team_id text DEFAULT NULL, _report_statuses int[] DEFAULT NULL)
-    RETURNS bigint
-    LANGUAGE sql
-    STABLE
-    AS $$
+CREATE OR REPLACE FUNCTION public.list_reports_ids(
+    _skip              int,
+    _take              int,
+    _organization_id   text DEFAULT NULL,
+    _user_id           text DEFAULT NULL,
+    _team_id           text DEFAULT NULL,
+    _report_statuses   int[] DEFAULT NULL
+)
+RETURNS TABLE(id int)
+LANGUAGE sql
+STABLE
+AS $$
     SELECT
-        COUNT(*)
-    FROM
-        public.reports r
-    WHERE(_organization_id IS NULL
-        OR r.creator_organization_id = _organization_id)
-    AND(_team_id IS NULL
-        OR r.creator_team_id = _team_id)
-    AND(_report_statuses IS NULL
-        OR r.status = ANY(_report_statuses))
-    AND(_user_id IS NULL
-        OR EXISTS(
-            SELECT
-                1
-            FROM
-                public.report_participants rp
-            WHERE
-                rp.report_id = r.id
-                AND rp.user_id = _user_id));
+        b.id
+    FROM public.list_reports_base(_organization_id, _user_id, _team_id, _report_statuses) AS b
+    ORDER BY
+        b.updated_at DESC NULLS FIRST,
+        b.created_at DESC
+    OFFSET GREATEST(_skip, 0)
+    LIMIT  GREATEST(_take, 0);
+$$;
+
+CREATE OR REPLACE FUNCTION public.list_reports_count(
+    _organization_id   text DEFAULT NULL,
+    _user_id           text DEFAULT NULL,
+    _team_id           text DEFAULT NULL,
+    _report_statuses   int[] DEFAULT NULL
+)
+RETURNS bigint
+LANGUAGE sql
+STABLE
+AS $$
+    SELECT COUNT(*)
+    FROM public.list_reports_base(_organization_id, _user_id, _team_id, _report_statuses);
 $$;
 
 CREATE OR REPLACE FUNCTION public.list_participants_internal(_report_ids int[])
