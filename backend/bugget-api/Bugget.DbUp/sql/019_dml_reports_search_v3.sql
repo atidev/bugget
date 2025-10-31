@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.search_reports_base(_query text, _statuses int[], _user_ids text[], _organization_id text)
+CREATE OR REPLACE FUNCTION public.search_reports_base(_query text, _statuses int[], _user_ids text[], _organization_id text, _team_id text)
     RETURNS TABLE(
         id int,
         created_at timestamp with time zone,
@@ -76,6 +76,9 @@ BEGIN
             AND (_organization_id IS NULL
                 OR (r.creator_organization_id IS NOT NULL
                     AND r.creator_organization_id = _organization_id))
+        AND (_team_id IS NULL
+            OR r.creator_team_id IS NULL
+            OR r.creator_team_id = _team_id)
         AND (_user_ids IS NULL
             OR EXISTS (
                 SELECT
@@ -88,7 +91,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.search_reports_count(_query text DEFAULT NULL, _statuses int[] DEFAULT NULL, _user_ids text[] DEFAULT NULL, _organization_id text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION public.search_reports_count(_query text DEFAULT NULL, _statuses int[] DEFAULT NULL, _user_ids text[] DEFAULT NULL, _organization_id text DEFAULT NULL, _team_id text DEFAULT NULL)
     RETURNS bigint
     LANGUAGE sql
     STABLE
@@ -96,10 +99,10 @@ CREATE OR REPLACE FUNCTION public.search_reports_count(_query text DEFAULT NULL,
     SELECT
         COUNT(*)
     FROM
-        public.search_reports_base(_query, _statuses, _user_ids, _organization_id);
+        public.search_reports_base(_query, _statuses, _user_ids, _organization_id, _team_id);
 $$;
 
-CREATE OR REPLACE FUNCTION public.search_reports_ids(_sort_field text, _sort_desc boolean, _skip int, _take int, _query text DEFAULT NULL, _statuses int[] DEFAULT NULL, _user_ids text[] DEFAULT NULL, _organization_id text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION public.search_reports_ids(_sort_field text, _sort_desc boolean, _skip int, _take int, _query text DEFAULT NULL, _statuses int[] DEFAULT NULL, _user_ids text[] DEFAULT NULL, _organization_id text DEFAULT NULL, _team_id text DEFAULT NULL)
     RETURNS TABLE(
         id int)
     LANGUAGE sql
@@ -108,7 +111,7 @@ CREATE OR REPLACE FUNCTION public.search_reports_ids(_sort_field text, _sort_des
     SELECT
         id
     FROM
-        public.search_reports_base(_query, _statuses, _user_ids, _organization_id)
+        public.search_reports_base(_query, _statuses, _user_ids, _organization_id, _team_id)
     ORDER BY
         CASE WHEN _sort_field = 'rank'
             AND _sort_desc THEN

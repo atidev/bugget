@@ -259,7 +259,8 @@ public sealed class ReportsDbClient : PostgresClient
             @query,
             @statuses::int[],
             @userIds::text[],
-            @organizationId::text
+            @organizationId::text,
+            @teamId::text
         );
 
         SELECT id FROM public.search_reports_ids(
@@ -267,7 +268,8 @@ public sealed class ReportsDbClient : PostgresClient
             @query,
             @statuses::int[],
             @userIds::text[],
-            @organizationId::text
+            @organizationId::text,
+            @teamId::text
         );
     ";
 
@@ -280,7 +282,8 @@ public sealed class ReportsDbClient : PostgresClient
             query = search.Query,
             statuses = search.ReportStatuses,        // int[]
             userIds = search.UserIds,               // string[]
-            organizationId = search.OrganizationId
+            organizationId = search.OrganizationId,
+            teamId = search.TeamId
         });
 
         var total = await grid.ReadSingleAsync<int>();

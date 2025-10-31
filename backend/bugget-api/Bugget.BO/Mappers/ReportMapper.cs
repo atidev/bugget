@@ -38,6 +38,7 @@ public static class ReportMapper
             Query = string.IsNullOrEmpty(query) ? null : query,
             ReportStatuses = reportStatuses?.Length > 0 ? reportStatuses : null,
             UserIds = resultUserIds.Count > 0 ? resultUserIds.ToArray() : null,
+            TeamId = teamId,
             Skip = skip,
             Take = take,
             Sort = SortOption.Parse(sort),

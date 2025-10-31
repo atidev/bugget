@@ -9,7 +9,7 @@ using Xunit;
 namespace Bugget.IntegrationTests;
 
 [Collection("PostgresCollection")]
-public class ReportsDbClient_ListReportsGraphTests : IClassFixture<AppWithPostgresFixture>
+public class ReportsDbClient_ListReportsTests : IClassFixture<AppWithPostgresFixture>
 {
     private readonly ReportsDbClient _reportsDbClient;
     private readonly BugsDbClient _bugsDbClient;
@@ -21,7 +21,7 @@ public class ReportsDbClient_ListReportsGraphTests : IClassFixture<AppWithPostgr
     private const int AttachType_BugFact = 0;
     private const int AttachType_Comment = 2;
 
-    public ReportsDbClient_ListReportsGraphTests(AppWithPostgresFixture fixture)
+    public ReportsDbClient_ListReportsTests(AppWithPostgresFixture fixture)
     {
         using var scope = fixture.Services.CreateScope();
         _reportsDbClient = scope.ServiceProvider.GetRequiredService<ReportsDbClient>();
