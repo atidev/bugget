@@ -13,37 +13,6 @@ namespace Bugget.BO.Mappers;
 
 public static class ReportMapper
 {
-    public static ReportView ToView(this ReportDbModel report, IReadOnlyDictionary<string, User> usersDict)
-    {
-        return new ReportView
-        {
-            Id = report.Id,
-            Title = report.Title,
-            Status = report.Status,
-            Responsible = usersDict.TryGetValue(report.ResponsibleUserId, out var er)
-                ? UsersAdapter.ToUserView(er)
-                : UsersAdapter.ToUserView(report.ResponsibleUserId),
-            Creator = usersDict.TryGetValue(report.CreatorUserId, out var ec)
-                ? UsersAdapter.ToUserView(ec)
-                : UsersAdapter.ToUserView(report.CreatorUserId),
-            CreatedAt = report.CreatedAt,
-            UpdatedAt = report.UpdatedAt,
-            Participants = report.ParticipantsUserIds.Select(p =>
-                usersDict.TryGetValue(p, out var e)
-                    ? UsersAdapter.ToUserView(e)
-                    : UsersAdapter.ToUserView(p)).ToArray(),
-            Bugs = report.Bugs?.Select(b => b.ToView(usersDict)).ToArray()
-        };
-    }
-
-    public static SearchReportsView ToView(this SearchReportsDbModel search, IReadOnlyDictionary<string, User> usersDict)
-    {
-        return new SearchReportsView
-        {
-            Reports = search.Reports.Select(r => ToView(r, usersDict)).ToArray(),
-            Total = search.Total
-        };
-    }
 
     public static Report ToReport(this ReportCreateDto report, string userId)
     {

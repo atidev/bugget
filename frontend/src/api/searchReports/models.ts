@@ -1,10 +1,5 @@
 import { BugStatuses, ReportStatuses } from "@/const";
 
-export type User = {
-  id: string | null;
-  name: string | null;
-};
-
 export type AttachmentResponse = {
   id: number;
   bugId: number;
@@ -19,7 +14,7 @@ export type BugResponse = {
   reportId: number;
   receive: string | null;
   expect: string | null;
-  creator: User;
+  creatorUserId: string;
   createdAt: string;
   updatedAt: string;
   status: BugStatuses;
@@ -31,7 +26,7 @@ export type CommentResponse = {
   id: number;
   bugId: number;
   text: string | null;
-  creator: User;
+  creatorUserId: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -40,11 +35,11 @@ export type ReportResponse = {
   id: number;
   title: string | null;
   status: ReportStatuses;
-  responsible: User;
-  creator: User;
+  responsibleUserId: string;
+  creatorUserId: string;
   createdAt: string;
   updatedAt: string;
-  participants: User[] | null;
+  participantsUserIds: string[] | null;
   bugs: BugResponse[] | null;
 };
 

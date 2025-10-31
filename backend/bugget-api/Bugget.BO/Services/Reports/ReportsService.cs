@@ -62,7 +62,7 @@ public sealed class ReportsService(
         return reportsDbClient.ListReportsAsync(organizationId, userId, teamId, reportStatuses, skip, take);
     }
 
-    public Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)
+    public Task<(long Total, ReportDbModel[] Reports)> SearchReportsAsync(SearchReports search)
     {
         return reportsDbClient.SearchReportsAsync(search);
     }

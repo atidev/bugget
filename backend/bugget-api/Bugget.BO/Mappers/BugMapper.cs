@@ -37,33 +37,4 @@ public static class BugMapper
             Status = bug.Status,
         };
     }
-
-    public static BugView ToView(this BugDbModel bug, IReadOnlyDictionary<string, User> usersDict)
-    {
-        return new BugView
-        {
-            Id = bug.Id,
-            ReportId = bug.ReportId,
-            Receive = bug.Receive,
-            Expect = bug.Expect,
-            Creator = usersDict.TryGetValue(bug.CreatorUserId, out var e)
-                ? UsersAdapter.ToUserView(e)
-                : UsersAdapter.ToUserView(bug.CreatorUserId),
-            CreatedAt = bug.CreatedAt,
-            UpdatedAt = bug.UpdatedAt,
-            Status = bug.Status,
-            Attachments = bug.Attachments?.Select(a => new AttachmentView
-            {
-                Id = a.Id,
-                EntityId = a.EntityId!.Value,
-                AttachType = a.AttachType,
-                CreatedAt = a.CreatedAt,
-                HasPreview = a.HasPreview.Value,
-                FileName = a.FileName ?? string.Empty,
-                CreatorUserId = a.CreatorUserId ?? string.Empty,
-            }).ToArray(),
-            Comments = bug.Comments?.Select(c => c.ToCommentView(bug.ReportId, usersDict))
-                .ToArray(),
-        };
-    }
 }

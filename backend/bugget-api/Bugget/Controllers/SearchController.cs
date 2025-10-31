@@ -20,8 +20,8 @@ public sealed class SearchController(
     /// </summary>
     /// <returns></returns>
     [HttpGet("search")]
-    [ProducesResponseType(typeof(SearchReportsView), 200)]
-    public async Task<SearchReportsView> SearchReportsAsync(
+    [ProducesResponseType(typeof(ReportViews), 200)]
+    public async Task<ReportViews> SearchReportsAsync(
         [FromQuery] string? query,
         [FromQuery] int[]? reportStatuses,
         [FromQuery] string? userId,
@@ -45,6 +45,10 @@ public sealed class SearchController(
                 usersClient.DictUsersByTeam()
                 ));
 
-        return searchResult.ToView(usersClient.DictUsers());
+        return new ReportViews
+        {
+            Total = searchResult.Total,
+            Reports = searchResult.Reports
+        };
     }
 }

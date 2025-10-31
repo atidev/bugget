@@ -1,5 +1,5 @@
 import { useUnit } from "effector-react";
-import { $searchResult } from "@/store/search";
+import { $searchResult, $usersStore } from "@/store/search";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import getStatusMeta from "@/utils/getStatusMeta";
@@ -28,7 +28,7 @@ const getLatestUpdateDate = (report: ReportResponse) => {
 };
 
 const SearchResults = () => {
-  const [searchResult] = useUnit([$searchResult]);
+  const [searchResult, usersStore] = useUnit([$searchResult, $usersStore]);
   const navigate = useNavigate();
 
   const handleClick = (
@@ -74,7 +74,7 @@ const SearchResults = () => {
             </div>
 
             <div className="text-sm text-base-content/70 mt-1">
-              Автор: {report.creator.name} • Создан:
+              Автор: {usersStore[report.creatorUserId]?.name ?? "—"} • Создан:
               {formatDistanceToNow(new Date(report.createdAt), {
                 addSuffix: true,
                 locale: ru,
@@ -88,7 +88,7 @@ const SearchResults = () => {
               })}
             </div>
             <div className="text-sm text-base-content/70">
-              Ответственный: {report.responsible?.name ?? "—"}
+              Ответственный: {usersStore[report.responsibleUserId]?.name ?? "—"}
             </div>
             {!!report.bugs?.length && (
               <div className="text-sm mt-1">

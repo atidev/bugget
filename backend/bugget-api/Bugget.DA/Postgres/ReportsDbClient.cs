@@ -74,7 +74,6 @@ public sealed class ReportsDbClient : PostgresClient
     }
 
 
-
     public async Task<(long total, ReportDbModel[] reports)> ListReportsAsync(
     string? organizationId, string? userId, string? teamId, int[]? statuses, int skip, int take)
     {
@@ -178,15 +177,11 @@ public sealed class ReportsDbClient : PostgresClient
         return jsonResult;
     }
 
-    public async Task<SearchReportsDbModel> SearchReportsAsync(SearchReports search)
+    public async Task<(long total, ReportDbModel[] reports)> SearchReportsAsync(SearchReports search)
     {
         var (total, ids) = await SearchReportIdsAsync(search);
         if (ids.Length == 0)
-            return new SearchReportsDbModel
-            {
-                Total = total,
-                Reports = Array.Empty<ReportDbModel>()
-            };
+            return (total, Array.Empty<ReportDbModel>());
 
         await using var conn = await DataSource.OpenConnectionAsync();
 
@@ -244,11 +239,7 @@ public sealed class ReportsDbClient : PostgresClient
             r.Bugs = rb;
         }
 
-        return new SearchReportsDbModel
-        {
-            Total = total,
-            Reports = reports
-        };
+        return (total, reports);
     }
 
     private async Task<(int total, int[] ids)> SearchReportIdsAsync(SearchReports search)
@@ -323,6 +314,4 @@ public sealed class ReportsDbClient : PostgresClient
         var ids = (await grid.ReadAsync<int>()).ToArray();
         return (total, ids);
     }
-
-    private T? Deserialize<T>(string json) => JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
 }
