@@ -1,5 +1,7 @@
 import { ReportResponse } from "@/api/reports/models";
-import ReportSummary from "./ReportSummary";
+import ReportCard from "@/components/ReportCard";
+import { useUnit } from "effector-react";
+import { $usersStore } from "@/store/reportsDashboard";
 
 type Props = {
   title: string;
@@ -7,13 +9,20 @@ type Props = {
 };
 
 const Section = ({ title, reports }: Props) => {
+  const usersStore = useUnit($usersStore);
+
   return (
     <section className="flex flex-col gap-3">
       <h2 className="section-title text-base-content">{title}</h2>
       <div className="reports-summary-wrapper">
         {!!reports.length &&
           reports.map((report) => (
-            <ReportSummary key={report.id} report={report} highlight />
+            <ReportCard
+              key={report.id}
+              report={report}
+              usersStore={usersStore}
+              className="border-error border-2"
+            />
           ))}
       </div>
     </section>

@@ -7,6 +7,7 @@ const unknownStatus: StatusMeta = {
   title: "Неизвестно",
   color: "badge-neutral",
   border: "border-neutral",
+  bgColor: "bg-neutral",
 };
 
 export default function getStatusMeta(

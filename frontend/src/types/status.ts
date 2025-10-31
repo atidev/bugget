@@ -7,4 +7,5 @@ export type StatusMeta = {
     | "badge-info"
     | "badge-neutral";
   border: string;
+  bgColor: string;
 };

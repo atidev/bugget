@@ -31,21 +31,25 @@ export const reportStatusMap: Record<number, StatusMeta> = {
     title: "В работе",
     color: "badge-error",
     border: "border-error",
+    bgColor: "bg-error",
   },
   [ReportStatuses.RESOLVED]: {
     title: "Решён",
     color: "badge-success",
     border: "border-success",
+    bgColor: "bg-success",
   },
   [ReportStatuses.REJECTED]: {
     title: "Отклонён",
     color: "badge-info",
     border: "border-info",
+    bgColor: "bg-info",
   },
   [ReportStatuses.BACKLOG]: {
     title: "Бэклог",
     color: "badge-neutral",
     border: "border-neutral",
+    bgColor: "bg-neutral",
   },
 };
 
@@ -54,11 +58,13 @@ export const bugStatusMap: Record<number, StatusMeta> = {
     title: "Открыт",
     color: "badge-error",
     border: "border-error",
+    bgColor: "bg-error",
   },
   [BugStatuses.ARCHIVED]: {
     title: "Исправлен",
     color: "badge-success",
     border: "border-success",
+    bgColor: "bg-success",
   },
 };
 
