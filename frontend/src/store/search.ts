@@ -14,7 +14,7 @@ import { Team } from "@/types/team";
 import { fetchUsers } from "@/api/users";
 import { UserResponse } from "@/types/user";
 
-export const searchFx = createEffect(
+export const searchFx = createEffect<SearchRequestQueryParams, SearchResponse>(
   async (params: SearchRequestQueryParams) => {
     const searchParams = new URLSearchParams();
     if (params.query) searchParams.append("query", params.query);
@@ -28,12 +28,14 @@ export const searchFx = createEffect(
         searchParams.append("reportStatuses", String(status));
       }
     }
-    return await searchReports(searchParams.toString());
+    const result = await searchReports(searchParams.toString());
+    return result || { reports: [], total: 0 };
   }
 );
 
 export const searchStarted = createEvent<SearchRequestQueryParams>();
 export const searchPageOpened = createEvent();
+export const loadMore = createEvent();
 
 export const updateQuery = createEvent<string>();
 export const updateSortField = createEvent<string>();
@@ -66,9 +68,42 @@ export const $teamFilter = createStore<Team | null>(null).on(
   (_, team) => team
 );
 
-export const $searchResult = createStore<SearchResponse>({} as SearchResponse)
-  .on(searchFx.doneData, (_, payload) => payload)
-  .reset(searchStarted);
+export const $skip = createStore<number>(0)
+  .on(loadMore, (skip) => skip + 10)
+  .reset([
+    updateQuery,
+    updateSortField,
+    updateSortDirection,
+    updateStatuses,
+    updateUserFilter,
+    updateTeamFilter,
+  ]);
+
+const ITEMS_PER_PAGE = 10;
+
+export const $searchResult = createStore<SearchResponse>({
+  reports: [],
+  total: 0,
+})
+  .on(searchFx.doneData, (state, newData) => {
+    // Проверяем, является ли это загрузкой дополнительных результатов
+    // Если skip > 0, значит это loadMore
+    if (newData.reports.length > 0 && state.reports.length > 0) {
+      return {
+        total: newData.total,
+        reports: [...state.reports, ...newData.reports],
+      };
+    }
+    return newData;
+  })
+  .reset([
+    updateQuery,
+    updateSortField,
+    updateSortDirection,
+    updateStatuses,
+    updateUserFilter,
+    updateTeamFilter,
+  ]);
 
 // Загрузка пользователей
 export const fetchUsersFx = createEffect<string[], UserResponse[]>(
@@ -134,6 +169,7 @@ sample({
     reportStatuses: $statuses,
     userFilter: $userFilter,
     teamFilter: $teamFilter,
+    skip: $skip,
   },
   clock: [
     $query.updates,
@@ -142,6 +178,7 @@ sample({
     $statuses.updates,
     updateUserFilter,
     $teamFilter.updates,
+    $skip.updates,
   ],
   fn: ({
     query,
@@ -150,15 +187,15 @@ sample({
     reportStatuses,
     userFilter,
     teamFilter,
+    skip,
   }) => ({
     query,
     sort: `${sortField}_${sortDirection}`,
     reportStatuses: reportStatuses ?? undefined,
     userId: userFilter?.id ?? undefined,
     teamId: teamFilter?.id ?? undefined,
-    skip: 0,
-    // TODO пагинация
-    take: 100,
+    skip,
+    take: ITEMS_PER_PAGE,
   }),
   target: searchStarted,
 });
