@@ -23,6 +23,8 @@ type ReportCardProps = {
   className?: string;
 };
 
+const maxParticipantsDisplayCount = 3;
+
 const ReportCard = ({
   report,
   usersStore = {},
@@ -79,7 +81,7 @@ const ReportCard = ({
   // Получаем имя ответственного
   const responsibleUserName = usersStore[report.responsibleUserId]?.name;
 
-  // Получаем участников (макс 3 для отображения)
+  // Получаем участников (макс 3 для отображения), исключая ответственного
   const participants = useMemo(() => {
     if (
       !report.participantsUserIds ||
@@ -90,14 +92,16 @@ const ReportCard = ({
 
     return report.participantsUserIds
       .filter((p) => p !== report.responsibleUserId)
-      .slice(0, 3)
+      .slice(0, maxParticipantsDisplayCount)
       .map((userId) => ({
         id: userId,
         name: usersStore[userId]?.name || userId,
       }));
   }, [report.participantsUserIds, usersStore]);
 
-  const totalParticipants = report.participantsUserIds?.length || 0;
+  const totalParticipants =
+    report.participantsUserIds?.filter((id) => id !== report.responsibleUserId)
+      .length || 0;
 
   // Форматируем дату в формате "4 апр"
   const formattedDate = useMemo(() => {
@@ -186,16 +190,17 @@ const ReportCard = ({
                   ))}
                 </div>
 
-                {totalParticipants > 3 && (
+                {totalParticipants > maxParticipantsDisplayCount && (
                   <div
                     className="tooltip tooltip-bottom ml-0.5"
                     data-tip={(report.participantsUserIds ?? [])
-                      .slice(3)
+                      .slice(maxParticipantsDisplayCount)
+                      .filter((id) => id !== report.responsibleUserId)
                       .map((id) => usersStore[id]?.name || id)
                       .join(", ")}
                   >
                     <span className="text-xs text-base-content/60 cursor-default">
-                      +{totalParticipants - 3}
+                      +{totalParticipants - maxParticipantsDisplayCount}
                     </span>
                   </div>
                 )}
