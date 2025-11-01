@@ -6,9 +6,9 @@ import { buildFullAppUrl } from "@/utils/buildFullUrl";
 // Универсальный тип для поддержки разных версий ReportResponse
 type ReportData = {
   id: number;
-  title: string | null;
+  title: string;
   status: number;
-  updatedAt: string;
+  createdAt: string;
   responsibleUserId: string;
   participantsUserIds?: string[] | null;
   bugs?: Array<{
@@ -29,7 +29,7 @@ const ReportCard = ({
   className = "",
 }: ReportCardProps) => {
   const navigate = useNavigate();
-  const statusMeta = reportStatusMap[report.status];
+  const statusMeta = reportStatusMap[Number(report.status)];
 
   // Обработчик клика с поддержкой открытия в новой вкладке
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -56,12 +56,12 @@ const ReportCard = ({
       return null;
     }
 
-    const activeBugs = report.bugs.filter(
-      (bug) => bug.status === BugStatuses.ACTIVE
+    const resolvedBugs = report.bugs.filter(
+      (bug) => bug.status !== BugStatuses.ACTIVE
     ).length;
     const totalBugs = report.bugs.length;
 
-    return { active: activeBugs, total: totalBugs };
+    return { resolved: resolvedBugs, total: totalBugs };
   }, [report.bugs]);
 
   // Подсчитываем количество комментариев
@@ -88,30 +88,33 @@ const ReportCard = ({
       return [];
     }
 
-    return report.participantsUserIds.slice(0, 3).map((userId) => ({
-      id: userId,
-      name: usersStore[userId]?.name || userId,
-    }));
+    return report.participantsUserIds
+      .filter((p) => p !== report.responsibleUserId)
+      .slice(0, 3)
+      .map((userId) => ({
+        id: userId,
+        name: usersStore[userId]?.name || userId,
+      }));
   }, [report.participantsUserIds, usersStore]);
 
   const totalParticipants = report.participantsUserIds?.length || 0;
 
   // Форматируем дату в формате "4 апр"
   const formattedDate = useMemo(() => {
-    const date = new Date(report.updatedAt);
+    const date = new Date(report.createdAt);
     return date.toLocaleDateString("ru-RU", {
       day: "numeric",
       month: "short",
     });
-  }, [report.updatedAt]);
+  }, [report.createdAt]);
 
   return (
     <div
-      className={`card bg-base-100 shadow hover:shadow-lg transition-all duration-200 cursor-pointer border border-base-300 hover:border-primary/30 ${className}`}
+      className={`card bg-base-100 cursor-pointer border border-base-300 hover:bg-base-200 ${className}`}
       onClick={handleClick}
       onMouseDown={handleMouseDown}
     >
-      <div className="card-body p-4 gap-3">
+      <div className="card-body p-3 gap-2">
         {/* Верхняя строка: номер, статус, заголовок, дата */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-2 flex-1 min-w-0">
@@ -122,18 +125,15 @@ const ReportCard = ({
               </span>
 
               {/* Индикатор статуса - круглая иконка */}
-              <div
-                className={`w-3 h-3 rounded-full flex-shrink-0 ${statusMeta?.bgColor || "bg-neutral"}`}
-                title={statusMeta?.title}
-              />
+              <statusMeta.icon className={`w-4 h-4 ${statusMeta.iconColor}`} />
             </div>
 
             {/* Заголовок */}
             <h3
-              className="text-sm font-medium line-clamp-1 flex-1 min-w-0"
-              title={report.title || "Без названия"}
+              className="text-sm font-bold line-clamp-1 flex-1 min-w-0"
+              title={report.title}
             >
-              {report.title || "Без названия"}
+              {report.title}
             </h3>
           </div>
 
@@ -151,13 +151,13 @@ const ReportCard = ({
             {responsibleUserName && (
               <div className="flex items-center gap-2">
                 <div
-                  className="w-7 h-7 rounded-full bg-accent text-accent-content flex items-center justify-center text-xs font-semibold border-2 border-base-100 hover:z-10 transition-transform hover:scale-110 cursor-pointer"
+                  className="w-6 h-6 rounded-full bg-accent text-accent-content flex items-center justify-center text-xs border-2 border-base-100 hover:z-10 transition-transform hover:scale-110 cursor-pointer"
                   title={`Ответственный: ${responsibleUserName}`}
                   aria-label={responsibleUserName}
                 >
                   {responsibleUserName?.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-sm font-semibold text-base-content">
+                <span className="text-xs text-base-content">
                   {responsibleUserName}
                 </span>
               </div>
@@ -166,46 +166,61 @@ const ReportCard = ({
             {/* Участники */}
             {participants.length > 0 && (
               <div className="flex items-center ml-2">
-                <div className="flex -space-x-2">
-                  {participants.map((participant) => (
+                <div className="flex -space-x-2 overflow-visible">
+                  {participants.map((p) => (
                     <div
-                      key={participant.id}
-                      className="w-6 h-6 rounded-full bg-primary text-primary-content flex items-center justify-center text-xs font-medium border-2 border-base-100 hover:z-10 transition-transform hover:scale-110 cursor-pointer"
-                      title={`Участник: ${participant.name}`}
-                      aria-label={participant.name}
+                      key={p.id}
+                      className="tooltip tooltip-bottom"
+                      data-tip={p.name}
                     >
-                      {participant.name?.charAt(0).toUpperCase()}
+                      <button
+                        type="button"
+                        className="w-6 h-6 rounded-full bg-primary text-primary-content flex items-center justify-center text-[10px] font-medium border-2 border-base-100
+                       transition-transform hover:scale-110 hover:z-20 focus:scale-110 focus:z-20 outline-none"
+                        aria-label={`Участник: ${p.name}`}
+                        tabIndex={0}
+                      >
+                        {p.name?.charAt(0).toUpperCase()}
+                      </button>
                     </div>
                   ))}
                 </div>
+
                 {totalParticipants > 3 && (
-                  <span className="text-xs text-base-content/60 ml-0.5">
-                    +{totalParticipants - 3}
-                  </span>
+                  <div
+                    className="tooltip tooltip-bottom ml-0.5"
+                    data-tip={(report.participantsUserIds ?? [])
+                      .slice(3)
+                      .map((id) => usersStore[id]?.name || id)
+                      .join(", ")}
+                  >
+                    <span className="text-xs text-base-content/60 cursor-default">
+                      +{totalParticipants - 3}
+                    </span>
+                  </div>
                 )}
               </div>
             )}
           </div>
 
           {/* Правый блок: баги, комментарии */}
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-2">
             {/* Баги */}
             {bugStats && (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-base-200">
-                <span className="text-base">🐛</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-base">🐞</span>
                 <span
-                  className={`text-sm font-semibold ${
-                    bugStats.active > 0 ? "text-error" : "text-success"
-                  }`}
+                  className={`text-sm font-semibold
+                    }`}
                 >
-                  {bugStats.active}/{bugStats.total}
+                  {bugStats.resolved}/{bugStats.total}
                 </span>
               </div>
             )}
 
             {/* Комментарии */}
             {commentsCount > 0 && (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-base-200">
+              <div className="flex items-center gap-1.5">
                 <span className="text-base">💬</span>
                 <span className="text-sm font-semibold">{commentsCount}</span>
               </div>

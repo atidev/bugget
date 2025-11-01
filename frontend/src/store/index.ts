@@ -24,9 +24,14 @@ import {
   updateUserFilter,
   $userFilter,
 } from "@/store/search";
-import { dashboardPageOpened, loadReportsFx } from "@/store/reportsDashboard";
+import {
+  dashboardPageOpened,
+  loadReportsFx,
+  recentlyResolvedSectionOpened,
+  loadRecentlyResolvedFx,
+} from "@/store/dashboard";
 import { authFx } from "./user";
-import { $reports } from "./reportsDashboard";
+import { $dashboardReports } from "./dashboard";
 
 const $src = combine({ user: $user, reportPath: $reportPathStore });
 
@@ -200,10 +205,33 @@ sample({
   target: loadReportsFx,
 });
 
-export const $responsibleReports = combine($reports, $user, (reports, user) => {
-  return reports.filter((report) => report.responsibleUserId === user?.id);
-});
+export const $responsibleReports = combine(
+  $dashboardReports,
+  $user,
+  (data, user) => {
+    const reports = data.reports;
+    return reports
+      .filter((report) => report.responsibleUserId === user?.id)
+      .sort((a, b) => b.status - a.status);
+  }
+);
 
-export const $participantReports = combine($reports, $user, (reports, user) => {
-  return reports.filter((report) => report.responsibleUserId !== user?.id);
+export const $participantReports = combine(
+  $dashboardReports,
+  $user,
+  (data, user) => {
+    const reports = data.reports;
+    return reports
+      .filter((report) => report.responsibleUserId !== user?.id)
+      .sort((a, b) => b.status - a.status);
+  }
+);
+
+// При открытии секции недавно решённых, загрузить их если есть userId
+sample({
+  source: $user,
+  clock: recentlyResolvedSectionOpened,
+  filter: (user) => !!user?.id,
+  fn: (user) => user.id,
+  target: loadRecentlyResolvedFx,
 });

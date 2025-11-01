@@ -6,7 +6,7 @@ const SearchResults = () => {
   const [searchResult, usersStore] = useUnit([$searchResult, $usersStore]);
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-1">
       {searchResult?.reports?.map((report) => (
         <ReportCard key={report.id} report={report} usersStore={usersStore} />
       ))}

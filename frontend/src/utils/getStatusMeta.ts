@@ -1,13 +1,14 @@
 import { bugStatusMap, reportStatusMap } from "@/const";
 import { StatusMeta } from "@/types/status";
+import { MessageCircleQuestion } from "lucide-react";
 
 type EntityType = "bug" | "report";
 
 const unknownStatus: StatusMeta = {
   title: "Неизвестно",
-  color: "badge-neutral",
-  border: "border-neutral",
   bgColor: "bg-neutral",
+  icon: MessageCircleQuestion,
+  iconColor: "text-neutral",
 };
 
 export default function getStatusMeta(
