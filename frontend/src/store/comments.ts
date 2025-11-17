@@ -150,7 +150,6 @@ export const setCommentsByBugIdEvent = createEvent<
 
 $commentsByBugId
   .on(setCommentsByBugIdEvent, (state, allComments) => {
-    console.log("setAllCommentsEvent", allComments);
     const newState = { ...state };
     allComments.forEach(({ bugId, comments }) => {
       newState[bugId] = comments;

@@ -3,7 +3,6 @@ export let extendedBasePath = "";
 const TEAM_ROOT_RE = /\/workspaces\/[^/]+\/teams\/[^/]+(?=\/|$)/;
 
 export function computeExtendedBasePath(pathname: string): string {
-  console.log("computeExtendedBasePath", pathname);
   if (!pathname) return "";
   const clean = pathname.includes("://")
     ? (() => {
