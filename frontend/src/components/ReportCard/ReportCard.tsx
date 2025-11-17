@@ -1,5 +1,4 @@
 import { BugStatuses, reportStatusMap } from "@/const";
-import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { buildFullAppUrl } from "@/utils/buildFullUrl";
 
@@ -17,7 +16,7 @@ type ReportData = {
   }> | null;
 };
 
-type ReportCardProps = {
+type Props = {
   report: ReportData;
   usersStore?: Record<string, { name: string }>;
   className?: string;
@@ -25,11 +24,7 @@ type ReportCardProps = {
 
 const maxParticipantsDisplayCount = 3;
 
-const ReportCard = ({
-  report,
-  usersStore = {},
-  className = "",
-}: ReportCardProps) => {
+const ReportCard = ({ report, usersStore = {}, className = "" }: Props) => {
   const navigate = useNavigate();
   const statusMeta = reportStatusMap[Number(report.status)];
 
@@ -53,64 +48,36 @@ const ReportCard = ({
   };
 
   // Подсчитываем открытые и всего багов
-  const bugStats = useMemo(() => {
-    if (!report.bugs || report.bugs.length === 0) {
-      return null;
-    }
-
-    const resolvedBugs = report.bugs.filter(
-      (bug) => bug.status !== BugStatuses.ACTIVE
-    ).length;
-    const totalBugs = report.bugs.length;
-
-    return { resolved: resolvedBugs, total: totalBugs };
-  }, [report.bugs]);
+  const bugStats = report.bugs?.length
+    ? {
+        resolved: report.bugs.filter((b) => b.status !== BugStatuses.ACTIVE)
+          .length,
+        total: report.bugs.length,
+      }
+    : null;
 
   // Подсчитываем количество комментариев
-  const commentsCount = useMemo(() => {
-    if (!report.bugs || report.bugs.length === 0) {
-      return 0;
-    }
-
-    return report.bugs.reduce(
-      (sum, bug) => sum + (bug.comments?.length || 0),
-      0
-    );
-  }, [report.bugs]);
+  const commentsCount =
+    report.bugs?.reduce((sum, b) => sum + (b.comments?.length || 0), 0) ?? 0;
 
   // Получаем имя ответственного
   const responsibleUserName = usersStore[report.responsibleUserId]?.name;
 
   // Получаем участников (макс 3 для отображения), исключая ответственного
-  const participants = useMemo(() => {
-    if (
-      !report.participantsUserIds ||
-      report.participantsUserIds.length === 0
-    ) {
-      return [];
-    }
+  const participants = (report.participantsUserIds ?? [])
+    .filter((id) => id !== report.responsibleUserId)
+    .slice(0, maxParticipantsDisplayCount)
+    .map((id) => ({ id, name: usersStore[id]?.name || id }));
 
-    return report.participantsUserIds
-      .filter((p) => p !== report.responsibleUserId)
-      .slice(0, maxParticipantsDisplayCount)
-      .map((userId) => ({
-        id: userId,
-        name: usersStore[userId]?.name || userId,
-      }));
-  }, [report.participantsUserIds, usersStore]);
-
-  const totalParticipants =
-    report.participantsUserIds?.filter((id) => id !== report.responsibleUserId)
-      .length || 0;
+  const totalParticipants = (report.participantsUserIds ?? []).filter(
+    (id) => id !== report.responsibleUserId
+  ).length;
 
   // Форматируем дату в формате "4 апр"
-  const formattedDate = useMemo(() => {
-    const date = new Date(report.createdAt);
-    return date.toLocaleDateString("ru-RU", {
-      day: "numeric",
-      month: "short",
-    });
-  }, [report.createdAt]);
+  const formattedDate = new Date(report.createdAt).toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "short",
+  });
 
   return (
     <div

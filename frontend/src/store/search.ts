@@ -79,7 +79,7 @@ export const $skip = createStore<number>(0)
     updateTeamFilter,
   ]);
 
-const ITEMS_PER_PAGE = 10;
+const itemsPerPage = 10;
 
 export const $searchResult = createStore<SearchResponse>({
   reports: [],
@@ -195,7 +195,7 @@ sample({
     userId: userFilter?.id ?? undefined,
     teamId: teamFilter?.id ?? undefined,
     skip,
-    take: ITEMS_PER_PAGE,
+    take: itemsPerPage,
   }),
   target: searchStarted,
 });

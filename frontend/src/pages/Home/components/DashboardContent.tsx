@@ -18,10 +18,6 @@ const DashboardContent = () => {
     dashboardPageOpened();
   }, []);
 
-  const handleRecentlyResolvedExpand = () => {
-    recentlyResolvedSectionOpened();
-  };
-
   return (
     <>
       <Section
@@ -32,7 +28,7 @@ const DashboardContent = () => {
       <Section title="Участник" reports={participantReports} />
       <LastReportsSection
         data={recentlyResolvedReports}
-        onExpand={handleRecentlyResolvedExpand}
+        onExpand={recentlyResolvedSectionOpened}
       />
     </>
   );
