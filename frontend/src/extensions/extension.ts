@@ -22,6 +22,7 @@ export type HostApi = {
     stores: {
       // доступ плагинов к сторам
       user: Store<UserResponse | null>;
+      usersStore: Store<Record<string, UserResponse>>;
     };
     events: {
       // доступ плагинов к событиям
@@ -41,9 +42,39 @@ export type HostApi = {
     Report: React.ComponentType;
     Search: React.ComponentType;
     ReportSidebar: React.ComponentType;
+    DashboardContent: React.ComponentType;
+    ReportCard: React.ComponentType<{
+      report: any;
+      usersStore?: Record<string, any>;
+      className?: string;
+    }>;
   };
+  // API для использования в расширениях
+  api: {
+    fetchReportsList: (
+      userId: string | null,
+      teamId: string | null,
+      reportStatuses: number[] | null,
+      skip?: number,
+      take?: number
+    ) => Promise<any>;
+  };
+  // Константы и типы
+  constants: {
+    ReportStatuses: typeof ReportStatuses;
+  };
+  types: {};
   // utils, etc
+  utils: {};
 };
+
+// Типы для экспорта
+export enum ReportStatuses {
+  BACKLOG = 0,
+  RESOLVED = 1,
+  IN_PROGRESS = 2,
+  REJECTED = 3,
+}
 
 // статический ресурс плагина - маршруты
 export type PatchableRouteObject = RouteObject & {
