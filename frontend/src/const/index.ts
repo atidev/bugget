@@ -1,4 +1,11 @@
 import { StatusMeta } from "@/types/status";
+import {
+  CircleDashed,
+  Clock,
+  CircleCheck,
+  XCircle,
+  CircleX,
+} from "lucide-react";
 
 export enum BugStatuses {
   ACTIVE = 0,
@@ -29,36 +36,48 @@ export enum AttachmentTypes {
 export const reportStatusMap: Record<number, StatusMeta> = {
   [ReportStatuses.IN_PROGRESS]: {
     title: "В работе",
-    color: "badge-error",
-    border: "border-error",
+    bgColor: "bg-error",
+    icon: Clock,
+    iconColor: "text-warning",
   },
   [ReportStatuses.RESOLVED]: {
     title: "Решён",
-    color: "badge-success",
-    border: "border-success",
+    bgColor: "bg-success",
+    icon: CircleCheck,
+    iconColor: "text-success",
   },
   [ReportStatuses.REJECTED]: {
     title: "Отклонён",
-    color: "badge-info",
-    border: "border-info",
+    bgColor: "bg-secondary",
+    icon: XCircle,
+    iconColor: "text-secondary",
   },
   [ReportStatuses.BACKLOG]: {
     title: "Бэклог",
-    color: "badge-neutral",
-    border: "border-neutral",
+    bgColor: "bg-neutral",
+    icon: CircleDashed,
+    iconColor: "text-base-content",
   },
 };
 
 export const bugStatusMap: Record<number, StatusMeta> = {
   [BugStatuses.ACTIVE]: {
     title: "Открыт",
-    color: "badge-error",
-    border: "border-error",
+    bgColor: "bg-error",
+    icon: CircleX,
+    iconColor: "text-error",
   },
   [BugStatuses.ARCHIVED]: {
-    title: "Исправлен",
-    color: "badge-success",
-    border: "border-success",
+    title: "Решён",
+    bgColor: "bg-success",
+    icon: CircleCheck,
+    iconColor: "text-success",
+  },
+  [BugStatuses.REJECTED]: {
+    title: "Отклонён",
+    bgColor: "bg-secondary",
+    icon: XCircle,
+    iconColor: "text-secondary",
   },
 };
 
@@ -75,3 +94,5 @@ export enum BugResultTypes {
 export const justNowString = "только что";
 export const yesterdayString = "вчера";
 export const backInTimeString = "назад";
+
+export const lastReportsDashboardTake = 5;

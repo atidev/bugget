@@ -33,7 +33,7 @@ export type CommentResponse = {
 
 export type ReportResponse = {
   id: number;
-  title: string | null;
+  title: string;
   status: ReportStatuses;
   responsibleUserId: string;
   creatorUserId: string;

@@ -1,12 +1,26 @@
 export let extendedBasePath = "";
 
+const TEAM_ROOT_RE = /\/workspaces\/[^/]+\/teams\/[^/]+(?=\/|$)/;
+
 export function computeExtendedBasePath(pathname: string): string {
   if (!pathname) return "";
-  let i = pathname.indexOf("/reports");
-  if (i === -1) {
-    i = pathname.indexOf("/search");
+  const clean = pathname.includes("://")
+    ? (() => {
+        try {
+          return new URL(pathname).pathname;
+        } catch {
+          return pathname.split("#")[0].split("?")[0];
+        }
+      })()
+    : pathname.split("#")[0].split("?")[0];
+
+  const match = clean.match(TEAM_ROOT_RE);
+  if (match) {
+    const end = (match.index ?? 0) + match[0].length;
+    return clean.slice(0, end);
   }
-  return i >= 0 ? pathname.slice(0, i) : "";
+
+  return "";
 }
 
 export function setExtendedBasePathFrom(pathname: string) {

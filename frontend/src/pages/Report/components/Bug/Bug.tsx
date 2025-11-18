@@ -193,7 +193,7 @@ const Bug = ({ bug }: Props) => {
   if (bug.status === BugStatuses.ARCHIVED) {
     borderColor = "border-success";
   } else if (bug.status === BugStatuses.REJECTED) {
-    borderColor = "border-warning";
+    borderColor = "border-secondary";
   }
 
   return (
